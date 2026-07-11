@@ -52,7 +52,6 @@ jobs:
         run: |
           mkdir -p .claude/skills
           cp -r .claude/_secret-skills-src/* .claude/skills/ 2>/dev/null || true
-          rm -rf .claude/_secret-skills-src
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
