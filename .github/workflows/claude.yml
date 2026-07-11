@@ -38,6 +38,8 @@ jobs:
       actions: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: develop 
       - name: Fetch private skills
         uses: actions/checkout@v4
         with:
