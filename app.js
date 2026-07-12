@@ -1,12 +1,66 @@
-const STREAM_URL = "https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8";
+(function () {
+  const STREAM_URL = "https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8";
 
-function App() {
-  const audioRef = React.useRef(null);
-  const [status, setStatus] = React.useState("loading");
+  const REST_BACKGROUND = "#1F4E23";
+  const HOVER_BACKGROUND = "#38A29D";
 
-  React.useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  function initApp() {
+    const root = document.getElementById("root");
+
+    const heading = document.createElement("h1");
+    heading.textContent = "Radio Calico";
+
+    const status = document.createElement("p");
+    status.textContent = "Status: loading";
+
+    const audio = document.createElement("audio");
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Listen Now";
+    Object.assign(button.style, {
+      background: REST_BACKGROUND,
+      color: "#FFFFFF",
+      borderRadius: "4px",
+      border: "none",
+      padding: "0.75rem 1.5rem",
+      textTransform: "uppercase",
+      letterSpacing: "0.05em",
+      cursor: "pointer",
+    });
+
+    let isPlaying = false;
+
+    function togglePlayback() {
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        button.textContent = "Listen Now";
+      } else {
+        audio.play();
+        isPlaying = true;
+        button.textContent = "Pause";
+      }
+    }
+
+    button.addEventListener("click", togglePlayback);
+    button.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+        event.preventDefault();
+        togglePlayback();
+      }
+    });
+    button.addEventListener("mouseenter", () => {
+      button.style.background = HOVER_BACKGROUND;
+    });
+    button.addEventListener("mouseleave", () => {
+      button.style.background = REST_BACKGROUND;
+    });
+
+    root.appendChild(heading);
+    root.appendChild(status);
+    root.appendChild(button);
+    root.appendChild(audio);
 
     let hls;
 
@@ -15,35 +69,26 @@ function App() {
       hls.loadSource(STREAM_URL);
       hls.attachMedia(audio);
       hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-        setStatus("ready");
+        status.textContent = "Status: ready";
       });
       hls.on(window.Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
-          setStatus("error");
+          status.textContent = "Status: error";
         }
       });
     } else if (audio.canPlayType("application/vnd.apple.mpegurl")) {
       // Safari has native HLS support
       audio.src = STREAM_URL;
-      audio.addEventListener("loadedmetadata", () => setStatus("ready"));
-      audio.addEventListener("error", () => setStatus("error"));
+      audio.addEventListener("loadedmetadata", () => {
+        status.textContent = "Status: ready";
+      });
+      audio.addEventListener("error", () => {
+        status.textContent = "Status: error";
+      });
     } else {
-      setStatus("unsupported");
+      status.textContent = "Status: unsupported";
     }
+  }
 
-    return () => {
-      if (hls) hls.destroy();
-    };
-  }, []);
-
-  return (
-    <div>
-      <h1>Radio Calico</h1>
-      <p>Status: {status}</p>
-      <audio ref={audioRef} controls autoPlay />
-    </div>
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+  initApp();
+})();
