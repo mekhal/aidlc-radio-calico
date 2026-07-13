@@ -46,7 +46,7 @@ jobs:
           repository: mekhal/claudeskill
           token: ${{ secrets.SKILLS_REPO_TOKEN }}
           ref: radio-calico-skill
-          path: .claude/_secret-skills-src
+          path: skills-src/claudeskill
           persist-credentials: true
       - uses: anthropics/claude-code-action@v1
         with:
