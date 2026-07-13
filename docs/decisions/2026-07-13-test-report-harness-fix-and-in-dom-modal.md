@@ -17,6 +17,8 @@ For Ticket 2, answering the plan's open questions:
 3. **Modal styling:** styled per `RadioCalicoStyle/RadioCalico_Style_Guide.txt`, not left unstyled.
 4. **Escape-key/focus handling:** in scope for this issue's AC, not deferred.
 5. **Re-opening the modal:** re-run the suites every time it opens (no caching of the last result).
+6. **Localization:** English only — no multi-language support for the Test page/modal.
+7. **Theme:** dark theme only — the Test page/modal does not follow the app's light/dark toggle; it always renders dark.
 
 ## Why
 
@@ -25,3 +27,4 @@ Keeps each ticket's Test PR/Code PR small enough to review (CLAUDE.md's "review-
 ## Impact
 
 - Ticket 2's implementation must namespace the injected fixture root (e.g. a distinct id, not `#root`) so `tests/load-app.js`'s `loadApp()` never touches the live app's mounted DOM.
+- Ticket 2's (#41) AC/plan should be amended before its Test PR is written: no i18n strings/switcher in the modal's copy, and the modal's styling is fixed dark-theme (per `RadioCalicoStyle/RadioCalico_Style_Guide.txt`'s dark palette), independent of the app's own theme toggle (`tests/theme-toggle-footer.test.js`).
