@@ -20,7 +20,7 @@ Two new skills were approved to capture the recurring patterns from rounds 3 and
 - **`test-pr-native-api-and-self-ref-checklist`** (step 4 / Test PR) — run the native-API-override check and the self-referential-suite-file check before finalizing test files, and record the resulting seam/exclusion contract in the Test PR description.
 - **`code-pr-implements-test-pr-contract`** (step 6 / Code PR) — implement exactly the seam/contract the Test PR recorded, and re-verify the self-referential exclusion still holds, instead of re-deriving a different mechanism from the test diff.
 
-Drafts are in `docs/skill-drafts/` (this PR) for a human to copy into `.claude/skills/<name>/SKILL.md`, per the write-guard workaround below.
+Drafts are in `docs/skill-drafts/` (this PR) for a human to copy into `.claude/skills/<name>/SKILL.md`, per the write-guard workaround below. (Note, 2026-07-15: this staging folder was renamed to `docs/agent-skills/` later the same PR — see the Impact section.)
 
 ## Why
 
@@ -32,5 +32,5 @@ Drafts are in `docs/skill-drafts/` (this PR) for a human to copy into `.claude/s
 ## Impact
 
 - `app.js`, `tests/load-app.js`, and `tests/test-report-suite-files.js` carry the bug 1–3 fixes (PRs #55/#56, #59/#61) and the bug-4 test-file fixes (PR #63), already merged through `develop` → `main`.
-- `docs/skill-drafts/test-pr-native-api-and-self-ref-checklist.md` and `docs/skill-drafts/code-pr-implements-test-pr-contract.md` hold the two approved skill drafts, ready to be copied into `.claude/skills/<name>/SKILL.md` by a human.
+- `docs/skill-drafts/test-pr-native-api-and-self-ref-checklist.md` and `docs/skill-drafts/code-pr-implements-test-pr-contract.md` hold the two approved skill drafts, ready to be copied into `.claude/skills/<name>/SKILL.md` by a human. **Update (2026-07-15):** `docs/skill-drafts/` was renamed to `docs/agent-skills/` (files moved as-is) so the staging folder is easier to browse — the two drafts now live at `docs/agent-skills/test-pr-native-api-and-self-ref-checklist.md` and `docs/agent-skills/code-pr-implements-test-pr-contract.md`.
 - A third candidate raised at the `@claude close` step, `verify-dom-fix-on-live-deploy` (don't present static-review-only confidence as equivalent to a real-browser check for DOM-mounting/ordering bugs), was **not** approved or drafted as a skill file in this round — it remains an open decision for a human to accept, request changes to, or skip.
