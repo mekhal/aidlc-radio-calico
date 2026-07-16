@@ -19,5 +19,7 @@
     "theme-toggle-footer.test.js",
     "skills-storage-in-repo.test.js",
     "app-mount-scoping.test.js",
+    "footer-lint-report-link.test.js",
+    "footer-security-report-link.test.js",
   ];
 })(window);

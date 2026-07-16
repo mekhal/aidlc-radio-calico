@@ -342,9 +342,36 @@
     });
     testReportButton.addEventListener("click", () => openTestReportModal(testReportButton));
 
+    // Issue #67: static reports published by CI (Mega-Linter, Trivy) — unlike
+    // the Test Report modal above, these can only run in CI, so they're plain
+    // links to pre-generated report pages instead of on-demand buttons.
+    const lintReportLink = document.createElement("a");
+    lintReportLink.dataset.testid = "footer-lint-report-link";
+    lintReportLink.href = "reports/lint/megalinter-report.html";
+    lintReportLink.target = "_blank";
+    lintReportLink.rel = "noopener noreferrer";
+    lintReportLink.textContent = "Lint Report";
+    Object.assign(lintReportLink.style, {
+      marginLeft: "1rem",
+      color: "#38A29D",
+    });
+
+    const securityReportLink = document.createElement("a");
+    securityReportLink.dataset.testid = "footer-security-report-link";
+    securityReportLink.href = "reports/security/trivy-report.html";
+    securityReportLink.target = "_blank";
+    securityReportLink.rel = "noopener noreferrer";
+    securityReportLink.textContent = "Security Report";
+    Object.assign(securityReportLink.style, {
+      marginLeft: "1rem",
+      color: "#38A29D",
+    });
+
     footer.appendChild(disclaimer);
     footer.appendChild(siteLink);
     footer.appendChild(testReportButton);
+    footer.appendChild(lintReportLink);
+    footer.appendChild(securityReportLink);
 
     const status = document.createElement("p");
     status.textContent = "Status: loading";
