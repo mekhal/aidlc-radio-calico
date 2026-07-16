@@ -51,15 +51,14 @@ Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
 - **Test coverage is intentionally absent** from both drafts — out of scope
   per the issue and `docs/decisions/2026-07-12-testing-framework-vanilla-runner.md`.
 
-## Fixes applied after the first live CI run
+## Fixes applied after the first live CI runs
 
 The first time these drafts were copied into `.github/workflows/` and run, both
-jobs failed. Both fixes below are applied in this folder's drafts — re-copy
-them into `.github/workflows/` to pick the fixes up.
+jobs failed, and Trivy failed twice more after its first fix. All fixes below
+are applied in this folder's drafts and confirmed live (both workflows have
+run green) — this folder is kept in sync with `.github/workflows/` so it
+stays a trustworthy copy source.
 
-- **Trivy — `Unable to resolve action 'aquasecurity/trivy-action@0.28.0'`.**
-  The action's release tags are all `v`-prefixed (`v0.28.0`, `v0.36.0`, ...);
-  there is no unprefixed `0.28.0` tag. Fixed by pinning `@v0.28.0` instead.
 - **Mega-Linter — `cp: cannot stat 'megalinter-reports/*.html'`.** Mega-Linter
   has no built-in HTML reporter, so `OUTPUT_FORMAT: html` was never a
   recognized variable and no `.html` file was ever written. Fixed by enabling
@@ -68,6 +67,22 @@ them into `.github/workflows/` to pick the fixes up.
   new dependencies, still no build step. If `MARKDOWN_SUMMARY_REPORTER`'s
   output filename ever changes upstream, the step now fails loudly with an
   `::error::` and a directory listing instead of a silent/cryptic `cp` error.
+- **Trivy, fix 1/3 — `Unable to resolve action 'aquasecurity/trivy-action@0.28.0'`.**
+  The action's release tags are all `v`-prefixed (`v0.28.0`, `v0.36.0`, ...);
+  there is no unprefixed `0.28.0` tag. Fixed by pinning `@v0.28.0` instead.
+- **Trivy, fix 2/3 — `Unable to resolve action 'aquasecurity/setup-trivy@v0.2.1'`.**
+  `trivy-action@v0.28.0` internally calls `setup-trivy@v0.2.1`, a tag that was
+  since deleted upstream (`v0.29.0`–`v0.31.0` have the same broken transitive
+  pin). `v0.32.0`+ pin `setup-trivy` by immutable commit SHA instead, so the
+  fix is bumping all the way to `@v0.36.0` (current latest), not just adding
+  the `v`.
+- **Trivy, fix 3/3 — `open /contrib/html.tpl: no such file or directory`.**
+  The old container-based `trivy-action` baked `contrib/html.tpl` into the
+  `aquasec/trivy` image root, so an absolute `template: "@/contrib/html.tpl"`
+  resolved. `v0.36.0` runs as a binary/composite action with no container
+  filesystem root — it checks out `aquasecurity/trivy`'s source itself and
+  resolves the template shorthand relatively. Fixed by dropping the leading
+  slash: `template: "@contrib/html.tpl"`.
 
 ## What's NOT covered here
 
