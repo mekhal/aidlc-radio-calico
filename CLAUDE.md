@@ -60,7 +60,7 @@ The gate block to append verbatim (each command is its own code block so GitHub 
 - **Test PR and Code PR are separate PRs** (steps 4 and 6). Never combine them, unless the human explicitly waives the Test PR at step 3 (see step 3 above) — the agent may propose the waiver but never decide it unilaterally.
 - **Split large work into multiple tickets** in steps 4 and 6 so a human can actually review each PR. Reviewability is a requirement, not a nicety.
 - **Reuse-first**, and cover reusable pieces with unit tests.
-- **Missed functionality becomes a NEW issue** — never expand scope inside the current loop. Keep the focus on closing the current issue.
+- **Missed functionality becomes a NEW issue** — never expand scope inside the current loop. Keep the focus on closing the current issue. **Exception:** if the out-of-scope finding belongs to a related ticket that's already sequenced (e.g. Ticket A → B → C under the same parent story), post it as a plain comment on that downstream ticket instead of opening a new issue — **do not tag `@claude`** in that comment; the human tags the agent themselves when they start work on that ticket. See `docs/decisions/2026-07-17-cross-reference-out-of-scope-findings-on-related-tickets.md`.
 - On step-7 rework requests, **loop back to step 6** (fix the code) and open a new Code PR; do not reopen the whole loop.
 - `develop` → `main` is a **prod release and is human-only**. Never open or merge a PR into `main`.
 - **Always explicitly set the PR base branch to `develop`** when opening a Test PR or Code PR (e.g. `gh pr create --base develop`) — never rely on the default base branch, which may be `main`. See `docs/decisions/2026-07-12-pr-base-branch-must-be-develop.md`.
@@ -79,7 +79,7 @@ These are the README's principles restated as directives you must act on. `READM
 - **Review-sized PRs.** Before opening a PR, if the diff is too large to review, split it into multiple tickets first.
 - **Capture the decision.** Every human decision is recorded so the agent improves next round (see "Skills").
 - **Production-grade.** Every Code PR must pass the Definition of Done below before a human merges.
-- **Close the current issue.** Missed functionality becomes a NEW issue — never drag it into the current loop.
+- **Close the current issue.** Missed functionality becomes a NEW issue — never drag it into the current loop, unless a related downstream ticket already exists, in which case comment the finding there instead (untagged — see Hard rules).
 
 ### The 5 questions (step 2 context discovery)
 
@@ -157,11 +157,11 @@ When you handle `@claude close`:
 1. List **only the new-skill candidates surfaced by this issue's own work** — do not review or re-propose changes to pre-existing skills already in `.claude/skills/`; whether to touch those is the human's independent call and never gates closing the issue.
 2. For each candidate, draft its `SKILL.md` content (in the format above) and ask the human to decide: add it, update a named existing skill, or skip — the issue can be closed with zero skill changes.
 
-**Write-guard workaround (structural, not a permissions gap):** any file path containing a `.claude/` segment is blocked from agent writes — confirmed empirically (issue #26, issue #43) against this repo's actual `permissions.allow`/`--allowedTools` config, so it cannot be opened by adding an allowlist entry. This is a deliberate Claude Code safety boundary (same category as the `.github/workflows/` restriction), not something to fix later. The workaround: the agent drafts `SKILL.md` content **outside** `.claude/` (inline in the PR/issue body, or a scratch file under `docs/`), and a **human** creates/commits the file at `.claude/skills/<kebab-name>/SKILL.md`.
+**Write-guard workaround (structural, not a permissions gap):** any file path containing a `.claude/` segment is blocked from agent writes — confirmed empirically (issue #26, issue #43) against this repo's actual `permissions.allow`/`--allowedTools` config, so it cannot be opened by adding an allowlist entry. This is a deliberate Claude Code safety boundary (same category as the `.github/workflows/` restriction), not something to fix later. The workaround: the agent drafts `SKILL.md` content **outside** `.claude/` (inline in the PR/issue body, or a scratch file under `docs/knowledge-asset/published/`), and a **human** creates/commits the file at `.claude/skills/<kebab-name>/SKILL.md`.
 
 ### Using a skill
 
-Skills are stored in this repo's own `.claude/skills/` (source of truth). Before starting any piece of work, check the skills available on the runner and invoke the relevant skill first. Also check `docs/agent-skills/` for skill candidates awaiting a human's promotion to `.claude/skills/` (see the write-guard workaround above) — read and apply their guidance too, since a draft not yet promoted is still a captured human decision.
+Skills are stored in this repo's own `.claude/skills/` (source of truth). Before starting any piece of work, check the skills available on the runner and invoke the relevant skill first. Also check `docs/knowledge-asset/published/` for skill candidates awaiting a human's promotion to `.claude/skills/` (see the write-guard workaround above) — read and apply their guidance too, since a draft not yet promoted is still a captured human decision. Drafts in `docs/knowledge-asset/deprecated/` are old/superseded — kept for history, not applied. When a draft becomes outdated, move it from `published/` to `deprecated/`; this folder is outside `.claude/`, so the agent can do that move directly.
 
 ## Source of truth & keeping docs in sync
 
