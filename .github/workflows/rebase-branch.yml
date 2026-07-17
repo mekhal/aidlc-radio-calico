@@ -1,3 +1,22 @@
+name: Rebase PR branch onto develop
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  rebase:
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/rebase') &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR')
+    runs-on: ubuntu-latest
     steps:
       - name: Resolve PR head ref
         id: pr
@@ -6,11 +25,15 @@
         run: |
           ref=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName -q .headRefName)
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ steps.pr.outputs.ref }}
           fetch-depth: 0
-      - run: |
+          persist-credentials: true
+
+      - name: Rebase onto develop and force-push
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin develop
