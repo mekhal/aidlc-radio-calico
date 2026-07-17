@@ -166,7 +166,7 @@ The AI then does **step 4** (Test PR) → Human **approves (step 5)** → AI **s
 - **PRs must be reviewable** if too big, split into tickets (applies to both the test step and the code step).
 - **Tests stick to the AC** no tests beyond the agreed AC scope.
 - **Reuse-first** build reusable code and write unit tests covering the reusable pieces.
-- **Missed work → new issue** don't drag newly found work into the current loop; focus on closing the current issue.
+- **Missed work → new issue** don't drag newly found work into the current loop; focus on closing the current issue. **Exception:** if it belongs to a related ticket already sequenced under the same parent story, comment it there instead — untagged (`@claude` not mentioned), so the human tags the AI themselves when that ticket's work starts.
 - **Separate PR types** the Test PR (step 4) and Code PR (step 6) are distinct PRs so review happens in layers — unless the human explicitly waives the Test PR at step 3; the AI may propose the waiver but never decide it unilaterally.
 
 ---
@@ -182,7 +182,7 @@ The heart of making the agent "keep getting better" is turning **human decisions
 - **Capture:** Every time a human decides (choosing an approach, setting a rule, redirecting a plan), it is recorded in the decision log.
 - **Distill:** Recurring/valuable decisions are written up as skills.
 - **Store:** Skills live in **this repo's own `.claude/skills/`** — there is no separate skills repo.
-- **Reuse:** The agent invokes these skills in later loops, working better and staying consistent with the human's prior decisions. It also checks `docs/agent-skills/` for candidates awaiting a human's promotion into `.claude/skills/`, and applies their guidance in the meantime.
+- **Reuse:** The agent invokes these skills in later loops, working better and staying consistent with the human's prior decisions. It also checks `docs/knowledge-asset/published/` for candidates awaiting a human's promotion into `.claude/skills/`, and applies their guidance in the meantime. Candidates that go stale move to `docs/knowledge-asset/deprecated/` and are no longer applied.
 
 > **Why in-repo?** This repo exists to demonstrate the AI-DLC loop end to end, so skills accumulate alongside the process that produced them instead of in a separate checkout.
 
