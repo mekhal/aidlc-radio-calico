@@ -618,6 +618,15 @@
     root.appendChild(audio);
     root.appendChild(footer);
 
+    // AC2: the footer is `position: fixed`, so it's taken out of document
+    // flow — body needs matching bottom padding or the fixed footer covers
+    // page content (Listen Now button, theme toggle, live indicator).
+    // Not wired to a `resize` listener: initApp() re-runs in the same live
+    // document every time the footer's own Test Report button is clicked
+    // (issue #41's in-DOM modal), and a `window`-level listener would leak
+    // and keep referencing that earlier, by-then-detached footer.
+    document.body.style.paddingBottom = `${footer.offsetHeight}px`;
+
     let hls;
 
     if (window.Hls && window.Hls.isSupported()) {
