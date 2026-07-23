@@ -1,0 +1,303 @@
+/* Issue #150: "Chloe" album promo landing page. This is a standalone page
+   (own CSS/JS, Bootstrap 5 + Bootstrap Icons via CDN) — deliberately not
+   sharing styles.css/app.js so it never collides with index.html's
+   Bootstrap 4 + Radio Calico brand stack. Portrait/album-art assets are
+   placeholders (Unsplash photo / CSS gradient diamond) per the human's
+   sign-off on issue #150. */
+
+:root {
+  --chloe-bg: #eaf3ea;
+  --chloe-bg-soft: #f4faf3;
+  --chloe-pink: #f2b9c9;
+  --chloe-pink-deep: #e08fa8;
+  --chloe-ink: #34402f;
+  --chloe-card-bg: #ffffff;
+  --chloe-diamond-1: #f7c6d9;
+  --chloe-diamond-2: #cfe8e0;
+  --chloe-sidebar-width: 64px;
+  --chloe-sidebar-width-mobile: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--chloe-bg);
+  color: var(--chloe-ink);
+  font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  font-size: 1.05rem;
+}
+
+h1,
+h2,
+.chloe-logo,
+.chloe-player-card__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---- Fixed vertical social sidebar (also carries the footer) ---- */
+
+.chloe-social-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--chloe-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  background: var(--chloe-bg-soft);
+  border-right: 1px solid rgba(52, 64, 47, 0.1);
+  z-index: 1030;
+}
+
+.chloe-social-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.chloe-social-sidebar__list a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--chloe-ink);
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.chloe-social-sidebar__list a:hover {
+  background: var(--chloe-pink);
+  color: #ffffff;
+}
+
+.chloe-social-sidebar__footer {
+  writing-mode: vertical-rl;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: rgba(52, 64, 47, 0.6);
+  margin: 0;
+}
+
+.chloe-page {
+  margin-left: var(--chloe-sidebar-width);
+}
+
+/* ---- Header navigation ---- */
+
+.chloe-header {
+  padding: 1.25rem 0;
+}
+
+.chloe-logo {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.75rem;
+  color: var(--chloe-pink-deep);
+  text-decoration: none;
+}
+
+.chloe-nav .nav-link {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--chloe-ink);
+  padding: 0.25rem 0;
+}
+
+.chloe-nav .nav-link:hover {
+  color: var(--chloe-pink-deep);
+}
+
+.chloe-nav-toggler {
+  border-color: rgba(52, 64, 47, 0.3);
+}
+
+/* ---- Hero section ---- */
+
+.chloe-hero {
+  min-height: calc(100vh - 88px);
+}
+
+.chloe-hero__portrait-col {
+  min-height: 480px;
+}
+
+.chloe-hero__portrait {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  background-size: cover;
+  background-position: center;
+  clip-path: ellipse(85% 100% at 50% 0%);
+}
+
+.chloe-hero__player-col {
+  padding: 3rem 1.5rem;
+}
+
+/* ---- Music player card ---- */
+
+.chloe-player-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--chloe-card-bg);
+  border-radius: 24px;
+  box-shadow: 0 20px 45px rgba(52, 64, 47, 0.12);
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+}
+
+.chloe-player-card__art {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+
+.chloe-player-card__diamond {
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(135deg, var(--chloe-diamond-1), var(--chloe-diamond-2));
+  transform: rotate(45deg);
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(224, 143, 168, 0.35);
+  transition: transform 0.6s ease;
+}
+
+.chloe-player-card__diamond.is-playing {
+  animation: chloe-diamond-spin 6s linear infinite;
+}
+
+@keyframes chloe-diamond-spin {
+  from {
+    transform: rotate(45deg);
+  }
+  to {
+    transform: rotate(405deg);
+  }
+}
+
+.chloe-player-card__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.chloe-player-card__artist {
+  margin: 0 0 1.5rem;
+  color: rgba(52, 64, 47, 0.65);
+  font-style: italic;
+}
+
+.chloe-player-card__progress .progress {
+  height: 6px;
+  background-color: rgba(224, 143, 168, 0.2);
+}
+
+.chloe-player-card__progress .progress-bar {
+  background-color: var(--chloe-pink-deep);
+}
+
+.chloe-player-card__time {
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  color: rgba(52, 64, 47, 0.65);
+}
+
+.chloe-player-card__controls {
+  margin: 1.5rem 0 1.25rem;
+}
+
+.chloe-player-card__play-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--chloe-pink-deep);
+  color: #ffffff;
+  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.chloe-player-card__play-btn:hover {
+  background: var(--chloe-pink);
+}
+
+.chloe-player-card__play-btn:active {
+  transform: scale(0.95);
+}
+
+.chloe-player-card__volume {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(52, 64, 47, 0.65);
+}
+
+.chloe-player-card__volume .form-range {
+  accent-color: var(--chloe-pink-deep);
+}
+
+/* ---- Supporting sections (About / What's this / Contact) ---- */
+
+.chloe-section {
+  padding: 4rem 1.5rem;
+}
+
+.chloe-section h2 {
+  color: var(--chloe-pink-deep);
+  margin-bottom: 1rem;
+}
+
+/* ---- Responsive: collapse the fixed left sidebar to a bottom bar so it
+   never overlaps hero/nav content on small screens. ---- */
+@media (max-width: 767.98px) {
+  .chloe-social-sidebar {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--chloe-sidebar-width-mobile);
+    flex-direction: row;
+    padding: 0.5rem 1rem;
+    border-right: none;
+    border-top: 1px solid rgba(52, 64, 47, 0.1);
+  }
+
+  .chloe-social-sidebar__list {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .chloe-social-sidebar__footer {
+    writing-mode: horizontal-tb;
+    margin: 0 0 0 0.75rem;
+  }
+
+  .chloe-page {
+    margin-left: 0;
+    padding-bottom: 64px;
+  }
+
+  .chloe-hero__portrait {
+    min-height: 320px;
+    clip-path: ellipse(100% 100% at 50% 0%);
+  }
+}
