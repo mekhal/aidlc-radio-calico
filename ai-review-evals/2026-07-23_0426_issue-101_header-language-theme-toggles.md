@@ -119,31 +119,42 @@ Medium
 
 ## Instruction Fidelity (0–5)
 
-
+4
 
 ---
 
 ## Result Satisfaction (0–5)
 
-
+3
 
 ---
 
 ## Human Decision *(Optional)*
 
-
+1. Re-emphasized the standing rule: every fix/branch must be pulled/rebased from `develop` before
+   editing (ย้ำเรื่อง การแก้ไขต้อง pull มาจาก branch develop).
+2. Confirmed it's acceptable for `main` to receive merges specifically via a `develop` → `main`
+   merge (ยอมให้ merge ในกรณี merge จาก develop ไป Master) — i.e. the recurring `main`/`develop`
+   divergence this ticket hit is expected to be resolved through that human-only release merge, not
+   something the agent needs to prevent.
 
 ---
 
 ## Review Notes *(Optional)*
 
-
+เพราะว่ามีการรับบ่อยเช่นเรื่อง toggle button. แถมยังชอบเอา branch master มาตั้งด้วย ทำให้ Ticket ยาว
+(Repeated redo rounds — e.g. the toggle-button visual spec — plus branches repeatedly getting
+checked out from `main`'s tip instead of `develop`'s, made this ticket run much longer than
+expected.)
 
 ---
 
 ## Future Policy *(Optional)*
 
-
+No new rule needed — both human-decision points reaffirm existing `CLAUDE.md` policy rather than
+changing it: the develop-first sync check (Hard Rules, `docs/decisions/2026-07-17-sync-to-develop-before-work-mitigation.md`)
+and `develop` → `main` being the sanctioned, human-only path for `main` to move forward
+(`CLAUDE.md`'s Branching section).
 
 ---
 
