@@ -218,6 +218,34 @@ body {
   min-height: 40vh;
 }
 
+/* --- Ticket B: hero row (portrait + reserved player-card column) --- */
+.chloe-hero {
+  align-items: stretch;
+}
+
+.chloe-hero__portrait-col {
+  padding: 0;
+}
+
+.chloe-hero__portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 60vh;
+  object-fit: cover;
+  /* Diagonal notch instead of a hard rectangle — the "artistic silhouette"
+     cut called for by AC2. */
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 78% 100%, 0 100%);
+}
+
+.chloe-hero__player-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  /* Empty until Ticket C attaches the Music Player Card here. */
+}
+
 /* --- Ticket A review (2026-07-24): copyright/disclaimer moved out of the
    sidebar into their own bottom-centered footer (AC4 revision) --- */
 .chloe-footer {

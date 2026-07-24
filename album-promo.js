@@ -315,10 +315,40 @@
     return header;
   }
 
-  function buildMain() {
+  // Ticket B (issue #156): Bootstrap 5 row/col-lg-6 hero. The right column
+  // is reserved empty here — Ticket C appends the Music Player Card into
+  // state.heroPlayerSlot rather than this function returning the node
+  // directly, so Ticket C doesn't need buildMain's call chain threaded
+  // through to reach it.
+  function buildHero(state) {
+    const hero = document.createElement("div");
+    hero.className = "row chloe-hero";
+
+    const portraitCol = document.createElement("div");
+    portraitCol.className = "col-lg-6 chloe-hero__portrait-col";
+
+    const portrait = document.createElement("img");
+    portrait.className = "chloe-hero__portrait";
+    portrait.src = "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop";
+    portrait.alt = "Artist portrait";
+    portraitCol.appendChild(portrait);
+
+    const playerCol = document.createElement("div");
+    playerCol.className = "col-lg-6 chloe-hero__player-col";
+    playerCol.dataset.testid = "hero-player-slot";
+    state.heroPlayerSlot = playerCol;
+
+    hero.appendChild(portraitCol);
+    hero.appendChild(playerCol);
+
+    return hero;
+  }
+
+  function buildMain(state) {
     const main = document.createElement("main");
     main.className = "chloe-main";
-    // Hero, player card, and theme polish land in Tickets B/C/D/E.
+    main.appendChild(buildHero(state));
+    // Player card, and theme polish land in Tickets C/D/E.
     return main;
   }
 
@@ -360,7 +390,7 @@
     const page = document.createElement("div");
     page.className = "chloe-page";
     page.appendChild(buildHeader(state));
-    page.appendChild(buildMain());
+    page.appendChild(buildMain(state));
     page.appendChild(buildFooter(state));
     root.appendChild(page);
 
