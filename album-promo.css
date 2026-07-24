@@ -14,7 +14,7 @@ body {
   font-family: "Cormorant Garamond", "Playfair Display", serif;
 }
 
-/* --- Ticket A: fixed vertical social sidebar (also the page footer) --- */
+/* --- Ticket A: fixed vertical footer-links sidebar --- */
 .chloe-sidebar {
   position: fixed;
   top: 0;
@@ -31,26 +31,11 @@ body {
   z-index: 1030;
 }
 
-.chloe-sidebar__icons-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
 .chloe-sidebar__icons {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
-}
-
-/* Site/report links (Test/Lint/Security Report, GitHub, LinkedIn) — kept as
-   a visually separate group below the social icons, mirroring app.js's
-   footer link set (see album-promo.js). */
-.chloe-sidebar__icons--footer {
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .chloe-sidebar__icons a {
@@ -132,26 +117,14 @@ body {
     border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  .chloe-sidebar__icons-wrap {
+  .chloe-sidebar__icons {
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 1rem;
+    flex-shrink: 0;
+    gap: 1.25rem;
     max-width: 100%;
     overflow-x: auto;
     padding: 0 0.75rem;
-  }
-
-  .chloe-sidebar__icons {
-    flex-direction: row;
-    flex-shrink: 0;
-    gap: 1.25rem;
-  }
-
-  .chloe-sidebar__icons--footer {
-    padding-top: 0;
-    padding-left: 1rem;
-    border-top: none;
-    border-left: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .chloe-sidebar__copy {

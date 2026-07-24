@@ -1,22 +1,15 @@
 (function () {
   "use strict";
 
-  const SOCIAL_LINKS = [
-    { testid: "sidebar-social-instagram", href: "#", label: "Instagram", icon: "bi-instagram" },
-    { testid: "sidebar-social-facebook", href: "#", label: "Facebook", icon: "bi-facebook" },
-    { testid: "sidebar-social-twitter-x", href: "#", label: "X (Twitter)", icon: "bi-twitter-x" },
-    { testid: "sidebar-social-youtube", href: "#", label: "YouTube", icon: "bi-youtube" },
-    { testid: "sidebar-social-spotify", href: "#", label: "Spotify", icon: "bi-spotify" },
-  ];
-
   // Mirrors app.js's footer `linksRow` (site link, Test/Lint/Security Report,
-  // GitHub, LinkedIn) — see review decision on issue #155 (2026-07-24) to
-  // carry the full production footer link set into this sidebar instead of
-  // just the social icons. Test Report links straight to the report page
-  // (tests/test-runner.html) rather than reusing app.js's openTestReportModal
-  // in-page modal, since that modal drives app.js's own TestHarness/test
-  // fixtures — logic this static landing page doesn't load and has no use
-  // for; a direct link reaches the same report without duplicating it.
+  // GitHub, LinkedIn) — see review decision on issue #155 (2026-07-24). This
+  // is now the sidebar's only link group, replacing the social icons per the
+  // follow-up review comment on PR #164 (2026-07-24). Test Report links
+  // straight to the report page (tests/test-runner.html) rather than reusing
+  // app.js's openTestReportModal in-page modal, since that modal drives
+  // app.js's own TestHarness/test fixtures — logic this static landing page
+  // doesn't load and has no use for; a direct link reaches the same report
+  // without duplicating it.
   const FOOTER_LINKS = [
     {
       testid: "sidebar-footer-site-link",
@@ -85,29 +78,18 @@
   function buildSidebar() {
     const aside = document.createElement("aside");
     aside.className = "chloe-sidebar";
-    aside.setAttribute("aria-label", "Social links and site footer");
-
-    const iconsWrap = document.createElement("div");
-    iconsWrap.className = "chloe-sidebar__icons-wrap";
-
-    const socialNav = document.createElement("nav");
-    socialNav.className = "chloe-sidebar__icons";
-    socialNav.setAttribute("aria-label", "Social media");
-    SOCIAL_LINKS.forEach((entry) => socialNav.appendChild(createIconLink(entry)));
+    aside.setAttribute("aria-label", "Site footer links");
 
     const footerNav = document.createElement("nav");
-    footerNav.className = "chloe-sidebar__icons chloe-sidebar__icons--footer";
+    footerNav.className = "chloe-sidebar__icons";
     footerNav.setAttribute("aria-label", "Site links");
     FOOTER_LINKS.forEach((entry) => footerNav.appendChild(createIconLink({ ...entry, external: true })));
-
-    iconsWrap.appendChild(socialNav);
-    iconsWrap.appendChild(footerNav);
 
     const copy = document.createElement("p");
     copy.className = "chloe-sidebar__copy";
     copy.innerHTML = "&copy; 2026 Radio Calico. Released under the MIT License.";
 
-    aside.appendChild(iconsWrap);
+    aside.appendChild(footerNav);
     aside.appendChild(copy);
 
     return aside;
