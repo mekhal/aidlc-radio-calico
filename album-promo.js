@@ -329,7 +329,7 @@
 
     const portrait = document.createElement("img");
     portrait.className = "chloe-hero__portrait";
-    portrait.src = "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop";
+    portrait.src = "https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg";
     portrait.alt = "Artist portrait";
     portraitCol.appendChild(portrait);
 
