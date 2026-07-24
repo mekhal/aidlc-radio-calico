@@ -172,7 +172,9 @@ body {
 /* Logo lockup ("Radio" + mark + "Calico") — review decision on issue #155
    (2026-07-24): #D8F2D5 (brand Mint, see RadioCalicoStyle/RadioCalico_Style_Guide.txt)
    applies strictly to this lockup; the rest of the page keeps the pastel-pink
-   "Chloe" theme from AC1/#150. */
+   "Chloe" theme from AC1/#150. Color swaps per theme (2026-07-24 review):
+   light uses --chloe-ink for contrast against the light --chloe-sage
+   background, dark uses --chloe-mint. */
 .chloe-wordmark {
   display: inline-flex;
   align-items: center;
@@ -181,6 +183,10 @@ body {
   font-style: italic;
   font-weight: 700;
   font-size: 2rem;
+  color: var(--chloe-ink);
+}
+
+[data-chloe-theme="dark"] .chloe-wordmark {
   color: var(--chloe-mint);
 }
 
