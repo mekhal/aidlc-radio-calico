@@ -55,27 +55,24 @@
   const LANG_STORAGE_KEY = "chloeAlbumPromoLanguage";
   const THEME_STORAGE_KEY = "chloeAlbumPromoTheme";
 
-  // Small self-contained copy set for this static page's own chrome — not
-  // wired to app.js's i18n/*.json fetch pipeline, since that would pull the
-  // main app's translation architecture into a page whose Test-PR waiver
-  // rests on staying self-contained DOM construction (issue #155 review,
-  // 2026-07-24).
-  const TRANSLATIONS = {
-    en: {
-      nav: { home: "Home", about: "About", whatsThis: "What's this", contact: "Contact" },
-      disclaimer: "Radio Calico is an independent internet radio stream. All music remains the property of its respective owners.",
-      copyright: "&copy; 2026 Radio Calico. Released under the MIT License.",
-      themeToggleLabel: "Toggle dark theme",
-      langSelectLabel: "Language",
-    },
-    th: {
-      nav: { home: "หน้าแรก", about: "เกี่ยวกับ", whatsThis: "คืออะไร", contact: "ติดต่อ" },
-      disclaimer: "Radio Calico เป็นสถานีวิทยุอินเทอร์เน็ตอิสระ เพลงทั้งหมดยังคงเป็นทรัพย์สินของเจ้าของลิขสิทธิ์",
-      copyright: "&copy; 2026 Radio Calico สงวนสิทธิ์ภายใต้สัญญาอนุญาต MIT",
-      themeToggleLabel: "สลับธีมมืด/สว่าง",
-      langSelectLabel: "ภาษา",
-    },
-  };
+  // Strings live in i18n/album-promo-en.json + i18n/album-promo-th.json,
+  // fetched below — kept as separate files from app.js's i18n/en.json +
+  // i18n/th.json (rather than merged in) so this page's copy set stays
+  // decoupled from the main app's keys, per the self-contained-page
+  // constraint from the issue #155 review. Follow-up review comment on PR
+  // #166 (2026-07-24) asked for the strings to live under i18n/ rather than
+  // inline in this file; mirrors app.js's loadTranslations() fetch pattern.
+  const ALBUM_PROMO_I18N_BASE_PATH = window.__ALBUM_PROMO_I18N_BASE_PATH__ || "i18n/";
+  let TRANSLATIONS = null;
+
+  async function loadTranslations() {
+    const [enResponse, thResponse] = await Promise.all([
+      fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-en.json`),
+      fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-th.json`),
+    ]);
+    const [en, th] = await Promise.all([enResponse.json(), thResponse.json()]);
+    return { en, th };
+  }
 
   const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
   const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
@@ -119,9 +116,10 @@
     function render() {
       const isDark = state.theme === "dark";
       button.setAttribute("aria-pressed", String(isDark));
+      iconEl.className = `bi ${isDark ? "bi-sun-fill" : "bi-moon-stars-fill"}`;
+      if (!TRANSLATIONS) return;
       button.setAttribute("aria-label", TRANSLATIONS[state.lang].themeToggleLabel);
       button.title = TRANSLATIONS[state.lang].themeToggleLabel;
-      iconEl.className = `bi ${isDark ? "bi-sun-fill" : "bi-moon-stars-fill"}`;
     }
 
     button.appendChild(iconEl);
@@ -151,6 +149,7 @@
 
     function render() {
       select.value = state.lang;
+      if (!TRANSLATIONS) return;
       select.setAttribute("aria-label", TRANSLATIONS[state.lang].langSelectLabel);
     }
 
@@ -217,6 +216,7 @@
     });
 
     function render() {
+      if (!TRANSLATIONS) return;
       NAV_KEYS.forEach((key) => {
         navLinks[key].textContent = TRANSLATIONS[state.lang].nav[key];
       });
@@ -249,6 +249,7 @@
     copy.className = "chloe-footer__copy";
 
     function render() {
+      if (!TRANSLATIONS) return;
       disclaimer.textContent = TRANSLATIONS[state.lang].disclaimer;
       copy.innerHTML = TRANSLATIONS[state.lang].copyright;
     }
@@ -278,6 +279,14 @@
     page.appendChild(buildMain());
     page.appendChild(buildFooter(state));
     root.appendChild(page);
+
+    // Exposed as a named promise (mirrors app.js's window.__i18nReady) so a
+    // future test suite for this page could deterministically await it
+    // instead of racing an arbitrary number of ticks against the fetch.
+    window.__albumPromoI18nReady = loadTranslations().then((data) => {
+      TRANSLATIONS = data;
+      state.onLanguageChange.forEach((fn) => fn());
+    });
   }
 
   initAlbumPromo();
