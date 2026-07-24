@@ -23,6 +23,16 @@
          app.js's initApp()) rather than hard-coded here. -->
     <div id="album-promo-root"></div>
 
+    <!-- Ticket C (issue #157 review, 2026-07-24): React + ReactDOM UMD builds
+         via CDN only (no npm install, no JSX/build step) — a scoped
+         exception to the vanilla-JS/jQuery stack decision (issue #20) for
+         the Music Player Card's playback-controls island only, matching the
+         same exception already locked for Ticket D's cover-art component
+         (issue #158). Must load before album-promo.js, which references the
+         React/ReactDOM globals when mounting the controls. -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
     <script src="album-promo.js"></script>
   </body>
 </html>
