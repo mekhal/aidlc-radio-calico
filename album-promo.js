@@ -315,11 +315,15 @@
     return header;
   }
 
-  // Ticket B (issue #156): Bootstrap 5 row/col-lg-6 hero. The right column
-  // is reserved empty here — Ticket C appends the Music Player Card into
-  // state.heroPlayerSlot rather than this function returning the node
-  // directly, so Ticket C doesn't need buildMain's call chain threaded
-  // through to reach it.
+  // Ticket B (issue #156): Bootstrap 5 row/col-lg-6 hero. Ticket C (issue
+  // #157) appends the Music Player Card into state.heroPlayerSlot rather
+  // than this function returning the node directly, so Ticket C doesn't
+  // need buildMain's call chain threaded through to reach it.
+  //
+  // #album-cover (issue #157 review, 2026-07-24): lives on THIS portrait
+  // image, not on a second `<img>` inside the Music Player Card — the Hero
+  // already shows the real cover art, so Ticket D (#158) binds/updates cover
+  // art here directly instead of duplicating it in the card.
   function buildHero(state) {
     const hero = document.createElement("div");
     hero.className = "row chloe-hero";
@@ -328,7 +332,9 @@
     portraitCol.className = "col-lg-6 chloe-hero__portrait-col";
 
     const portrait = document.createElement("img");
+    portrait.id = "album-cover";
     portrait.className = "chloe-hero__portrait";
+    portrait.dataset.testid = "hero-portrait-cover";
     portrait.src = "https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg";
     portrait.alt = "Artist portrait";
     portraitCol.appendChild(portrait);
@@ -337,6 +343,7 @@
     playerCol.className = "col-lg-6 chloe-hero__player-col";
     playerCol.dataset.testid = "hero-player-slot";
     state.heroPlayerSlot = playerCol;
+    playerCol.appendChild(buildMusicPlayerCard(state));
 
     hero.appendChild(portraitCol);
     hero.appendChild(playerCol);
@@ -344,11 +351,143 @@
     return hero;
   }
 
+  // Ticket C (issue #157) — tracking hook only, per the issue #157 review
+  // (2026-07-24): no analytics service is wired up in this repo yet.
+  // Whichever ticket first wires a real analytics service should dispatch
+  // through this same helper when it sets live title/artist text, passing
+  // the same analyticsId ("track-title"/"track-artist") used below.
+  function dispatchTrackAnalyticsEvent(analyticsId, value) {
+    document.dispatchEvent(new CustomEvent("album-promo:track-metadata-view", { detail: { analyticsId, value } }));
+  }
+
+  // Ticket C (issue #157): Music Player Card UI shell. DOM hooks for Ticket D
+  // (#158) to bind live data, none of which this ticket re-touches:
+  //   - #album-cover        → set in buildHero() above (Hero portrait image)
+  //   - #track-title        → this card's title element
+  //   - #track-artist       → this card's artist element
+  //   - [data-analytics-id="track-title"|"track-artist"] → tracking hook
+  //     (AC2); dispatch via dispatchTrackAnalyticsEvent() above, don't
+  //     re-wire a new mechanism.
+  // Progress bar + time readout (AC3) and playback controls (AC4/AC5) are
+  // static/visual-only per #150 — no real audio.
+  function buildMusicPlayerCard(state) {
+    const card = document.createElement("div");
+    card.className = "chloe-player-card";
+    card.dataset.testid = "music-player-card";
+
+    const title = document.createElement("p");
+    title.id = "track-title";
+    title.className = "chloe-player-card__title";
+    title.dataset.testid = "player-track-title";
+    title.dataset.analyticsId = "track-title";
+
+    const artist = document.createElement("p");
+    artist.id = "track-artist";
+    artist.className = "chloe-player-card__artist";
+    artist.dataset.testid = "player-track-artist";
+    artist.dataset.analyticsId = "track-artist";
+
+    function renderMeta() {
+      if (!TRANSLATIONS) return;
+      const loadingText = TRANSLATIONS[state.lang].playerLoading;
+      title.textContent = loadingText;
+      artist.textContent = loadingText;
+      dispatchTrackAnalyticsEvent("track-title", loadingText);
+      dispatchTrackAnalyticsEvent("track-artist", loadingText);
+    }
+
+    renderMeta();
+    state.onLanguageChange.push(renderMeta);
+
+    const progress = document.createElement("div");
+    progress.className = "chloe-player-card__progress";
+    progress.dataset.testid = "player-progress";
+
+    const progressTrack = document.createElement("div");
+    progressTrack.className = "chloe-player-card__progress-track";
+    const progressFill = document.createElement("div");
+    progressFill.className = "chloe-player-card__progress-fill";
+    progressTrack.appendChild(progressFill);
+
+    const time = document.createElement("div");
+    time.className = "chloe-player-card__time";
+    time.dataset.testid = "player-time";
+    time.textContent = "00:00 / 00:00";
+
+    progress.appendChild(progressTrack);
+    progress.appendChild(time);
+
+    const controlsRoot = document.createElement("div");
+    controlsRoot.dataset.testid = "player-controls-root";
+
+    card.appendChild(title);
+    card.appendChild(artist);
+    card.appendChild(progress);
+    card.appendChild(controlsRoot);
+
+    mountPlayerControls(controlsRoot);
+
+    return card;
+  }
+
+  // Ticket C (issue #157 review, 2026-07-24): playback controls are a React
+  // DOM island (React.createElement + hooks via CDN UMD builds, no
+  // JSX/build step) — a scoped exception to the vanilla-JS/jQuery stack
+  // decision (issue #20), matching the same exception already locked for
+  // Ticket D's cover-art component (issue #158). isPlaying/volume are local
+  // component state only — visual toggles, no real audio (per #150).
+  function PlayerControls() {
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [volume, setVolume] = React.useState(80);
+
+    return React.createElement(
+      "div",
+      { className: "chloe-player-controls", "data-testid": "player-controls" },
+      React.createElement(
+        "button",
+        {
+          type: "button",
+          className: "chloe-player-controls__play",
+          "data-testid": "player-play-pause",
+          "aria-pressed": isPlaying,
+          "aria-label": isPlaying ? "Pause" : "Play",
+          onClick: () => setIsPlaying((playing) => !playing),
+        },
+        React.createElement("i", {
+          className: `bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`,
+          "aria-hidden": "true",
+        })
+      ),
+      React.createElement(
+        "span",
+        { className: "chloe-player-controls__timer", "data-testid": "player-timer" },
+        "0:00"
+      ),
+      React.createElement(
+        "label",
+        { className: "chloe-player-controls__volume", "data-testid": "player-volume" },
+        React.createElement("i", { className: "bi bi-volume-up", "aria-hidden": "true" }),
+        React.createElement("input", {
+          type: "range",
+          min: 0,
+          max: 100,
+          value: volume,
+          "aria-label": "Volume",
+          onChange: (event) => setVolume(Number(event.target.value)),
+        })
+      )
+    );
+  }
+
+  function mountPlayerControls(container) {
+    ReactDOM.createRoot(container).render(React.createElement(PlayerControls));
+  }
+
   function buildMain(state) {
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
-    // Player card, and theme polish land in Tickets C/D/E.
+    // Live data binding (Ticket D) and theme polish (Ticket E) land next.
     return main;
   }
 

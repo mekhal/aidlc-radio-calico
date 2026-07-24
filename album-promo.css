@@ -250,7 +250,115 @@ body {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  /* Empty until Ticket C attaches the Music Player Card here. */
+}
+
+/* --- Ticket C: Music Player Card (issue #157) ---
+   The card is a fixed white surface in both themes (AC1: "white rounded
+   card"), so it uses its own --chloe-card-* tokens rather than the
+   theme-linked --chloe-ink/--chloe-sage pair used elsewhere on the page. */
+.chloe-player-card {
+  width: 100%;
+  max-width: 360px;
+  background: #ffffff;
+  color: #2f2a2c;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chloe-player-card__title {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.chloe-player-card__artist {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.75;
+}
+
+.chloe-player-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.chloe-player-card__progress-track {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--chloe-mint);
+  overflow: hidden;
+}
+
+.chloe-player-card__progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--chloe-pink-deep);
+}
+
+.chloe-player-card__time {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  text-align: right;
+}
+
+/* Ticket C (issue #157 review, 2026-07-24): playback controls DOM is
+   rendered by the React island (mountPlayerControls() in album-promo.js) —
+   these rules only style the classes/data-testids that component renders. */
+.chloe-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chloe-player-controls__play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--chloe-pink-deep);
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.chloe-player-controls__play:hover {
+  opacity: 0.9;
+}
+
+.chloe-player-controls__timer {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  min-width: 2.5rem;
+}
+
+.chloe-player-controls__volume {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex: 1;
+}
+
+.chloe-player-controls__volume input[type="range"] {
+  flex: 1;
+  accent-color: var(--chloe-pink-deep);
 }
 
 /* --- Ticket A review (2026-07-24): copyright/disclaimer moved out of the

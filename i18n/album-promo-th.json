@@ -7,5 +7,6 @@
   "themeLabelDark": "มืด",
   "languageToggleLabel": "สลับภาษา",
   "langLabelEn": "English",
-  "langLabelTh": "Thai"
+  "langLabelTh": "Thai",
+  "playerLoading": "กำลังโหลด…"
 }
