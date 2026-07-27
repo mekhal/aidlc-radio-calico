@@ -420,8 +420,8 @@
     const controlsRoot = document.createElement("div");
     controlsRoot.dataset.testid = "player-controls-root";
 
-    card.appendChild(title);
     card.appendChild(artist);
+    card.appendChild(title);
     card.appendChild(progress);
     card.appendChild(controlsRoot);
 
