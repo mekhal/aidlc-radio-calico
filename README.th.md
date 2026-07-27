@@ -79,8 +79,10 @@ jobs:
 ## 4. AI-DLC Loop (แกนหลัก)
 
 <div align="center">
-  <img src="aidlc-loop.png" alt="AI-DLC Loop — 7 ขั้น" width="900" />
+  <img src="aidlc-loop-gates.jpg" alt="ขั้น 6: Code PR Gates — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อน Human Merge" width="900" />
 </div>
+
+loop 7 ขั้นด้านล่างคือเส้นทางที่ทุก issue ต้องผ่าน ส่วนภาพนี้ซูมเข้าไปที่**ขั้น 6** (Code PR) และ 4 gate (Security, Quality, Reviewability, Traceability) ที่ต้องผ่านก่อนมนุษย์ merge ปิดขั้น 7
 
 ### รายละเอียดแต่ละขั้น
 
@@ -174,11 +176,17 @@ Integration test: HLS player โหลด stream URL สำเร็จ
 
 ## 7. Skill Capture & Reuse
 
-หัวใจของการทำให้ agent "เก่งขึ้นเรื่อย ๆ" คือการเปลี่ยน **การตัดสินใจของมนุษย์** ให้กลายเป็น **skill ที่นำกลับมาใช้ซ้ำได้**
+หัวใจของการทำให้ agent "เก่งขึ้นเรื่อย ๆ" คือการเปลี่ยน **การตัดสินใจของมนุษย์** ให้กลายเป็น **skill ที่นำกลับมาใช้ซ้ำได้** — แต่ skill จะถูกไว้ใจให้ reuse ได้ก็ต่อเมื่อผ่าน gate แบบเดียวกับ Code PR ก่อน
 
 <div align="center">
-  <img src="skill-capture-reuse.png" alt="Skill Capture & Reuse — vòng lặp cải thiện liên tục" width="900" />
+  <img src="skill-reuse-gates.jpg" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อนนำ skill กลับมาใช้ซ้ำ" width="900" />
 </div>
+
+**Quality & Safety Gates for Skill Reuse:** ก่อนที่การตัดสินใจจาก loop ที่ปิดไปแล้วจะถูกไว้ใจให้เป็น skill ที่ reuse ได้ loop ที่มันมาจากต้องผ่าน:
+
+- **Security** — ผ่าน security scan (dependency, secret, SAST) แล้ว · ไม่มี secret ใน repo · ตาม least-privilege
+- **Quality** — lint/format ผ่าน และถ้า Test PR ถูก **waive** ไว้ในขั้น 3 (ไม่ใช่ทุกงานต้องมี unit test) skill นั้นก็**ไม่ถูกตัดสิทธิ์** จาก reuse — lint กับ security scan ยังรันตามปกติก่อน merge ไม่ว่าจะมี unit test หรือไม่
+- **Reviewability / Traceability** — PR ต้นทางมีขนาดพอเหมาะและอ้างอิงกลับไปยัง issue/AC ที่มา ทำให้ตามรอยการตัดสินใจเบื้องหลัง skill ได้ภายหลัง
 
 - **จับ (Capture):** ทุกครั้งที่มนุษย์ตัดสินใจ (เช่น เลือกแนวทาง, กำหนดกติกา, แก้ทิศทาง plan) จะถูกบันทึกไว้ใน decision log
 - **กลั่น (Distill):** การตัดสินใจที่เกิดซ้ำ/มีคุณค่า ถูกเขียนเป็น skill
@@ -214,11 +222,17 @@ aidlc-radiocalico/
 
 ### Branching
 
+<div align="center">
+  <img src="branching-overview.png" alt="Branching Overview: Feature Branch (AI) ทำงานแล้วเปิด PR, Developer หรือ Tester rebase เข้า develop, จากนั้น MGT release develop เข้า main (prod)" width="900" />
+</div>
+
+AI ทำงานใน feature branch → **Developer หรือ Tester** rebase งานเข้า `develop` → **MGT** release `develop` เข้า `main` (prod)
+
 | Branch | ความหมาย |
 |---|---|
 | feature branch | ที่ AI เปิด Test PR / Code PR ในแต่ละ loop — ต้องระบุ `--base develop` ชัดเจนเสมอ (ห้ามพึ่ง default base branch ซึ่งอาจเป็น `main`) รวมถึงลิงก์ "Create PR" ที่พิมพ์เองในคอมเมนต์ก่อนมี PR จริง (`compare/develop...branch` ห้ามใช้ `compare/main...branch`) ก่อนแก้ไฟล์ใด ๆ AI ต้องตรวจก่อนว่า working tree ตรงกับ `origin/develop` จริง แล้ว sync ถ้าไม่ตรง (ดู issue #106 — บาง job checkout ไปที่ `main` แทน `develop`) เมื่อ PR เปิดแล้ว ให้คอมเมนต์ตามงานต่อที่ตัว PR นั้น (ไม่ใช่ที่ issue ต้นทาง) ไม่เช่นนั้น harness จะสร้าง branch ซ้ำซ้อนขึ้นมาใหม่โดยไม่ตั้งใจ ก่อนทำงานเดิมซ้ำที่เคยอนุมัติแล้ว ให้เช็คว่ามี branch/PR เดิมที่ diff เดียวกันอยู่แล้วหรือไม่ แล้วนำมาใช้ต่อแทนการเริ่มใหม่ |
-| `develop` | ปลายทางของแต่ละ loop ที่สมบูรณ์ (มนุษย์ merge) |
-| `main` | Production การ merge จาก `develop` → `main` คือ **prod release** และต้องทำโดย **มนุษย์เท่านั้น** |
+| `develop` | ปลายทางของแต่ละ loop ที่สมบูรณ์ **Developer หรือ Tester** เป็นคน rebase feature branch เข้ามาแล้ว merge PR ที่นี่ |
+| `main` | Production การ merge จาก `develop` → `main` คือ **Production Release** ทำโดย **MGT** (เจ้าของการ release) — มนุษย์เท่านั้น |
 
 การ merge หรือลบ branch (เช่น รวม branch ที่ซ้ำซ้อนกัน) เป็นการทำ git ด้วยมือโดยมนุษย์เท่านั้น — agent ทำได้แค่สร้างและ push commit ไปยัง branch เท่านั้น
 
@@ -246,7 +260,11 @@ aidlc-radiocalico/
 
 ## 10. มาตรฐาน Production-grade
 
-ทุก Code PR (ขั้น 6) ต้องผ่าน gate เหล่านี้ก่อนมนุษย์จะ merge:
+<div align="center">
+  <img src="code-pr-gates.png" alt="ขั้น 6: Code PR Gates — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อน Human Merge" width="900" />
+</div>
+
+ทุก Code PR (ขั้น 6) ต้องผ่าน **ทั้ง 4 gate** ด้านล่าง — Security, Quality, Reviewability, Traceability — ก่อนมนุษย์จะ merge:
 
 | หมวด | เกณฑ์ |
 |---|---|
