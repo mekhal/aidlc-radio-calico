@@ -8,5 +8,10 @@
   "languageToggleLabel": "Switch language",
   "langLabelEn": "English",
   "langLabelTh": "Thai",
-  "playerLoading": "Loading…"
+  "playerLoading": "Loading…",
+  "playerRatingLabel": "Rate this track:",
+  "playerRatingUpLabel": "Rate this track up",
+  "playerRatingDownLabel": "Rate this track down",
+  "playerQualitySourceLabel": "Source quality",
+  "playerQualityStreamLabel": "Stream quality"
 }

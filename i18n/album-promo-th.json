@@ -8,5 +8,10 @@
   "languageToggleLabel": "สลับภาษา",
   "langLabelEn": "English",
   "langLabelTh": "Thai",
-  "playerLoading": "กำลังโหลด…"
+  "playerLoading": "กำลังโหลด…",
+  "playerRatingLabel": "ให้คะแนนเพลงนี้:",
+  "playerRatingUpLabel": "ให้คะแนนเพลงนี้แบบชอบ",
+  "playerRatingDownLabel": "ให้คะแนนเพลงนี้แบบไม่ชอบ",
+  "playerQualitySourceLabel": "คุณภาพต้นฉบับ",
+  "playerQualityStreamLabel": "คุณภาพสตรีม"
 }
