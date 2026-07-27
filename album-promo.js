@@ -360,74 +360,167 @@
     document.dispatchEvent(new CustomEvent("album-promo:track-metadata-view", { detail: { analyticsId, value } }));
   }
 
-  // Ticket C (issue #157): Music Player Card UI shell. DOM hooks for Ticket D
-  // (#158) to bind live data, none of which this ticket re-touches:
+  function bindRatingToggle(upBtn, downBtn) {
+    function setActive(btn, isActive) {
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-pressed", String(isActive));
+    }
+    function activate(target, other) {
+      const willActivate = !target.classList.contains("is-active");
+      setActive(target, willActivate);
+      if (willActivate) setActive(other, false);
+    }
+    upBtn.addEventListener("click", () => activate(upBtn, downBtn));
+    downBtn.addEventListener("click", () => activate(downBtn, upBtn));
+  }
+
+  // Ticket C (issue #157): Now Playing panel UI shell — no card wrapper
+  // (2026-07-27 review: the RadioCalicoLayout.png reference floats this
+  // content directly on the page background; only the playback strip below
+  // is a themed surface). DOM hooks for downstream tickets to bind, none of
+  // which this ticket re-touches:
   //   - #album-cover        → set in buildHero() above (Hero portrait image)
-  //   - #track-title        → this card's title element
-  //   - #track-artist       → this card's artist element
+  //   - #track-title        → track title text
+  //   - #track-year         → release year, rendered next to the title
+  //   - #track-artist       → artist name
+  //   - #track-album        → album name
+  //   - #track-quality-source / #track-quality-stream → source/stream
+  //     quality metadata lines
   //   - [data-analytics-id="track-title"|"track-artist"] → tracking hook
   //     (AC2); dispatch via dispatchTrackAnalyticsEvent() above, don't
   //     re-wire a new mechanism.
-  // Progress bar + time readout (AC3) and playback controls (AC4/AC5) are
+  //   - [data-testid="player-rating-up"|"player-rating-down"] → rating
+  //     buttons; this ticket only wires a local visual toggle (no
+  //     persistence/counting) — see the 2026-07-27 review comment on #157
+  //     for the follow-up ticket that owns the real vote-recording logic.
+  // Progress bar + time readout (AC3) and playback controls (AC4/AC5) stay
   // static/visual-only per #150 — no real audio.
   function buildMusicPlayerCard(state) {
-    const card = document.createElement("div");
-    card.className = "chloe-player-card";
-    card.dataset.testid = "music-player-card";
-
-    const title = document.createElement("p");
-    title.id = "track-title";
-    title.className = "chloe-player-card__title";
-    title.dataset.testid = "player-track-title";
-    title.dataset.analyticsId = "track-title";
+    const panel = document.createElement("div");
+    panel.className = "chloe-now-playing";
+    panel.dataset.testid = "now-playing-panel";
 
     const artist = document.createElement("p");
     artist.id = "track-artist";
-    artist.className = "chloe-player-card__artist";
+    artist.className = "chloe-now-playing__artist";
     artist.dataset.testid = "player-track-artist";
     artist.dataset.analyticsId = "track-artist";
 
+    const titleLine = document.createElement("p");
+    titleLine.className = "chloe-now-playing__title-line";
+    titleLine.dataset.testid = "player-title-line";
+
+    const title = document.createElement("span");
+    title.id = "track-title";
+    title.className = "chloe-now-playing__title";
+    title.dataset.testid = "player-track-title";
+    title.dataset.analyticsId = "track-title";
+
+    const year = document.createElement("span");
+    year.id = "track-year";
+    year.className = "chloe-now-playing__year";
+    year.dataset.testid = "player-track-year";
+    year.textContent = "(—)";
+
+    titleLine.appendChild(title);
+    titleLine.appendChild(document.createTextNode(" "));
+    titleLine.appendChild(year);
+
+    const album = document.createElement("p");
+    album.id = "track-album";
+    album.className = "chloe-now-playing__album";
+    album.dataset.testid = "player-track-album";
+
+    const quality = document.createElement("div");
+    quality.className = "chloe-now-playing__quality";
+    quality.dataset.testid = "player-quality";
+
+    const qualitySource = document.createElement("p");
+    qualitySource.id = "track-quality-source";
+    qualitySource.className = "chloe-now-playing__quality-line";
+    qualitySource.dataset.testid = "player-quality-source";
+
+    const qualityStream = document.createElement("p");
+    qualityStream.id = "track-quality-stream";
+    qualityStream.className = "chloe-now-playing__quality-line";
+    qualityStream.dataset.testid = "player-quality-stream";
+
+    quality.appendChild(qualitySource);
+    quality.appendChild(qualityStream);
+
+    const rating = document.createElement("div");
+    rating.className = "chloe-now-playing__rating";
+    rating.dataset.testid = "player-rating";
+
+    const ratingLabel = document.createElement("span");
+    ratingLabel.className = "chloe-now-playing__rating-label";
+    ratingLabel.dataset.testid = "player-rating-label";
+
+    const ratingUp = document.createElement("button");
+    ratingUp.type = "button";
+    ratingUp.className = "chloe-now-playing__rating-btn";
+    ratingUp.dataset.testid = "player-rating-up";
+    ratingUp.setAttribute("aria-pressed", "false");
+    ratingUp.textContent = "👍";
+
+    const ratingDown = document.createElement("button");
+    ratingDown.type = "button";
+    ratingDown.className = "chloe-now-playing__rating-btn";
+    ratingDown.dataset.testid = "player-rating-down";
+    ratingDown.setAttribute("aria-pressed", "false");
+    ratingDown.textContent = "👎";
+
+    bindRatingToggle(ratingUp, ratingDown);
+
+    rating.appendChild(ratingLabel);
+    rating.appendChild(ratingUp);
+    rating.appendChild(ratingDown);
+
     function renderMeta() {
       if (!TRANSLATIONS) return;
-      const loadingText = TRANSLATIONS[state.lang].playerLoading;
-      title.textContent = loadingText;
-      artist.textContent = loadingText;
-      dispatchTrackAnalyticsEvent("track-title", loadingText);
-      dispatchTrackAnalyticsEvent("track-artist", loadingText);
+      const t = TRANSLATIONS[state.lang];
+      title.textContent = t.playerLoading;
+      artist.textContent = t.playerLoading;
+      album.textContent = t.playerLoading;
+      qualitySource.textContent = `${t.playerQualitySourceLabel}: ${t.playerLoading}`;
+      qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerLoading}`;
+      ratingLabel.textContent = t.playerRatingLabel;
+      ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
+      ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
+      dispatchTrackAnalyticsEvent("track-title", t.playerLoading);
+      dispatchTrackAnalyticsEvent("track-artist", t.playerLoading);
     }
 
     renderMeta();
     state.onLanguageChange.push(renderMeta);
 
-    const progress = document.createElement("div");
-    progress.className = "chloe-player-card__progress";
-    progress.dataset.testid = "player-progress";
+    const playerBox = document.createElement("div");
+    playerBox.className = "chloe-now-playing__player-box";
+    playerBox.dataset.testid = "player-box";
 
     const progressTrack = document.createElement("div");
-    progressTrack.className = "chloe-player-card__progress-track";
+    progressTrack.className = "chloe-now-playing__progress-track";
+    progressTrack.dataset.testid = "player-progress";
     const progressFill = document.createElement("div");
-    progressFill.className = "chloe-player-card__progress-fill";
+    progressFill.className = "chloe-now-playing__progress-fill";
     progressTrack.appendChild(progressFill);
-
-    const time = document.createElement("div");
-    time.className = "chloe-player-card__time";
-    time.dataset.testid = "player-time";
-    time.textContent = "00:00 / 00:00";
-
-    progress.appendChild(progressTrack);
-    progress.appendChild(time);
 
     const controlsRoot = document.createElement("div");
     controlsRoot.dataset.testid = "player-controls-root";
 
-    card.appendChild(artist);
-    card.appendChild(title);
-    card.appendChild(progress);
-    card.appendChild(controlsRoot);
+    playerBox.appendChild(progressTrack);
+    playerBox.appendChild(controlsRoot);
+
+    panel.appendChild(artist);
+    panel.appendChild(titleLine);
+    panel.appendChild(album);
+    panel.appendChild(quality);
+    panel.appendChild(rating);
+    panel.appendChild(playerBox);
 
     mountPlayerControls(controlsRoot);
 
-    return card;
+    return panel;
   }
 
   // Ticket C (issue #157 review, 2026-07-24): playback controls are a React
@@ -435,7 +528,9 @@
   // JSX/build step) — a scoped exception to the vanilla-JS/jQuery stack
   // decision (issue #20), matching the same exception already locked for
   // Ticket D's cover-art component (issue #158). isPlaying/volume are local
-  // component state only — visual toggles, no real audio (per #150).
+  // component state only — visual toggles, no real audio (per #150). The
+  // timer (2026-07-27 review) doubles as AC3's time readout, formatted
+  // `<mm:ss> / ● Live` since this is a live stream, not a fixed-length file.
   function PlayerControls() {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
@@ -460,8 +555,14 @@
       ),
       React.createElement(
         "span",
-        { className: "chloe-player-controls__timer", "data-testid": "player-timer" },
-        "0:00"
+        {
+          className: "chloe-player-controls__timer",
+          "data-testid": "player-timer",
+          "aria-label": "Elapsed time, live broadcast",
+        },
+        "0:00 / ",
+        React.createElement("span", { className: "chloe-player-controls__live-dot", "aria-hidden": "true" }),
+        "Live"
       ),
       React.createElement(
         "label",
