@@ -123,7 +123,7 @@ This is not limited to gate approvals. If you are not fully sure what an instruc
 Decided under issue #20 (see `docs/decisions/2026-07-12-tech-stack-vanilla-js-jquery.md`):
 
 - **App code:** HTML + vanilla JavaScript + jQuery. No build step, no bundler. If any React remains, it is limited to bare `ReactDOM`/`React.createElement` with no extra npm packages and no JSX/Babel transform.
-- **Dependencies:** CDN `<script>` references only — the app never runs `npm install`.
+- **Dependencies:** CDN `<script>` references only — the app never runs `npm install`. Before adding or changing any CDN `<script>`/`<link>` reference, read `config/cdn-sources.json` first and use its listed primary/fallback order for that library; if a library isn't listed there yet, add an entry as part of the same change rather than hardcoding a one-off URL. See `docs/decisions/2026-07-27-centralized-cdn-config.md`.
 - **Data:** `localStorage` is the "database"; there is no backend/server-side store.
 - **Tests:** hand-written vanilla JavaScript (no Jest/npm test framework) under `tests/`. If a test needs "the database," mock `localStorage` — only as far as the AC under test requires. Tests run only when `tests/test-runner.html` is opened directly in a browser (never on app load, never via an `npm test` script); `index.html` links to that report page. See `docs/decisions/2026-07-12-testing-framework-vanilla-runner.md` and `tests/README.md`.
 
