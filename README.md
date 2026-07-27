@@ -252,7 +252,7 @@ The sample product used for the demo is **Radio Calico** a high-quality, ad-free
 
 Decided under issue #20 (see `docs/decisions/`):
 
-- **App code:** HTML + vanilla JavaScript + jQuery, CDN `<script>` dependencies only — no build step, no `npm install`. If any React remains, it's limited to bare `ReactDOM`/`React.createElement`, no extra packages.
+- **App code:** HTML + vanilla JavaScript + jQuery, CDN `<script>` dependencies only — no build step, no `npm install`. If any React remains, it's limited to bare `ReactDOM`/`React.createElement`, no extra packages. `config/cdn-sources.json` is the single source of truth for which CDN provider/fallback to use per library — check it before adding or changing a CDN reference.
 - **Data:** `localStorage` acts as the "database"; no backend store.
 - **Tests:** hand-written vanilla JavaScript under `tests/`, run only by opening `tests/test-runner.html` in a browser (never on app load, never via `npm test`); mock `localStorage` where a test needs "the database." `index.html` links to the test report page.
 
