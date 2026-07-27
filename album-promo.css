@@ -9,6 +9,7 @@
   --chloe-player-box-bg: #2f2a2c;
   --chloe-player-box-fg: #f5eee0;
   --chloe-live-dot: #e5484d;
+  --chloe-sans: "Montserrat", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* Ticket A review (2026-07-24): dark theme toggled via [data-chloe-theme]
@@ -221,29 +222,33 @@ body {
   flex: 1 0 auto;
   padding: 0 2rem 2rem;
   min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* --- Ticket B: hero row (portrait + reserved player-card column) --- */
+/* --- Ticket B: hero row (portrait + reserved player-card column) ---
+   Columns centered against each other vertically so the shorter Now Playing
+   column sits mid-height beside the tall square cover (per RadioCalicoLayout
+   reference + 2026-07-27 request to vertically-center the block on screen). */
 .chloe-hero {
-  align-items: stretch;
+  align-items: center;
 }
 
 .chloe-hero__portrait-col {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 2rem;
 }
 
 .chloe-hero__portrait {
   display: block;
   width: 100%;
-  max-width: 380px;
+  max-width: 528px;
   aspect-ratio: 1 / 1;
   height: auto;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 575.98px) {
@@ -255,7 +260,7 @@ body {
 .chloe-hero__player-col {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2rem;
 }
 
@@ -267,38 +272,41 @@ body {
    fixed literal-black box. */
 .chloe-now-playing {
   width: 100%;
-  max-width: 360px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .chloe-now-playing__artist {
   margin: 0;
-  font-family: "Playfair Display", serif;
-  font-style: italic;
+  font-family: var(--chloe-sans);
   font-weight: 700;
-  font-size: 1.6rem;
+  font-size: 3rem;
+  line-height: 1.1;
 }
 
 .chloe-now-playing__title-line {
   margin: 0;
-  font-size: 1.1rem;
+  font-family: var(--chloe-sans);
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
 .chloe-now-playing__title {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .chloe-now-playing__year {
-  opacity: 0.6;
+  font-weight: 700;
 }
 
 .chloe-now-playing__album {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  opacity: 0.85;
+  font-family: var(--chloe-sans);
+  font-size: 1.05rem;
+  font-weight: 700;
+  opacity: 0.95;
 }
 
 .chloe-now-playing__quality {
@@ -309,16 +317,18 @@ body {
 
 .chloe-now-playing__quality-line {
   margin: 0;
-  font-size: 0.75rem;
+  font-family: var(--chloe-sans);
+  font-size: 0.9rem;
   font-style: italic;
-  opacity: 0.65;
+  opacity: 0.6;
 }
 
 .chloe-now-playing__rating {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.85rem;
+  font-family: var(--chloe-sans);
+  font-size: 0.95rem;
 }
 
 .chloe-now-playing__rating-btn {
@@ -349,9 +359,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  font-family: var(--chloe-sans);
 }
 
 .chloe-now-playing__progress-track {
+  display: none;
   position: relative;
   height: 4px;
   border-radius: 999px;
