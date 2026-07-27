@@ -230,6 +230,9 @@ body {
   padding: 2rem;
 }
 
+/* issue #157 review (2026-07-27): square (1:1) album art per the Now
+   Playing layout request — object-fit: cover center-crops the existing
+   portrait-oriented cover image into a square instead of distorting it. */
 .chloe-hero__portrait {
   display: block;
   width: 100%;
