@@ -230,9 +230,6 @@ body {
   padding: 2rem;
 }
 
-/* issue #157 review (2026-07-27): square (1:1) album art per the Now
-   Playing layout request — object-fit: cover center-crops the existing
-   portrait-oriented cover image into a square instead of distorting it. */
 .chloe-hero__portrait {
   display: block;
   width: 100%;
@@ -274,9 +271,6 @@ body {
   gap: 1rem;
 }
 
-/* issue #157 review (2026-07-27): Now Playing hierarchy — artist is the
-   largest/boldest element, track title is secondary (DOM order swapped to
-   match in album-promo.js: artist renders above title). */
 .chloe-player-card__artist {
   margin: 0;
   font-family: "Playfair Display", serif;
