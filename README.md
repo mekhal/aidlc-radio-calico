@@ -79,8 +79,10 @@ jobs:
 ## 4. AI-DLC Loop (the core)
 
 <div align="center">
-  <img src="aidlc-loop.png" alt="AI-DLC Loop 7 steps" width="900" />
+  <img src="aidlc-loop-gates.jpg" alt="Step 6: Code PR Gates — Security, Quality, Reviewability, and Traceability, all required before Human Merge" width="900" />
 </div>
+
+The 7-step loop below is where every issue moves through; the diagram zooms into **step 6**, the Code PR, and the four gates (Security, Quality, Reviewability, Traceability) it must clear before the human merge that closes step 7.
 
 ### Step by step
 
@@ -174,11 +176,17 @@ The AI then does **step 4** (Test PR) → Human **approves (step 5)** → AI **s
 
 ## 7. Skill Capture & Reuse
 
-The heart of making the agent "keep getting better" is turning **human decisions** into **reusable skills**.
+The heart of making the agent "keep getting better" is turning **human decisions** into **reusable skills** — but a skill is only trusted for reuse once it clears the same kind of gates as a Code PR.
 
 <div align="center">
-  <img src="skill-capture-reuse.png" alt="Skill Capture & Reuse continuous improvement loop" width="900" />
+  <img src="skill-reuse-gates.jpg" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, and Traceability, all required before a skill is reused" width="900" />
 </div>
+
+**Quality & Safety Gates for Skill Reuse:** before a decision captured from a closed loop is trusted as a reusable skill, the loop it came from must have cleared:
+
+- **Security** — passed its security scan (dependency, secret, SAST); no secrets committed; least-privilege.
+- **Quality** — lint/format clean, and if the Test PR was **waived** at step 3 (not every change needs a unit test), the skill is **not excluded** from reuse — lint and the security scan still ran before merge regardless of whether unit tests exist.
+- **Reviewability / Traceability** — the originating PR was a reasonable size and references the issue/AC it came from, so the decision behind the skill can be traced back later.
 
 - **Capture:** Every time a human decides (choosing an approach, setting a rule, redirecting a plan), it is recorded in the decision log.
 - **Distill:** Recurring/valuable decisions are written up as skills.
@@ -214,11 +222,17 @@ aidlc-radiocalico/
 
 ### Branching
 
+<div align="center">
+  <img src="branching-overview.png" alt="Branching Overview: Feature Branch (AI) works and opens a PR, a Developer or Tester rebases it into develop, then MGT releases develop to main (prod)" width="900" />
+</div>
+
+AI works in feature branches → a **Developer or Tester** rebases the work into `develop` → **MGT** releases `develop` to `main` (prod).
+
 | Branch | Meaning |
 |---|---|
 | feature branch | Where the AI opens the Test PR / Code PR for each loop — always with an explicit `--base develop` (never rely on the default base branch, which may be `main`), including any manually-posted "Create PR" compare link before a PR exists (`compare/develop...branch`, never `compare/main...branch`). Before editing anything, the AI verifies its working tree actually matches `origin/develop` and syncs it if it doesn't (see issue #106 — jobs sometimes check out `main` instead of `develop`). Once its PR is open, post follow-ups on that PR (not the parent issue), otherwise the harness spins up a stray duplicate branch. Before re-implementing an already-approved change, check for an existing branch/PR with the same diff and reuse it instead of starting over |
-| `develop` | The destination of each completed loop (merged by a human) |
-| `main` | Production merging `develop` → `main` is a **prod release** and must be done by a **human only** |
+| `develop` | The destination of each completed loop. A **Developer or Tester** rebases the feature branch in and merges the PR here |
+| `main` | Production merging `develop` → `main` is a **Production Release**, done by **MGT** (release owner) — human-only |
 
 Merging or deleting branches (e.g. consolidating duplicates) is a manual, human-only git operation — the agent can only create and push commits to a branch.
 
@@ -246,7 +260,11 @@ Decided under issue #20 (see `docs/decisions/`):
 
 ## 10. Production-grade Standards
 
-Every Code PR (step 6) must pass these gates before a human merges:
+<div align="center">
+  <img src="code-pr-gates.png" alt="Step 6: Code PR Gates — Security, Quality, Reviewability, and Traceability, all required before Human Merge" width="900" />
+</div>
+
+Every Code PR (step 6) must pass **all four gates** below — Security, Quality, Reviewability, Traceability — before a human can merge:
 
 | Category | Criteria |
 |---|---|
