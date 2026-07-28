@@ -335,9 +335,11 @@
     portrait.id = "album-cover";
     portrait.className = "chloe-hero__portrait";
     portrait.dataset.testid = "hero-portrait-cover";
-    portrait.src = "https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg";
+    portrait.src = NOW_PLAYING_COVER_URL;
+    portrait.decoding = "async";
     portrait.alt = "Artist portrait";
     portraitCol.appendChild(portrait);
+    state.nowPlaying.coverEl = portrait;
 
     const playerCol = document.createElement("div");
     playerCol.className = "col-lg-6 chloe-hero__player-col";
@@ -476,19 +478,33 @@
     rating.appendChild(ratingUp);
     rating.appendChild(ratingDown);
 
+    // Ticket D (issue #158): title/artist reflect state.nowPlaying.lastMetadata
+    // once a live fetch has landed, instead of the static loading placeholder
+    // used before the first fetch — this stops a language toggle re-render
+    // from stomping real Now Playing data back to "Loading…". Album/quality
+    // stay placeholder-only: metadatav2.json's field names for those aren't
+    // confirmed by this ticket's AC, so they're left out of scope (flagged in
+    // the Code PR summary) rather than guessed.
+    const status = document.createElement("p");
+    status.id = "now-playing-status";
+    status.className = "chloe-now-playing__status";
+    status.dataset.testid = "now-playing-status";
+    status.hidden = true;
+
     function renderMeta() {
       if (!TRANSLATIONS) return;
       const t = TRANSLATIONS[state.lang];
-      title.textContent = t.playerLoading;
-      artist.textContent = t.playerLoading;
+      const md = state.nowPlaying.lastMetadata;
+      title.textContent = md ? md.title || "" : t.playerLoading;
+      artist.textContent = md ? md.artist || "" : t.playerLoading;
       album.textContent = t.playerLoading;
       qualitySource.textContent = `${t.playerQualitySourceLabel}: ${t.playerLoading}`;
       qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerLoading}`;
       ratingLabel.textContent = t.playerRatingLabel;
       ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
       ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
-      dispatchTrackAnalyticsEvent("track-title", t.playerLoading);
-      dispatchTrackAnalyticsEvent("track-artist", t.playerLoading);
+      dispatchTrackAnalyticsEvent("track-title", title.textContent);
+      dispatchTrackAnalyticsEvent("track-artist", artist.textContent);
     }
 
     renderMeta();
@@ -516,9 +532,14 @@
     panel.appendChild(album);
     panel.appendChild(quality);
     panel.appendChild(rating);
+    panel.appendChild(status);
     panel.appendChild(playerBox);
 
     mountPlayerControls(controlsRoot);
+
+    state.nowPlaying.artistEl = artist;
+    state.nowPlaying.titleEl = title;
+    state.nowPlaying.statusEl = status;
 
     return panel;
   }
@@ -584,11 +605,177 @@
     ReactDOM.createRoot(container).render(React.createElement(PlayerControls));
   }
 
+  // Ticket D (issue #158): Now Playing data fetch + Recently Played +
+  // near-real-time polling. AC1/AC2 fetch metadatav2.json/cover.jpg and bind
+  // them into the DOM hooks above; AC3 renders the 5-item Recently Played
+  // list; AC4 falls back gracefully (placeholder cover + status message) on
+  // fetch failure. Per the 2026-07-28 step-3 approval, cover art and all
+  // other metadata refresh together on ONE shared poll loop (not two
+  // independent cadences) — interval overridable via
+  // window.__ALBUM_PROMO_METADATA_POLL_MS__ so tests don't wait a real 10s
+  // (docs/decisions/2026-07-24-ticket-d-cover-art-react-dom-stack-and-polling-interval.md).
+  // AC5: kept as small functions, each testable via the DOM behavior they
+  // produce — matching every other suite in this repo (see tests/README.md);
+  // nothing here is exposed on window purely for unit testing.
+  const NOW_PLAYING_METADATA_URL = "https://d3d4yli4hf5bmh.cloudfront.net/metadatav2.json";
+  const NOW_PLAYING_COVER_URL = "https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg";
+  // Reuse-first (AC4/AC5): same logo asset app.js/album-promo.js already use
+  // elsewhere, rather than a new placeholder-cover asset.
+  const NOW_PLAYING_COVER_FALLBACK_SRC = "RadioCalicoStyle/RadioCalicoLogoTM.png";
+  const NOW_PLAYING_RECENT_COUNT = 5;
+  const NOW_PLAYING_DEFAULT_POLL_MS = 10000;
+
+  let nowPlayingIntervalId = null;
+
+  function getNowPlayingPollMs() {
+    return window.__ALBUM_PROMO_METADATA_POLL_MS__ || NOW_PLAYING_DEFAULT_POLL_MS;
+  }
+
+  async function fetchNowPlayingMetadata() {
+    const response = await fetch(NOW_PLAYING_METADATA_URL);
+    if (!response || !response.ok) throw new Error("Now Playing metadata fetch failed");
+    return response.json();
+  }
+
+  async function verifyCoverArtReachable() {
+    const response = await fetch(NOW_PLAYING_COVER_URL);
+    if (!response || !response.ok) throw new Error("Now Playing cover fetch failed");
+    return response;
+  }
+
+  function parseRecentlyPlayed(metadata) {
+    const tracks = [];
+    for (let n = 1; n <= NOW_PLAYING_RECENT_COUNT; n += 1) {
+      tracks.push({
+        artist: (metadata && metadata[`prev_artist_${n}`]) || "",
+        title: (metadata && metadata[`prev_title_${n}`]) || "",
+      });
+    }
+    return tracks;
+  }
+
+  function renderNowPlayingMetadata(elements, metadata) {
+    elements.artistEl.textContent = metadata.artist || "";
+    elements.titleEl.textContent = metadata.title || "";
+  }
+
+  // Rebuilds the list from scratch on every successful fetch rather than
+  // patching existing <li> nodes, so the item count and each item's text
+  // always land in the DOM together — the AC3 tests assert both right after
+  // the same waitFor, with no separate wait for content to fill in.
+  function renderRecentlyPlayed(listEl, tracks) {
+    listEl.textContent = "";
+    tracks.forEach((track) => {
+      const item = document.createElement("li");
+      item.className = "chloe-recently-played__item";
+      item.dataset.testid = "recently-played-item";
+
+      const artistEl = document.createElement("span");
+      artistEl.className = "chloe-recently-played__artist";
+      artistEl.dataset.testid = "recently-played-artist";
+      artistEl.textContent = track.artist;
+
+      const titleEl = document.createElement("span");
+      titleEl.className = "chloe-recently-played__title";
+      titleEl.dataset.testid = "recently-played-title";
+      titleEl.textContent = track.title;
+
+      item.appendChild(artistEl);
+      item.appendChild(titleEl);
+      listEl.appendChild(item);
+    });
+  }
+
+  function showNowPlayingStatus(elements, message) {
+    elements.statusEl.textContent = message;
+    elements.statusEl.hidden = false;
+  }
+
+  function hideNowPlayingStatus(elements) {
+    elements.statusEl.hidden = true;
+    elements.statusEl.textContent = "";
+  }
+
+  function setCoverSrc(coverEl, src) {
+    coverEl.src = src;
+  }
+
+  async function refreshNowPlaying(state) {
+    const elements = state.nowPlaying;
+    const t = TRANSLATIONS[state.lang];
+
+    try {
+      const metadata = await fetchNowPlayingMetadata();
+      state.nowPlaying.lastMetadata = metadata;
+      renderNowPlayingMetadata(elements, metadata);
+      renderRecentlyPlayed(elements.recentlyPlayedListEl, parseRecentlyPlayed(metadata));
+      hideNowPlayingStatus(elements);
+    } catch (err) {
+      showNowPlayingStatus(elements, t.nowPlayingUnavailable);
+    }
+
+    try {
+      await verifyCoverArtReachable();
+      // Cache-bust so the browser re-requests the image on every poll tick
+      // instead of silently reusing a stale cached response for the same URL.
+      setCoverSrc(elements.coverEl, `${NOW_PLAYING_COVER_URL}?t=${Date.now()}`);
+    } catch (err) {
+      setCoverSrc(elements.coverEl, NOW_PLAYING_COVER_FALLBACK_SRC);
+    }
+  }
+
+  function stopNowPlayingUpdates() {
+    if (nowPlayingIntervalId !== null) {
+      clearInterval(nowPlayingIntervalId);
+      nowPlayingIntervalId = null;
+    }
+  }
+
+  function startNowPlayingUpdates(state) {
+    stopNowPlayingUpdates();
+    refreshNowPlaying(state);
+    nowPlayingIntervalId = setInterval(() => refreshNowPlaying(state), getNowPlayingPollMs());
+  }
+
+  // tests/load-album-promo.js's unloadAlbumPromo() calls this before removing
+  // the mounted root, so a leftover interval from one test doesn't keep
+  // polling (against the real network, once the next test's mock is
+  // installed/removed) after that test has finished.
+  window.__albumPromoStopNowPlaying = stopNowPlayingUpdates;
+
+  function buildRecentlyPlayed(state) {
+    const section = document.createElement("section");
+    section.className = "chloe-recently-played";
+    section.dataset.testid = "recently-played";
+
+    const heading = document.createElement("h2");
+    heading.className = "chloe-recently-played__heading";
+
+    const list = document.createElement("ul");
+    list.className = "chloe-recently-played__list";
+    list.dataset.testid = "recently-played-list";
+
+    function render() {
+      if (!TRANSLATIONS) return;
+      heading.textContent = TRANSLATIONS[state.lang].recentlyPlayedHeading;
+    }
+    render();
+    state.onLanguageChange.push(render);
+
+    section.appendChild(heading);
+    section.appendChild(list);
+
+    state.nowPlaying.recentlyPlayedListEl = list;
+
+    return section;
+  }
+
   function buildMain(state) {
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
-    // Live data binding (Ticket D) and theme polish (Ticket E) land next.
+    main.appendChild(buildRecentlyPlayed(state));
+    // Theme polish (Ticket E) lands next.
     return main;
   }
 
@@ -621,7 +808,7 @@
     const root = document.getElementById("album-promo-root");
     if (!root) return;
 
-    const state = { lang: getStoredLanguage(), theme: getStoredTheme(), onLanguageChange: [] };
+    const state = { lang: getStoredLanguage(), theme: getStoredTheme(), onLanguageChange: [], nowPlaying: {} };
     document.documentElement.lang = state.lang;
     document.documentElement.setAttribute("data-chloe-theme", state.theme);
 
@@ -640,6 +827,7 @@
     window.__albumPromoI18nReady = loadTranslations().then((data) => {
       TRANSLATIONS = data;
       state.onLanguageChange.forEach((fn) => fn());
+      startNowPlayingUpdates(state);
     });
   }
 

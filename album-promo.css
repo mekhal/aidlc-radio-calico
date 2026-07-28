@@ -351,6 +351,16 @@ body {
   transform: scale(1.15);
 }
 
+/* --- Ticket D (issue #158, AC4): fetch-failure status line --- */
+.chloe-now-playing__status {
+  margin: 0;
+  font-family: var(--chloe-sans);
+  font-size: 0.85rem;
+  font-style: italic;
+  opacity: 0.75;
+  color: var(--chloe-pink-deep);
+}
+
 .chloe-now-playing__player-box {
   background: var(--chloe-player-box-bg);
   color: var(--chloe-player-box-fg);
@@ -379,6 +389,50 @@ body {
   width: 0%;
   border-radius: 999px;
   background: var(--chloe-pink-deep);
+}
+
+/* --- Ticket D (issue #158, AC3): Recently Played list, below the hero row --- */
+.chloe-recently-played {
+  max-width: 900px;
+  margin: 3rem auto 0;
+  padding: 0 1rem;
+}
+
+.chloe-recently-played__heading {
+  font-family: var(--chloe-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  margin: 0 0 1rem;
+}
+
+.chloe-recently-played__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chloe-recently-played__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: var(--chloe-sans);
+  font-size: 0.95rem;
+}
+
+.chloe-recently-played__artist {
+  font-weight: 700;
+}
+
+.chloe-recently-played__title {
+  opacity: 0.75;
 }
 
 /* Ticket C (issue #157 review, 2026-07-24): playback controls DOM is
