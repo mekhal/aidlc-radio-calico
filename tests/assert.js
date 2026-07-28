@@ -21,12 +21,11 @@
       try {
         await fn();
         results.push({ name: fullName, passed: true });
+        console.log(`PASS: ${fullName}`);
       } catch (error) {
-        results.push({
-          name: fullName,
-          passed: false,
-          error: error && error.message ? error.message : String(error),
-        });
+        const message = error && error.message ? error.message : String(error);
+        results.push({ name: fullName, passed: false, error: message });
+        console.log(`FAIL: ${fullName} — ${message}`);
       }
     });
     queue = promise;
