@@ -73,6 +73,11 @@
     <script src="mock-hls.js"></script>
     <script src="load-app.js"></script>
 
+    <!-- issue #205: persists this run's results to localStorage (AC1), read
+         by tests/test-report-dashboard.html — never the other way around. -->
+    <script src="report-storage.js"></script>
+    <script src="load-test-report-dashboard.js"></script>
+
     <!-- issue #158 (Ticket D): album-promo.js's own Now Playing data-fetch
          suite. Not app.js interface-function tests, so (like
          harness-serialization/skills-storage-in-repo below) wired directly
@@ -109,12 +114,22 @@
     <script src="harness-serialization.test.js"></script>
     <script src="skills-storage-in-repo.test.js"></script>
 
+    <!-- issue #205: report-storage.js/test-report-dashboard.js have no
+         app.js DOM surface (same category as the two files above), so their
+         suites are wired directly here too. -->
+    <script src="report-storage.test.js"></script>
+    <script src="test-report-dashboard.test.js"></script>
+
     <script>
       (async function () {
         await window.TestHarness.allSettled();
         const results = window.TestHarness.getResults();
         const list = document.getElementById("results");
         const passed = results.filter((r) => r.passed).length;
+
+        // issue #205, AC1: replace the previously stored run every time this
+        // full suite finishes — the Test Report Dashboard reads only this.
+        window.TestReportStorage.saveTestReport(results);
 
         results.forEach((result) => {
           const item = document.createElement("li");
