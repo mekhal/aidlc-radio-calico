@@ -1,0 +1,102 @@
+/* Issue #205 (AC2): dashboard-specific content only — header/sidebar/footer
+   chrome (chloe-header/chloe-sidebar/chloe-footer/chloe-page/chloe-main)
+   comes from ../album-promo.css, loaded alongside this file, and shares its
+   --chloe-* custom properties. */
+
+.report-dashboard-main {
+  display: block;
+  padding-top: 2rem;
+}
+
+.report-heading {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--chloe-ink);
+  margin: 0 0 1.5rem;
+}
+
+.report-timestamp {
+  font-family: var(--chloe-sans);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin: 0 0 1.5rem;
+}
+
+.report-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.report-stat-tile {
+  flex: 1 1 140px;
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+.report-stat-tile__value {
+  font-family: var(--chloe-sans);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.report-stat-tile__label {
+  font-family: var(--chloe-sans);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+  margin: 0.25rem 0 0;
+}
+
+.report-stat-tile--passed .report-stat-tile__value {
+  color: var(--chloe-mint);
+}
+
+.report-stat-tile--failed .report-stat-tile__value {
+  color: var(--chloe-pink-deep);
+}
+
+.report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 900px;
+}
+
+.report-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  font-family: var(--chloe-sans);
+  font-size: 0.9rem;
+  color: var(--chloe-ink);
+}
+
+.report-list__item.is-pass {
+  background: var(--chloe-mint);
+}
+
+.report-list__item.is-fail {
+  background: var(--chloe-pink);
+}
+
+.report-list__error {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.report-empty-state {
+  font-family: var(--chloe-sans);
+  font-size: 1rem;
+  opacity: 0.8;
+}
