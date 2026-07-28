@@ -66,11 +66,22 @@
          — mirrors the existing window.__APP_JS_PATH__ override pattern. -->
     <script>
       window.__I18N_BASE_PATH__ = "../i18n/";
+      window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
     </script>
 
     <script src="assert.js"></script>
     <script src="mock-hls.js"></script>
     <script src="load-app.js"></script>
+
+    <!-- issue #158 (Ticket D): album-promo.js's own Now Playing data-fetch
+         suite. Not app.js interface-function tests, so (like
+         harness-serialization/skills-storage-in-repo below) wired directly
+         here rather than into test-report-suite-files.js. -->
+    <script src="mock-metadata-fetch.js"></script>
+    <script src="load-album-promo.js"></script>
+    <script src="now-playing-metadata-fetch.test.js"></script>
+    <script src="recently-played-list.test.js"></script>
+    <script src="now-playing-polling.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of
