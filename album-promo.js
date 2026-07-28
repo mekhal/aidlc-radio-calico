@@ -4,12 +4,12 @@
   // Mirrors app.js's footer `linksRow` (site link, Test/Lint/Security Report,
   // GitHub, LinkedIn) — see review decision on issue #155 (2026-07-24). This
   // is now the sidebar's only link group, replacing the social icons per the
-  // follow-up review comment on PR #164 (2026-07-24). Test Report links
-  // straight to the report page (tests/test-runner.html) rather than reusing
-  // app.js's openTestReportModal in-page modal, since that modal drives
-  // app.js's own TestHarness/test fixtures — logic this static landing page
-  // doesn't load and has no use for; a direct link reaches the same report
-  // without duplicating it.
+  // follow-up review comment on PR #164 (2026-07-24). Test Report links to
+  // the Test Report Dashboard (tests/test-report-dashboard.html, issue #205
+  // AC5) rather than tests/test-runner.html directly, or app.js's
+  // openTestReportModal in-page modal — that modal drives app.js's own
+  // TestHarness/test fixtures, logic this static landing page doesn't load
+  // and has no use for.
   const FOOTER_LINKS = [
     {
       testid: "sidebar-footer-site-link",
@@ -19,7 +19,7 @@
     },
     {
       testid: "sidebar-footer-test-report-link",
-      href: "tests/test-runner.html",
+      href: "tests/test-report-dashboard.html",
       label: "Test Report",
       icon: "bi-clipboard-check",
     },
