@@ -34,6 +34,11 @@
   }
 
   function unloadAlbumPromo(root) {
+    // Ticket D (issue #158): stop the Now Playing poll loop before tearing
+    // down, so a leftover setInterval doesn't keep firing (against whatever
+    // fetch happens to be installed — real network once the test's mock is
+    // restored) after this test has finished.
+    if (global.__albumPromoStopNowPlaying) global.__albumPromoStopNowPlaying();
     if (root && root.parentNode) root.parentNode.removeChild(root);
   }
 

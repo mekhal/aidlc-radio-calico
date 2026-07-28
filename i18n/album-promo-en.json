@@ -13,5 +13,7 @@
   "playerRatingUpLabel": "Rate this track up",
   "playerRatingDownLabel": "Rate this track down",
   "playerQualitySourceLabel": "Source quality",
-  "playerQualityStreamLabel": "Stream quality"
+  "playerQualityStreamLabel": "Stream quality",
+  "recentlyPlayedHeading": "Recently Played",
+  "nowPlayingUnavailable": "Unable to load track info right now."
 }
