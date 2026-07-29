@@ -986,7 +986,7 @@
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
-    createRecentlyPlayedListElement(state);
+    main.appendChild(buildRecentlyPlayed(state));
     return main;
   }
 
