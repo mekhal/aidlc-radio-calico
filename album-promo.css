@@ -249,6 +249,7 @@ body {
   aspect-ratio: 1 / 1;
   height: auto;
   object-fit: cover;
+  margin: 0 auto;
 }
 
 @media (max-width: 575.98px) {
@@ -267,10 +268,15 @@ body {
 /* Ticket E (issue #159, AC3): below `lg`, portrait/player columns stack full
    width — the desktop flex-end/flex-start alignment (meant to draw the two
    columns toward each other) would otherwise leave the portrait right-hung
-   and the player card left-hung on a full-width column instead of centered. */
+   and the player card left-hung on a full-width column instead of centered.
+   `width: 100%` is required here too: `.chloe-hero` is a Bootstrap `.row`
+   (flex) and `col-lg-6` only applies at >=992px, so below that these columns
+   have no Bootstrap-applied width and shrink-to-fit their content — leaving
+   `justify-content: center` with no full-width box to center within. */
 @media (max-width: 991.98px) {
   .chloe-hero__portrait-col,
   .chloe-hero__player-col {
+    width: 100%;
     justify-content: center;
   }
 }
