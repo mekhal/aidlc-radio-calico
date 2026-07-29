@@ -6,12 +6,22 @@
  * assertions). Any URL that isn't metadatav2.json/cover.jpg (e.g. this
  * page's own i18n/*.json fetches) passes through to the real fetch
  * untouched. See tests/README.md.
+ *
+ * `coverResponses` (issue #158 follow-up: fetchCoverFingerprint coverage) is
+ * an optional queue of Blob bodies (strings) for the cover.jpg response, so a
+ * test can control whether consecutive polls return identical or different
+ * bytes — that's what drives fetchCoverFingerprint's SHA-256 digest, and in
+ * turn whether refreshNowPlaying() repaints #album-cover. Defaults to the
+ * same empty-Blob body every call, matching the previous behavior.
  */
 (function (global) {
   function installMockMetadataFetch(options) {
     const opts = options || {};
     const metadataQueue = (
       opts.metadataResponses || (opts.metadataResponse ? [opts.metadataResponse] : [])
+    ).slice();
+    const coverQueue = (
+      opts.coverResponses || (opts.coverResponse !== undefined ? [opts.coverResponse] : [])
     ).slice();
     const originalFetch = global.fetch.bind(global);
 
@@ -25,6 +35,11 @@
     function nextMetadataResponse() {
       if (!metadataQueue.length) return opts.metadataResponse || {};
       return metadataQueue.length > 1 ? metadataQueue.shift() : metadataQueue[0];
+    }
+
+    function nextCoverResponse() {
+      if (!coverQueue.length) return opts.coverResponse !== undefined ? opts.coverResponse : "";
+      return coverQueue.length > 1 ? coverQueue.shift() : coverQueue[0];
     }
 
     global.fetch = function (url, init) {
@@ -46,7 +61,7 @@
         if (state.coverShouldFail) {
           return Promise.reject(new Error("mock cover fetch failure"));
         }
-        return Promise.resolve({ ok: true, blob: () => Promise.resolve(new Blob()) });
+        return Promise.resolve({ ok: true, blob: () => Promise.resolve(new Blob([nextCoverResponse()])) });
       }
 
       return originalFetch(url, init);
