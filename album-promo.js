@@ -637,10 +637,23 @@
     return response.json();
   }
 
-  async function verifyCoverArtReachable() {
+  function bufferToHex(buffer) {
+    return Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  // Fetches cover.jpg and returns a SHA-256 hex digest of its bytes, so
+  // refreshNowPlaying() can skip repainting #album-cover when the poll
+  // fetches back the same image it already has (see the 2026-07-29 flicker
+  // report on issue #158: cache-busting the src on every 10s tick caused a
+  // repaint even when the cover art hadn't actually changed).
+  async function fetchCoverFingerprint() {
     const response = await fetch(NOW_PLAYING_COVER_URL);
     if (!response || !response.ok) throw new Error("Now Playing cover fetch failed");
-    return response;
+    const blob = await response.blob();
+    const buffer = await blob.arrayBuffer();
+    return bufferToHex(await crypto.subtle.digest("SHA-256", buffer));
   }
 
   function parseRecentlyPlayed(metadata) {
@@ -715,10 +728,14 @@
     }
 
     try {
-      await verifyCoverArtReachable();
-      // Cache-bust so the browser re-requests the image on every poll tick
-      // instead of silently reusing a stale cached response for the same URL.
-      setCoverSrc(elements.coverEl, `${NOW_PLAYING_COVER_URL}?t=${Date.now()}`);
+      const fingerprint = await fetchCoverFingerprint();
+      if (fingerprint !== state.nowPlaying.lastCoverFingerprint) {
+        state.nowPlaying.lastCoverFingerprint = fingerprint;
+        // Cache-bust only on a real change, so the browser doesn't reuse a
+        // stale cached response once the cover art does change, but also
+        // doesn't repaint (flicker) the <img> on every tick when it hasn't.
+        setCoverSrc(elements.coverEl, `${NOW_PLAYING_COVER_URL}?t=${Date.now()}`);
+      }
     } catch (err) {
       setCoverSrc(elements.coverEl, NOW_PLAYING_COVER_FALLBACK_SRC);
     }

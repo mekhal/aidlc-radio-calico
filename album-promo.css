@@ -391,8 +391,13 @@ body {
   background: var(--chloe-pink-deep);
 }
 
-/* --- Ticket D (issue #158, AC3): Recently Played list, below the hero row --- */
+/* --- Ticket D (issue #158, AC3): Recently Played list, below the hero row ---
+   Hidden per issue #158 (2026-07-29): human wants this moved to a Modal
+   (tracked separately in #209). Fetch/render logic (buildRecentlyPlayed(),
+   refreshNowPlaying()) stays running in the background so the Modal work
+   can reuse it as-is — only the inline section is hidden here. */
 .chloe-recently-played {
+  display: none;
   max-width: 900px;
   margin: 3rem auto 0;
   padding: 0 1rem;
