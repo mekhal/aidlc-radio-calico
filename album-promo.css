@@ -264,6 +264,17 @@ body {
   padding: 2rem;
 }
 
+/* Ticket E (issue #159, AC3): below `lg`, portrait/player columns stack full
+   width — the desktop flex-end/flex-start alignment (meant to draw the two
+   columns toward each other) would otherwise leave the portrait right-hung
+   and the player card left-hung on a full-width column instead of centered. */
+@media (max-width: 991.98px) {
+  .chloe-hero__portrait-col,
+  .chloe-hero__player-col {
+    justify-content: center;
+  }
+}
+
 /* --- Ticket C: Now Playing panel (issue #157) ---
    2026-07-27 review (RadioCalicoLayout.png): content floats directly on the
    page background (no white card wrapper — see the removed AC1 "white

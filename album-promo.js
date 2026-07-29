@@ -792,7 +792,6 @@
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
     main.appendChild(buildRecentlyPlayed(state));
-    // Theme polish (Ticket E) lands next.
     return main;
   }
 
