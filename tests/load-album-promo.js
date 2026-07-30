@@ -39,6 +39,12 @@
     // fetch happens to be installed — real network once the test's mock is
     // restored) after this test has finished.
     if (global.__albumPromoStopNowPlaying) global.__albumPromoStopNowPlaying();
+    // Issue #220 (Option B): pause playback and destroy the Hls instance
+    // before tearing down, so a leftover instance doesn't survive across
+    // tests. Guarded like the hook above — a no-op until album-promo.js
+    // defines it (this test helper is written before that code exists, per
+    // TDD).
+    if (global.__albumPromoStopPlayback) global.__albumPromoStopPlayback();
     if (root && root.parentNode) root.parentNode.removeChild(root);
   }
 
