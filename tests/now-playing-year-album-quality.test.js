@@ -14,13 +14,15 @@
  *        playerQualitySourceLabel i18n label plus a value derived from
  *        bit_depth/sample_rate (e.g. "16-bit / 44.1kHz"), with the same
  *        language-toggle protection as AC2.
- *   AC4: #track-quality-stream shows the playerQualityStreamLabel i18n
- *        label plus the static "24-bit / 48 kHz lossless" string — not
- *        sourced from metadatav2.json, does not change per fetch tick.
  *   AC5: on fetch failure, or when date/album/bit_depth/sample_rate is
  *        missing/empty on an otherwise-successful response, the
  *        corresponding field falls back to "" (matching the existing
  *        artist/title pattern) — no new error UI.
+ *
+ * AC4 (static #track-quality-stream string) was dropped from scope during
+ * PR review (issue #225): deriving real per-stream quality would need extra
+ * requests beyond this ticket, and a hardcoded placeholder value wasn't
+ * wanted either, so #track-quality-stream is no longer rendered at all.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -76,15 +78,13 @@
       }
     });
 
-    it("shows the static stream-quality string, unrelated to metadatav2.json (AC4)", async () => {
+    it("does not render a #track-quality-stream element (AC4 dropped, issue #225)", async () => {
       const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
       const root = await loadAlbumPromo();
       try {
         await waitFor(() => root.querySelector("#track-album").textContent === SAMPLE_METADATA.album);
 
-        expect(root.querySelector("#track-quality-stream").textContent).toBe(
-          "Stream quality: 24-bit / 48 kHz lossless"
-        );
+        expect(root.querySelector("#track-quality-stream")).toBe(null);
       } finally {
         mock.restore();
         unloadAlbumPromo(root);
