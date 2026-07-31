@@ -520,10 +520,13 @@ body {
   gap: 0.5rem;
   margin-left: auto;
   flex: 1;
+  min-width: 0;
 }
 
 .chloe-player-controls__volume input[type="range"] {
   flex: 1;
+  min-width: 48px;
+  max-width: 100%;
   accent-color: var(--chloe-pink-deep);
 }
 
