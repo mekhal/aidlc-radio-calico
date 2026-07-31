@@ -136,7 +136,7 @@
   }
 
   describe("PlayerControls elapsed-time counter + autoplay (issue #228)", () => {
-    it("starts playback automatically on mount (no click) and begins ticking the counter from 0:00 once play resolves (AC1)", async () => {
+    it("starts playback automatically on mount (no click) and begins ticking the counter from 0:00 once play resolves", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const spy = spyOnPlayPause();
@@ -159,7 +159,7 @@
       }
     });
 
-    it("falls back to the paused state with no unhandled error when the autoplay play() promise rejects (AC2)", async () => {
+    it("falls back to the paused state with no unhandled error when the autoplay play() promise rejects", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const rejections = captureUnhandledRejections();
@@ -185,7 +185,7 @@
       }
     });
 
-    it("stops ticking and holds its current value while paused (AC3)", async () => {
+    it("stops ticking and holds its current value while paused", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const spy = spyOnPlayPause();
@@ -209,7 +209,7 @@
       }
     });
 
-    it("resumes ticking from where it stopped, not from 0:00, after pause then play again (AC4)", async () => {
+    it("resumes ticking from where it stopped, not from 0:00, after pause then play again", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const spy = spyOnPlayPause();
@@ -238,7 +238,7 @@
       }
     });
 
-    it("only resets to 0:00 on a fresh mount, never merely from pause/resume (AC5)", async () => {
+    it("only resets to 0:00 on a fresh mount, never merely from pause/resume", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const spy = spyOnPlayPause();
@@ -272,7 +272,7 @@
       }
     });
 
-    it("clears the tick interval on pause and on unmount, leaving nothing running (AC6)", async () => {
+    it("clears the tick interval on pause and on unmount, leaving nothing running", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const tracker = trackIntervals();
@@ -299,7 +299,7 @@
       }
     });
 
-    it("uses window.__ALBUM_PROMO_TIMER_TICK_MS__ to control the tick cadence (AC7)", async () => {
+    it("uses window.__ALBUM_PROMO_TIMER_TICK_MS__ to control the tick cadence", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 100000;
       const spy = spyOnPlayPause();
@@ -328,7 +328,7 @@
       }
     });
 
-    it("keeps the live-dot span, Live text, data-testid, and aria-label unchanged (AC8)", async () => {
+    it("keeps the live-dot span, Live text, data-testid, and aria-label unchanged", async () => {
       window.installMockHls();
       const spy = spyOnPlayPause();
       const root = await loadAlbumPromo();
@@ -348,7 +348,7 @@
       }
     });
 
-    it("still supports manual play/pause clicks after the autoplay mount (AC9)", async () => {
+    it("still supports manual play/pause clicks after the autoplay mount", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_TIMER_TICK_MS__ = 20;
       const spy = spyOnPlayPause();
