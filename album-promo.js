@@ -388,12 +388,11 @@
   //   - #track-artist       → artist name
   //   - #track-album        → album name, bound to metadatav2.json's `album`
   //     field (issue #221)
-  //   - #track-quality-source / #track-quality-stream → source/stream
-  //     quality metadata lines. Source is derived from metadatav2.json's
-  //     `bit_depth`/`sample_rate` (issue #221 — that JSON has no separate
-  //     stream-quality field); stream is a static brand constant per
-  //     RadioCalicoStyle/RadioCalico_Style_Guide.txt's "24-bit / 48 kHz
-  //     lossless" delivery spec, not a per-track value.
+  //   - #track-quality-source → source quality metadata line, derived from
+  //     metadatav2.json's `bit_depth`/`sample_rate` (issue #221). A
+  //     #track-quality-stream line was dropped (issue #225 review) — deriving
+  //     real per-stream quality would need extra requests beyond this
+  //     ticket's scope, and a hardcoded placeholder value wasn't wanted.
   //   - [data-analytics-id="track-title"|"track-artist"] → tracking hook
   //     (AC2); dispatch via dispatchTrackAnalyticsEvent() above, don't
   //     re-wire a new mechanism.
@@ -448,13 +447,7 @@
     qualitySource.className = "chloe-now-playing__quality-line";
     qualitySource.dataset.testid = "player-quality-source";
 
-    const qualityStream = document.createElement("p");
-    qualityStream.id = "track-quality-stream";
-    qualityStream.className = "chloe-now-playing__quality-line";
-    qualityStream.dataset.testid = "player-quality-stream";
-
     quality.appendChild(qualitySource);
-    quality.appendChild(qualityStream);
 
     const rating = document.createElement("div");
     rating.className = "chloe-now-playing__rating";
@@ -507,7 +500,6 @@
       qualitySource.textContent = `${t.playerQualitySourceLabel}: ${
         md ? formatSourceQuality(md.bit_depth, md.sample_rate) : t.playerLoading
       }`;
-      qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerQualityStreamValue}`;
       ratingLabel.textContent = t.playerRatingLabel;
       ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
       ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
@@ -731,10 +723,10 @@
     return tracks;
   }
 
-  // Issue #221: metadatav2.json only ever carries one bit_depth/sample_rate
-  // pair (the source recording's quality) — there's no separate per-track
-  // stream-quality field, so #track-quality-stream is a static brand
-  // constant (playerQualityStreamValue) instead of being derived here.
+  // Issue #221: derives the #track-quality-source line from metadatav2.json's
+  // bit_depth/sample_rate pair. A #track-quality-stream line was dropped
+  // (issue #225 review) rather than hardcoded — see buildMusicPlayerCard's
+  // DOM-hooks comment above.
   function formatSourceQuality(bitDepth, sampleRate) {
     if (!bitDepth || !sampleRate) return "";
     const khz = sampleRate / 1000;
