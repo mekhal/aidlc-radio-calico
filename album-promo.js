@@ -383,11 +383,17 @@
   // which this ticket re-touches:
   //   - #album-cover        → set in buildHero() above (Hero portrait image)
   //   - #track-title        → track title text
-  //   - #track-year         → release year, rendered next to the title
+  //   - #track-year         → release year, bound to metadatav2.json's `date`
+  //     field (issue #221 — confirmed via live sample there's no `year` key)
   //   - #track-artist       → artist name
-  //   - #track-album        → album name
+  //   - #track-album        → album name, bound to metadatav2.json's `album`
+  //     field (issue #221)
   //   - #track-quality-source / #track-quality-stream → source/stream
-  //     quality metadata lines
+  //     quality metadata lines. Source is derived from metadatav2.json's
+  //     `bit_depth`/`sample_rate` (issue #221 — that JSON has no separate
+  //     stream-quality field); stream is a static brand constant per
+  //     RadioCalicoStyle/RadioCalico_Style_Guide.txt's "24-bit / 48 kHz
+  //     lossless" delivery spec, not a per-track value.
   //   - [data-analytics-id="track-title"|"track-artist"] → tracking hook
   //     (AC2); dispatch via dispatchTrackAnalyticsEvent() above, don't
   //     re-wire a new mechanism.
@@ -481,10 +487,9 @@
     // Ticket D (issue #158): title/artist reflect state.nowPlaying.lastMetadata
     // once a live fetch has landed, instead of the static loading placeholder
     // used before the first fetch — this stops a language toggle re-render
-    // from stomping real Now Playing data back to "Loading…". Album/quality
-    // stay placeholder-only: metadatav2.json's field names for those aren't
-    // confirmed by this ticket's AC, so they're left out of scope (flagged in
-    // the Code PR summary) rather than guessed.
+    // from stomping real Now Playing data back to "Loading…". Issue #221
+    // extends the same lastMetadata-guard pattern to year/album/quality-source
+    // once their real metadatav2.json field names were confirmed.
     const status = document.createElement("p");
     status.id = "now-playing-status";
     status.className = "chloe-now-playing__status";
@@ -497,9 +502,12 @@
       const md = state.nowPlaying.lastMetadata;
       title.textContent = md ? md.title || "" : t.playerLoading;
       artist.textContent = md ? md.artist || "" : t.playerLoading;
-      album.textContent = t.playerLoading;
-      qualitySource.textContent = `${t.playerQualitySourceLabel}: ${t.playerLoading}`;
-      qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerLoading}`;
+      year.textContent = md ? md.date || "" : "(—)";
+      album.textContent = md ? md.album || "" : t.playerLoading;
+      qualitySource.textContent = `${t.playerQualitySourceLabel}: ${
+        md ? formatSourceQuality(md.bit_depth, md.sample_rate) : t.playerLoading
+      }`;
+      qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerQualityStreamValue}`;
       ratingLabel.textContent = t.playerRatingLabel;
       ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
       ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
@@ -539,6 +547,9 @@
 
     state.nowPlaying.artistEl = artist;
     state.nowPlaying.titleEl = title;
+    state.nowPlaying.yearEl = year;
+    state.nowPlaying.albumEl = album;
+    state.nowPlaying.qualitySourceEl = qualitySource;
     state.nowPlaying.statusEl = status;
 
     return panel;
@@ -720,9 +731,26 @@
     return tracks;
   }
 
-  function renderNowPlayingMetadata(elements, metadata) {
+  // Issue #221: metadatav2.json only ever carries one bit_depth/sample_rate
+  // pair (the source recording's quality) — there's no separate per-track
+  // stream-quality field, so #track-quality-stream is a static brand
+  // constant (playerQualityStreamValue) instead of being derived here.
+  function formatSourceQuality(bitDepth, sampleRate) {
+    if (!bitDepth || !sampleRate) return "";
+    const khz = sampleRate / 1000;
+    const khzText = Number.isInteger(khz) ? String(khz) : khz.toFixed(1);
+    return `${bitDepth}-bit / ${khzText}kHz`;
+  }
+
+  function renderNowPlayingMetadata(elements, metadata, t) {
     elements.artistEl.textContent = metadata.artist || "";
     elements.titleEl.textContent = metadata.title || "";
+    elements.yearEl.textContent = metadata.date || "";
+    elements.albumEl.textContent = metadata.album || "";
+    elements.qualitySourceEl.textContent = `${t.playerQualitySourceLabel}: ${formatSourceQuality(
+      metadata.bit_depth,
+      metadata.sample_rate
+    )}`;
   }
 
   // Rebuilds the list from scratch on every successful fetch rather than
@@ -773,7 +801,7 @@
     try {
       const metadata = await fetchNowPlayingMetadata();
       state.nowPlaying.lastMetadata = metadata;
-      renderNowPlayingMetadata(elements, metadata);
+      renderNowPlayingMetadata(elements, metadata, t);
       renderRecentlyPlayed(elements.recentlyPlayedListEl, parseRecentlyPlayed(metadata));
       hideNowPlayingStatus(elements);
     } catch (err) {
