@@ -99,8 +99,10 @@
 
       const button = root.querySelector('[data-testid="player-play-pause"]');
 
-      button.click();
-      await nextTick();
+      // Issue #228: playback now autoplays on mount, so .play() has already
+      // been called once and the button already reflects "playing" before
+      // any click — this test covers the manual toggle from that starting
+      // point (pause, then resume).
       expect(spy.calls.play.length).toBe(1);
       expect(button.getAttribute("aria-pressed")).toBe("true");
 
@@ -108,6 +110,11 @@
       await nextTick();
       expect(spy.calls.pause.length).toBe(1);
       expect(button.getAttribute("aria-pressed")).toBe("false");
+
+      button.click();
+      await nextTick();
+      expect(spy.calls.play.length).toBe(2);
+      expect(button.getAttribute("aria-pressed")).toBe("true");
 
       spy.restore();
       unloadAlbumPromo(root);
