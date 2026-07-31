@@ -383,11 +383,16 @@
   // which this ticket re-touches:
   //   - #album-cover        → set in buildHero() above (Hero portrait image)
   //   - #track-title        → track title text
-  //   - #track-year         → release year, rendered next to the title
+  //   - #track-year         → release year, bound to metadatav2.json's `date`
+  //     field (issue #221 — confirmed via live sample there's no `year` key)
   //   - #track-artist       → artist name
-  //   - #track-album        → album name
-  //   - #track-quality-source / #track-quality-stream → source/stream
-  //     quality metadata lines
+  //   - #track-album        → album name, bound to metadatav2.json's `album`
+  //     field (issue #221)
+  //   - #track-quality-source → source quality metadata line, derived from
+  //     metadatav2.json's `bit_depth`/`sample_rate` (issue #221). A
+  //     #track-quality-stream line was dropped (issue #225 review) — deriving
+  //     real per-stream quality would need extra requests beyond this
+  //     ticket's scope, and a hardcoded placeholder value wasn't wanted.
   //   - [data-analytics-id="track-title"|"track-artist"] → tracking hook
   //     (AC2); dispatch via dispatchTrackAnalyticsEvent() above, don't
   //     re-wire a new mechanism.
@@ -442,13 +447,7 @@
     qualitySource.className = "chloe-now-playing__quality-line";
     qualitySource.dataset.testid = "player-quality-source";
 
-    const qualityStream = document.createElement("p");
-    qualityStream.id = "track-quality-stream";
-    qualityStream.className = "chloe-now-playing__quality-line";
-    qualityStream.dataset.testid = "player-quality-stream";
-
     quality.appendChild(qualitySource);
-    quality.appendChild(qualityStream);
 
     const rating = document.createElement("div");
     rating.className = "chloe-now-playing__rating";
@@ -481,10 +480,9 @@
     // Ticket D (issue #158): title/artist reflect state.nowPlaying.lastMetadata
     // once a live fetch has landed, instead of the static loading placeholder
     // used before the first fetch — this stops a language toggle re-render
-    // from stomping real Now Playing data back to "Loading…". Album/quality
-    // stay placeholder-only: metadatav2.json's field names for those aren't
-    // confirmed by this ticket's AC, so they're left out of scope (flagged in
-    // the Code PR summary) rather than guessed.
+    // from stomping real Now Playing data back to "Loading…". Issue #221
+    // extends the same lastMetadata-guard pattern to year/album/quality-source
+    // once their real metadatav2.json field names were confirmed.
     const status = document.createElement("p");
     status.id = "now-playing-status";
     status.className = "chloe-now-playing__status";
@@ -497,9 +495,11 @@
       const md = state.nowPlaying.lastMetadata;
       title.textContent = md ? md.title || "" : t.playerLoading;
       artist.textContent = md ? md.artist || "" : t.playerLoading;
-      album.textContent = t.playerLoading;
-      qualitySource.textContent = `${t.playerQualitySourceLabel}: ${t.playerLoading}`;
-      qualityStream.textContent = `${t.playerQualityStreamLabel}: ${t.playerLoading}`;
+      year.textContent = md ? md.date || "" : "(—)";
+      album.textContent = md ? md.album || "" : t.playerLoading;
+      qualitySource.textContent = `${t.playerQualitySourceLabel}: ${
+        md ? formatSourceQuality(md.bit_depth, md.sample_rate) : t.playerLoading
+      }`;
       ratingLabel.textContent = t.playerRatingLabel;
       ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
       ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
@@ -539,6 +539,9 @@
 
     state.nowPlaying.artistEl = artist;
     state.nowPlaying.titleEl = title;
+    state.nowPlaying.yearEl = year;
+    state.nowPlaying.albumEl = album;
+    state.nowPlaying.qualitySourceEl = qualitySource;
     state.nowPlaying.statusEl = status;
 
     return panel;
@@ -548,17 +551,70 @@
   // DOM island (React.createElement + hooks via CDN UMD builds, no
   // JSX/build step) — a scoped exception to the vanilla-JS/jQuery stack
   // decision (issue #20), matching the same exception already locked for
-  // Ticket D's cover-art component (issue #158). isPlaying/volume are local
-  // component state only — visual toggles, no real audio (per #150). The
-  // timer (2026-07-27 review) doubles as AC3's time readout, formatted
-  // `<mm:ss> / ● Live` since this is a live stream, not a fixed-length file.
+  // Ticket D's cover-art component (issue #158). The timer (2026-07-27
+  // review) doubles as AC3's time readout, formatted `<mm:ss> / ● Live`
+  // since this is a live stream, not a fixed-length file.
+  //
+  // Issue #220 (Option B, confirmed 2026-07-30): real playback is wired up
+  // here as a self-contained <audio>/hls.js path (not imported from
+  // app.js), matching this page's existing standalone-page precedent
+  // (AC6, #158). Mirrors app.js's own Hls setup (STREAM_URL, Hls.js primary
+  // with Safari's native HLS support as fallback) rather than introducing a
+  // second pattern.
+  const STREAM_URL = "https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8";
+
   function PlayerControls() {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
+    const audioRef = React.useRef(null);
+    const hlsRef = React.useRef(null);
+
+    React.useEffect(() => {
+      const audio = audioRef.current;
+
+      function stopPlayback() {
+        audio.pause();
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+      }
+
+      if (window.Hls && window.Hls.isSupported()) {
+        const hls = new window.Hls();
+        hls.loadSource(STREAM_URL);
+        hls.attachMedia(audio);
+        hlsRef.current = hls;
+      } else if (audio.canPlayType("application/vnd.apple.mpegurl")) {
+        audio.src = STREAM_URL;
+      }
+
+      // tests/load-album-promo.js's unloadAlbumPromo() calls this before
+      // removing the mounted root, mirroring window.__albumPromoStopNowPlaying
+      // above, so no Hls instance survives across page loads/tests (AC6).
+      window.__albumPromoStopPlayback = stopPlayback;
+
+      return stopPlayback;
+    }, []);
+
+    React.useEffect(() => {
+      if (audioRef.current) audioRef.current.volume = volume / 100;
+    }, [volume]);
+
+    function togglePlayback() {
+      const audio = audioRef.current;
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        audio.play();
+      }
+      setIsPlaying((playing) => !playing);
+    }
 
     return React.createElement(
       "div",
       { className: "chloe-player-controls", "data-testid": "player-controls" },
+      React.createElement("audio", { ref: audioRef }),
       React.createElement(
         "button",
         {
@@ -567,7 +623,7 @@
           "data-testid": "player-play-pause",
           "aria-pressed": isPlaying,
           "aria-label": isPlaying ? "Pause" : "Play",
-          onClick: () => setIsPlaying((playing) => !playing),
+          onClick: togglePlayback,
         },
         React.createElement("i", {
           className: `bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`,
@@ -667,9 +723,26 @@
     return tracks;
   }
 
-  function renderNowPlayingMetadata(elements, metadata) {
+  // Issue #221: derives the #track-quality-source line from metadatav2.json's
+  // bit_depth/sample_rate pair. A #track-quality-stream line was dropped
+  // (issue #225 review) rather than hardcoded — see buildMusicPlayerCard's
+  // DOM-hooks comment above.
+  function formatSourceQuality(bitDepth, sampleRate) {
+    if (!bitDepth || !sampleRate) return "";
+    const khz = sampleRate / 1000;
+    const khzText = Number.isInteger(khz) ? String(khz) : khz.toFixed(1);
+    return `${bitDepth}-bit / ${khzText}kHz`;
+  }
+
+  function renderNowPlayingMetadata(elements, metadata, t) {
     elements.artistEl.textContent = metadata.artist || "";
     elements.titleEl.textContent = metadata.title || "";
+    elements.yearEl.textContent = metadata.date || "";
+    elements.albumEl.textContent = metadata.album || "";
+    elements.qualitySourceEl.textContent = `${t.playerQualitySourceLabel}: ${formatSourceQuality(
+      metadata.bit_depth,
+      metadata.sample_rate
+    )}`;
   }
 
   // Rebuilds the list from scratch on every successful fetch rather than
@@ -720,7 +793,7 @@
     try {
       const metadata = await fetchNowPlayingMetadata();
       state.nowPlaying.lastMetadata = metadata;
-      renderNowPlayingMetadata(elements, metadata);
+      renderNowPlayingMetadata(elements, metadata, t);
       renderRecentlyPlayed(elements.recentlyPlayedListEl, parseRecentlyPlayed(metadata));
       hideNowPlayingStatus(elements);
     } catch (err) {

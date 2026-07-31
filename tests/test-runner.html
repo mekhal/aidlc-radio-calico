@@ -85,9 +85,16 @@
     <script src="mock-metadata-fetch.js"></script>
     <script src="load-album-promo.js"></script>
     <script src="now-playing-metadata-fetch.test.js"></script>
+    <script src="now-playing-year-album-quality.test.js"></script>
     <script src="recently-played-list.test.js"></script>
     <script src="now-playing-polling.test.js"></script>
     <script src="cover-art-fingerprint.test.js"></script>
+
+    <!-- issue #220 (Option B): PlayerControls' real audio playback suite —
+         same category as the Ticket D suites above (album-promo.js's own
+         DOM surface, not app.js interface functions), so wired directly
+         here rather than into test-report-suite-files.js. -->
+    <script src="player-real-audio-playback.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of

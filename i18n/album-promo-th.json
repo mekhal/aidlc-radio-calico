@@ -13,7 +13,6 @@
   "playerRatingUpLabel": "ให้คะแนนเพลงนี้แบบชอบ",
   "playerRatingDownLabel": "ให้คะแนนเพลงนี้แบบไม่ชอบ",
   "playerQualitySourceLabel": "คุณภาพต้นฉบับ",
-  "playerQualityStreamLabel": "คุณภาพสตรีม",
   "recentlyPlayedHeading": "เล่นล่าสุด",
   "nowPlayingUnavailable": "ไม่สามารถโหลดข้อมูลเพลงได้ในขณะนี้"
 }
