@@ -14,6 +14,7 @@
   "playerRatingDownLabel": "Rate this track down",
   "playerQualitySourceLabel": "Source quality",
   "playerQualityStreamLabel": "Stream quality",
+  "playerQualityStreamValue": "24-bit / 48 kHz lossless",
   "recentlyPlayedHeading": "Recently Played",
   "nowPlayingUnavailable": "Unable to load track info right now."
 }
