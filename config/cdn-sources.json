@@ -38,6 +38,14 @@
       "fallbacks": [],
       "usedIn": ["tests/test-runner.html"],
       "notes": "Not yet migrated off unpkg.com — see knownDrift below. Out of scope for issue #157; flagged for a future ticket."
+    },
+    "hls.js": {
+      "version": "1",
+      "type": "js",
+      "primary": "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js",
+      "fallbacks": ["https://unpkg.com/hls.js@1/dist/hls.min.js"],
+      "usedIn": ["index.html", "album-promo.html"],
+      "notes": "Issue #220 (Option B): same library app.js already relies on via window.Hls (app.js itself has no <script> tag of its own in either HTML file — see the app.js dead-code note on issue #220). jsDelivr primary / unpkg fallback, matching the react/react-dom entries above. Must load before album-promo.js."
     }
   },
   "knownDrift": [

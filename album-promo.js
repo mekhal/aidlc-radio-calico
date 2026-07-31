@@ -548,17 +548,70 @@
   // DOM island (React.createElement + hooks via CDN UMD builds, no
   // JSX/build step) — a scoped exception to the vanilla-JS/jQuery stack
   // decision (issue #20), matching the same exception already locked for
-  // Ticket D's cover-art component (issue #158). isPlaying/volume are local
-  // component state only — visual toggles, no real audio (per #150). The
-  // timer (2026-07-27 review) doubles as AC3's time readout, formatted
-  // `<mm:ss> / ● Live` since this is a live stream, not a fixed-length file.
+  // Ticket D's cover-art component (issue #158). The timer (2026-07-27
+  // review) doubles as AC3's time readout, formatted `<mm:ss> / ● Live`
+  // since this is a live stream, not a fixed-length file.
+  //
+  // Issue #220 (Option B, confirmed 2026-07-30): real playback is wired up
+  // here as a self-contained <audio>/hls.js path (not imported from
+  // app.js), matching this page's existing standalone-page precedent
+  // (AC6, #158). Mirrors app.js's own Hls setup (STREAM_URL, Hls.js primary
+  // with Safari's native HLS support as fallback) rather than introducing a
+  // second pattern.
+  const STREAM_URL = "https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8";
+
   function PlayerControls() {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
+    const audioRef = React.useRef(null);
+    const hlsRef = React.useRef(null);
+
+    React.useEffect(() => {
+      const audio = audioRef.current;
+
+      function stopPlayback() {
+        audio.pause();
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+      }
+
+      if (window.Hls && window.Hls.isSupported()) {
+        const hls = new window.Hls();
+        hls.loadSource(STREAM_URL);
+        hls.attachMedia(audio);
+        hlsRef.current = hls;
+      } else if (audio.canPlayType("application/vnd.apple.mpegurl")) {
+        audio.src = STREAM_URL;
+      }
+
+      // tests/load-album-promo.js's unloadAlbumPromo() calls this before
+      // removing the mounted root, mirroring window.__albumPromoStopNowPlaying
+      // above, so no Hls instance survives across page loads/tests (AC6).
+      window.__albumPromoStopPlayback = stopPlayback;
+
+      return stopPlayback;
+    }, []);
+
+    React.useEffect(() => {
+      if (audioRef.current) audioRef.current.volume = volume / 100;
+    }, [volume]);
+
+    function togglePlayback() {
+      const audio = audioRef.current;
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        audio.play();
+      }
+      setIsPlaying((playing) => !playing);
+    }
 
     return React.createElement(
       "div",
       { className: "chloe-player-controls", "data-testid": "player-controls" },
+      React.createElement("audio", { ref: audioRef }),
       React.createElement(
         "button",
         {
@@ -567,7 +620,7 @@
           "data-testid": "player-play-pause",
           "aria-pressed": isPlaying,
           "aria-label": isPlaying ? "Pause" : "Play",
-          onClick: () => setIsPlaying((playing) => !playing),
+          onClick: togglePlayback,
         },
         React.createElement("i", {
           className: `bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`,
