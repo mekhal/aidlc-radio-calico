@@ -563,16 +563,51 @@
   // second pattern.
   const STREAM_URL = "https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8";
 
+  // Issue #228: elapsed-time counter tick cadence, overridable for tests —
+  // mirrors the window.__ALBUM_PROMO_METADATA_POLL_MS__ convention used by
+  // the Now Playing poll loop above.
+  const PLAYER_TIMER_DEFAULT_TICK_MS = 1000;
+
+  function getPlayerTimerTickMs() {
+    return window.__ALBUM_PROMO_TIMER_TICK_MS__ || PLAYER_TIMER_DEFAULT_TICK_MS;
+  }
+
+  function formatElapsed(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  }
+
   function PlayerControls() {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
+    const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
     const audioRef = React.useRef(null);
     const hlsRef = React.useRef(null);
+    const timerIntervalRef = React.useRef(null);
+
+    function stopTimer() {
+      if (timerIntervalRef.current !== null) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    }
+
+    // Cumulative, not per-play: the counter is only ever reset by mounting
+    // a fresh component (elapsedSeconds's initial useState(0)) — pause just
+    // stops the tick and resume continues it from wherever it left off.
+    function startTimer() {
+      stopTimer();
+      timerIntervalRef.current = setInterval(() => {
+        setElapsedSeconds((seconds) => seconds + 1);
+      }, getPlayerTimerTickMs());
+    }
 
     React.useEffect(() => {
       const audio = audioRef.current;
 
       function stopPlayback() {
+        stopTimer();
         audio.pause();
         if (hlsRef.current) {
           hlsRef.current.destroy();
@@ -589,6 +624,18 @@
         audio.src = STREAM_URL;
       }
 
+      // Autoplay on mount, per the 2026-07-31 step-3 scope revision. A
+      // rejected play() (browser autoplay policy) is caught so it falls
+      // back to the normal paused UI instead of an unhandled rejection or
+      // a stuck/broken state.
+      audio
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          startTimer();
+        })
+        .catch(() => {});
+
       // tests/load-album-promo.js's unloadAlbumPromo() calls this before
       // removing the mounted root, mirroring window.__albumPromoStopNowPlaying
       // above, so no Hls instance survives across page loads/tests (AC6).
@@ -604,9 +651,11 @@
     function togglePlayback() {
       const audio = audioRef.current;
       if (isPlaying) {
+        stopTimer();
         audio.pause();
       } else {
         audio.play();
+        startTimer();
       }
       setIsPlaying((playing) => !playing);
     }
@@ -637,7 +686,7 @@
           "data-testid": "player-timer",
           "aria-label": "Elapsed time, live broadcast",
         },
-        "0:00 / ",
+        `${formatElapsed(elapsedSeconds)} / `,
         React.createElement("span", { className: "chloe-player-controls__live-dot", "aria-hidden": "true" }),
         "Live"
       ),
