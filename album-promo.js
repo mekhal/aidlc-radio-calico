@@ -473,9 +473,23 @@
 
     bindRatingToggle(ratingUp, ratingDown);
 
+    // Issue #209: Recently Played moved from an inline section into a Modal
+    // — this button (flush-right via CSS margin-left: auto, per the
+    // 2026-08-01 review thread) opens it. Kept in the same row as the
+    // rating controls, above the audio-control row below.
+    const recentlyPlayedTrigger = document.createElement("button");
+    recentlyPlayedTrigger.type = "button";
+    recentlyPlayedTrigger.className = "chloe-now-playing__recently-played-trigger";
+    recentlyPlayedTrigger.dataset.testid = "recently-played-trigger";
+    recentlyPlayedTrigger.setAttribute("aria-haspopup", "dialog");
+    recentlyPlayedTrigger.addEventListener("click", () => {
+      openRecentlyPlayedModal(state, recentlyPlayedTrigger);
+    });
+
     rating.appendChild(ratingLabel);
     rating.appendChild(ratingUp);
     rating.appendChild(ratingDown);
+    rating.appendChild(recentlyPlayedTrigger);
 
     // Ticket D (issue #158): title/artist reflect state.nowPlaying.lastMetadata
     // once a live fetch has landed, instead of the static loading placeholder
@@ -503,6 +517,8 @@
       ratingLabel.textContent = t.playerRatingLabel;
       ratingUp.setAttribute("aria-label", t.playerRatingUpLabel);
       ratingDown.setAttribute("aria-label", t.playerRatingDownLabel);
+      recentlyPlayedTrigger.textContent = `🗔 ${t.recentlyPlayedHeading}`;
+      recentlyPlayedTrigger.setAttribute("aria-label", t.recentlyPlayedTriggerLabel);
       dispatchTrackAnalyticsEvent("track-title", title.textContent);
       dispatchTrackAnalyticsEvent("track-artist", artist.textContent);
     }
@@ -882,38 +898,95 @@
   // installed/removed) after that test has finished.
   window.__albumPromoStopNowPlaying = stopNowPlayingUpdates;
 
-  function buildRecentlyPlayed(state) {
-    const section = document.createElement("section");
-    section.className = "chloe-recently-played";
-    section.dataset.testid = "recently-played";
-
-    const heading = document.createElement("h2");
-    heading.className = "chloe-recently-played__heading";
-
-    const list = document.createElement("ul");
-    list.className = "chloe-recently-played__list";
+  // Issue #209: the inline Recently Played section (formerly built here) was
+  // deleted per the human's step-3 review decision ("ลบ code เดิมออกเลย") —
+  // renderRecentlyPlayed()/parseRecentlyPlayed()/refreshNowPlaying() are
+  // unchanged and keep polling every 10s (AC4), now targeting this list
+  // element. It's kept detached from the page until openRecentlyPlayedModal()
+  // below appends it into the modal, and stays the SAME node across
+  // open/close cycles so its content (and live updates) survive a close.
+  function createRecentlyPlayedListElement(state) {
+    const list = document.createElement("ol");
+    list.className = "chloe-recently-played-modal__list";
     list.dataset.testid = "recently-played-list";
-
-    function render() {
-      if (!TRANSLATIONS) return;
-      heading.textContent = TRANSLATIONS[state.lang].recentlyPlayedHeading;
-    }
-    render();
-    state.onLanguageChange.push(render);
-
-    section.appendChild(heading);
-    section.appendChild(list);
-
     state.nowPlaying.recentlyPlayedListEl = list;
+  }
 
-    return section;
+  // Modeled on app.js's openTestReportModal() (issue #41) per the 2026-08-01
+  // review's reuse-first decision: backdrop + centered role="dialog" panel,
+  // Escape/backdrop-click/close-button all close it, focus returns to the
+  // trigger, and the modal/backdrop nodes are fully removed from the DOM on
+  // close (AC2). Colors come from the page's existing --chloe-* custom
+  // properties (album-promo.css) rather than a hardcoded palette, so the
+  // modal tracks the light/dark toggle automatically (AC5).
+  function openRecentlyPlayedModal(state, trigger) {
+    const t = TRANSLATIONS[state.lang];
+    let closed = false;
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "chloe-recently-played-modal-backdrop";
+    backdrop.dataset.testid = "recently-played-modal-backdrop";
+
+    const modal = document.createElement("div");
+    modal.className = "chloe-recently-played-modal";
+    modal.dataset.testid = "recently-played-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", t.recentlyPlayedHeading);
+    modal.tabIndex = -1;
+
+    const header = document.createElement("div");
+    header.className = "chloe-recently-played-modal__header";
+
+    const title = document.createElement("h2");
+    title.className = "chloe-recently-played-modal__title";
+    title.textContent = t.recentlyPlayedHeading;
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "chloe-recently-played-modal__close";
+    closeButton.dataset.testid = "recently-played-modal-close";
+    closeButton.setAttribute("aria-label", t.recentlyPlayedModalCloseLabel);
+    closeButton.textContent = "✕";
+
+    header.appendChild(title);
+    header.appendChild(closeButton);
+
+    modal.appendChild(header);
+    // Reuses the SAME live list node the 10s poll already targets (AC4) —
+    // moving it here (rather than cloning) means the modal shows whatever
+    // it already holds and keeps receiving refreshNowPlaying()'s updates
+    // while open, with no second fetch path.
+    modal.appendChild(state.nowPlaying.recentlyPlayedListEl);
+
+    function closeModal() {
+      if (closed) return;
+      closed = true;
+      document.removeEventListener("keydown", onKeyDown);
+      if (modal.parentNode) modal.parentNode.removeChild(modal);
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      if (trigger && typeof trigger.focus === "function") trigger.focus();
+    }
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") closeModal();
+    }
+
+    backdrop.addEventListener("click", closeModal);
+    closeButton.addEventListener("click", closeModal);
+    document.addEventListener("keydown", onKeyDown);
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(modal);
+
+    modal.focus();
   }
 
   function buildMain(state) {
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
-    main.appendChild(buildRecentlyPlayed(state));
+    createRecentlyPlayedListElement(state);
     return main;
   }
 

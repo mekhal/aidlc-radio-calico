@@ -1,12 +1,20 @@
 /**
- * Ticket D (issue #158), AC3: render a "เล่นล่าสุด" (Recently Played) list of
- * the 5 previous tracks using the prev_artist_1..5/prev_title_1..5 fields
- * from the same metadatav2.json response, placed below the hero/player
- * section.
+ * Ticket D (issue #158), AC3: originally rendered a "เล่นล่าสุด" (Recently
+ * Played) list of the 5 previous tracks using the prev_artist_1..5/
+ * prev_title_1..5 fields from the same metadatav2.json response, inline
+ * below the hero/player section.
  *
- * Fails today (RED) — album-promo.js's buildMain() only appends buildHero();
- * there is no Recently Played section, and no [data-testid="recently-played"]
- * hook, anywhere in the page yet.
+ * Updated for issue #209 (Recently Played moved into a Modal, AC6): the
+ * inline section was deleted outright, so the list now only exists inside
+ * the modal opened via [data-testid="recently-played-trigger"]. These tests
+ * open the modal first — renderRecentlyPlayed()/parseRecentlyPlayed() and
+ * the recently-played-item/-artist/-title test-ids are unchanged, only
+ * where the list lives in the DOM changed. The former "DOM order below
+ * hero" assertion no longer applies (it checked the now-deleted inline
+ * section) and isn't replaced with new trigger-placement coverage here,
+ * since AC1 wasn't in this Test PR's scope — see
+ * tests/recently-played-modal.test.js for the AC2 open/close coverage this
+ * complements.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -39,14 +47,27 @@
     prev_title_5: "Blue Lights",
   };
 
-  describe("Recently Played list (issue #158, Ticket D, AC3)", () => {
-    it("renders exactly 5 previously played tracks", async () => {
+  async function openRecentlyPlayedModal(root) {
+    const trigger = root.querySelector('[data-testid="recently-played-trigger"]');
+    trigger.click();
+    return waitFor(() => document.querySelector('[data-testid="recently-played-modal"]'));
+  }
+
+  function closeRecentlyPlayedModal() {
+    const closeButton = document.querySelector('[data-testid="recently-played-modal-close"]');
+    if (closeButton) closeButton.click();
+  }
+
+  describe("Recently Played list (issue #158, Ticket D, AC3 — moved into a Modal by issue #209)", () => {
+    it("renders exactly 5 previously played tracks in the modal", async () => {
       const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
       const root = await loadAlbumPromo();
       try {
-        await waitFor(() => root.querySelectorAll('[data-testid="recently-played-item"]').length === 5);
+        await openRecentlyPlayedModal(root);
+        await waitFor(() => document.querySelectorAll('[data-testid="recently-played-item"]').length === 5);
 
-        expect(root.querySelectorAll('[data-testid="recently-played-item"]').length).toBe(5);
+        expect(document.querySelectorAll('[data-testid="recently-played-item"]').length).toBe(5);
+        closeRecentlyPlayedModal();
       } finally {
         mock.restore();
         unloadAlbumPromo(root);
@@ -57,9 +78,10 @@
       const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
       const root = await loadAlbumPromo();
       try {
-        await waitFor(() => root.querySelectorAll('[data-testid="recently-played-item"]').length === 5);
+        await openRecentlyPlayedModal(root);
+        await waitFor(() => document.querySelectorAll('[data-testid="recently-played-item"]').length === 5);
 
-        const items = root.querySelectorAll('[data-testid="recently-played-item"]');
+        const items = document.querySelectorAll('[data-testid="recently-played-item"]');
         [1, 2, 3, 4, 5].forEach((n, index) => {
           const item = items[index];
           expect(item.querySelector('[data-testid="recently-played-artist"]').textContent).toBe(
@@ -69,25 +91,7 @@
             SAMPLE_METADATA[`prev_title_${n}`]
           );
         });
-      } finally {
-        mock.restore();
-        unloadAlbumPromo(root);
-      }
-    });
-
-    it("places the Recently Played section below the hero/player section in DOM order", async () => {
-      const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
-      const root = await loadAlbumPromo();
-      try {
-        await waitFor(() => root.querySelector('[data-testid="recently-played"]'));
-
-        const hero = root.querySelector('[data-testid="hero-player-slot"]');
-        const recentlyPlayed = root.querySelector('[data-testid="recently-played"]');
-        expect(hero).toBeTruthy();
-        expect(recentlyPlayed).toBeTruthy();
-        expect(
-          !!(hero.compareDocumentPosition(recentlyPlayed) & Node.DOCUMENT_POSITION_FOLLOWING)
-        ).toBeTruthy();
+        closeRecentlyPlayedModal();
       } finally {
         mock.restore();
         unloadAlbumPromo(root);

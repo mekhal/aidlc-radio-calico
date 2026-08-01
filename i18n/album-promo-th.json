@@ -14,5 +14,7 @@
   "playerRatingDownLabel": "ให้คะแนนเพลงนี้แบบไม่ชอบ",
   "playerQualitySourceLabel": "คุณภาพต้นฉบับ",
   "recentlyPlayedHeading": "เล่นล่าสุด",
+  "recentlyPlayedTriggerLabel": "เปิดรายการเพลงล่าสุด",
+  "recentlyPlayedModalCloseLabel": "ปิดรายการเพลงล่าสุด",
   "nowPlayingUnavailable": "ไม่สามารถโหลดข้อมูลเพลงได้ในขณะนี้"
 }
