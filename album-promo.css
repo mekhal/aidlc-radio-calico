@@ -368,6 +368,25 @@ body {
   transform: scale(1.15);
 }
 
+/* Issue #209: Recently Played modal trigger — flush-right within the
+   existing .chloe-now-playing__rating flex row, above the audio controls. */
+.chloe-now-playing__recently-played-trigger {
+  margin-left: auto;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: var(--chloe-ink);
+  font-family: var(--chloe-sans);
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.chloe-now-playing__recently-played-trigger:hover {
+  opacity: 1;
+}
+
 /* --- Ticket D (issue #158, AC4): fetch-failure status line --- */
 .chloe-now-playing__status {
   margin: 0;
@@ -408,49 +427,100 @@ body {
   background: var(--chloe-pink-deep);
 }
 
-/* --- Ticket D (issue #158, AC3): Recently Played list, below the hero row ---
-   Hidden per issue #158 (2026-07-29): human wants this moved to a Modal
-   (tracked separately in #209). Fetch/render logic (buildRecentlyPlayed(),
-   refreshNowPlaying()) stays running in the background so the Modal work
-   can reuse it as-is — only the inline section is hidden here. */
-.chloe-recently-played {
-  display: none;
-  max-width: 900px;
-  margin: 3rem auto 0;
-  padding: 0 1rem;
+/* --- Issue #209: Recently Played Modal ---
+   The inline section (formerly here) was deleted outright per the human's
+   step-3 review decision ("ลบ code เดิมออกเลย") — renderRecentlyPlayed()/
+   parseRecentlyPlayed()/refreshNowPlaying() are unchanged and now target
+   the modal's list element instead (see openRecentlyPlayedModal() in
+   album-promo.js). Colors are drawn from the page's --chloe-* custom
+   properties (defined near the top of this file, theme-aware via
+   [data-chloe-theme="dark"]) so the modal tracks the light/dark toggle
+   automatically, rather than a hardcoded palette (AC5). */
+.chloe-recently-played-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
-.chloe-recently-played__heading {
+.chloe-recently-played-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 480px);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 16px;
+  padding: 1.5rem;
+  z-index: 1001;
+  font-family: var(--chloe-sans);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.chloe-recently-played-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chloe-recently-played-modal__title {
   font-family: var(--chloe-sans);
   font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   opacity: 0.8;
-  margin: 0 0 1rem;
+  margin: 0;
 }
 
-.chloe-recently-played__list {
-  list-style: none;
+.chloe-recently-played-modal__close {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: var(--chloe-ink);
+  font-family: var(--chloe-sans);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0.25rem 0.6rem;
+  opacity: 0.8;
+}
+
+.chloe-recently-played-modal__close:hover {
+  opacity: 1;
+}
+
+/* AC3: numbered "N. Artist : Title" rows — list-style: decimal gives the
+   numbering for free; the colon is a ::after on the artist span so it stays
+   out of the artist span's own textContent (recently-played-list.test.js
+   asserts that text matches prev_artist_N exactly). */
+.chloe-recently-played-modal__list {
+  list-style: decimal;
+  list-style-position: inside;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .chloe-recently-played__item {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   font-family: var(--chloe-sans);
   font-size: 0.95rem;
 }
 
+.chloe-recently-played__item:last-child {
+  border-bottom: none;
+}
+
 .chloe-recently-played__artist {
   font-weight: 700;
+}
+
+.chloe-recently-played__artist::after {
+  content: " : ";
+  font-weight: 400;
 }
 
 .chloe-recently-played__title {
