@@ -14,5 +14,7 @@
   "playerRatingDownLabel": "Rate this track down",
   "playerQualitySourceLabel": "Source quality",
   "recentlyPlayedHeading": "Recently Played",
+  "recentlyPlayedTriggerLabel": "Open Recently Played",
+  "recentlyPlayedModalCloseLabel": "Close Recently Played",
   "nowPlayingUnavailable": "Unable to load track info right now."
 }
