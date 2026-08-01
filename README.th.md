@@ -275,7 +275,21 @@ AI ทำงานใน feature branch → **Developer หรือ Tester** re
 
 ---
 
-## 11. อ้างอิงและกิตติกรรมประกาศ (References & Acknowledgements)
+## 11. Quality & Safety Gates (เกณฑ์คุณภาพและความปลอดภัย)
+
+นี่คือเครื่องมือและ workflow จริงที่รองรับ 4 gate ใน [ข้อ 10](#10-มาตรฐาน-production-grade) ด้านบน:
+
+| Gate | เครื่องมือ | สิ่งที่ทำงานอยู่ตอนนี้ |
+|---|---|---|
+| **Code Quality & Linting** | [`.github/workflows/mega-linter.yml`](.github/workflows/mega-linter.yml) (Mega-Linter) | สแกนเฉพาะ diff ทุกครั้งที่เปิด PR เข้า `develop` เพื่อ feedback เร็ว · สแกนทั้ง codebase เมื่อ push เข้า `develop` และตามตารางรายสัปดาห์ |
+| **Automated Testing (TDD)** | เทสที่เขียนเองภายใต้ [`tests/`](tests/) รันผ่าน `tests/test-runner.html` | ทุก feature มีเทส unit/integration ที่ครอบคลุม Acceptance Criteria (AC) ของตัวเอง — ดู [ข้อ 4](#4-ai-dlc-loop-แกนหลัก) และ [ข้อ 9](#9-โปรเจกต์-radio-calico) |
+| **Security & Vulnerability Scanning** | [`.github/workflows/trivy.yml`](.github/workflows/trivy.yml) (Trivy) | สแกน filesystem ทุกครั้งที่เปิด PR เข้า `develop` และเมื่อ push · ผลลัพธ์อัปโหลดเป็น SARIF เข้า GitHub Code Scanning |
+
+**ตอนนี้ยังเป็น report-only:** ทั้ง Mega-Linter และ Trivy รันแบบแสดงผลที่พบแต่ยังไม่บล็อก (`DISABLE_ERRORS: true` / `exit-code: 0`) — ดู `docs/decisions/2026-07-16-ci-tooling-defaults.md` การจะทำให้ gate ใดบล็อกการ merge เป็นการตัดสินใจในอนาคตหลังจากไล่ตรวจ finding ที่พบแล้ว ไม่ใช่สิ่งที่ README นี้ควรอ้างว่าบังคับใช้อยู่แล้ว
+
+---
+
+## 12. อ้างอิงและกิตติกรรมประกาศ (References & Acknowledgements)
 
 - แนวคิดและกระบวนการในโปรเจกต์นี้ได้แรงบันดาลใจจากคอร์ส **"Claude Code: Building Faster with AI, from Prototype to Prod"** บน Udemy ขอบคุณ **Frank Kane**
 - ขอบคุณ **คุณ Kunaruk Osatapirat** (Speaker) สำหรับหัวข้อ **"AI-driven architecture: Designing distributed systems at scale"** ในงาน **AWS Summit Bangkok 2026**

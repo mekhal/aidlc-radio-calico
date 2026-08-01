@@ -275,7 +275,21 @@ Every Code PR (step 6) must pass **all four gates** below — Security, Quality,
 
 ---
 
-## 11. References & Acknowledgements
+## 11. Quality & Safety Gates
+
+These are the concrete tools and workflows that back the four gates in [Section 10](#10-production-grade-standards) above:
+
+| Gate | Tooling | What it does today |
+|---|---|---|
+| **Code Quality & Linting** | [`.github/workflows/mega-linter.yml`](.github/workflows/mega-linter.yml) (Mega-Linter) | Diff-only scan on every PR into `develop` for fast feedback; full-codebase scan on push to `develop` and on a weekly schedule. |
+| **Automated Testing (TDD)** | Hand-written tests under [`tests/`](tests/), run via `tests/test-runner.html` | Every feature is covered by unit/integration tests scoped to its Acceptance Criteria (AC) — see [Section 4](#4-ai-dlc-loop-the-core) and [Section 9](#9-the-radio-calico-project). |
+| **Security & Vulnerability Scanning** | [`.github/workflows/trivy.yml`](.github/workflows/trivy.yml) (Trivy) | Filesystem scan on every PR into `develop` and on push; results upload as SARIF to GitHub Code Scanning. |
+
+**Report-only today:** both Mega-Linter and Trivy currently run with findings surfaced but non-blocking (`DISABLE_ERRORS: true` / `exit-code: 0`) — see `docs/decisions/2026-07-16-ci-tooling-defaults.md`. Making either gate merge-blocking is a follow-up decision once findings are triaged, not something this README should claim is already enforced.
+
+---
+
+## 12. References & Acknowledgements
 
 - The ideas and process in this project were inspired by the Udemy course **"Claude Code: Building Faster with AI, from Prototype to Prod"** thanks to **Frank Kane**.
 - Thanks to **Kunaruk Osatapirat** (speaker) for the talk **"AI-driven architecture: Designing distributed systems at scale"** at **AWS Summit Bangkok 2026**.
