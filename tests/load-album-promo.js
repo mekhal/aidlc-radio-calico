@@ -4,11 +4,29 @@
  * Babel transform needed here: album-promo.js already calls
  * React.createElement directly (no JSX), so the fetched source can run as
  * plain JS. See tests/README.md.
+ *
+ * Issue #253 (Ticket 1): shared/state.js, shared/translations.js, and
+ * shared/helpers.js are fetched and injected ahead of album-promo.js, in
+ * dependency order, mirroring album-promo.js's own fetch+inject below (AC3)
+ * — each has a path-override hook, same convention as
+ * window.__ALBUM_PROMO_JS_PATH__. Injecting them here even before Ticket 1's
+ * shared/ files exist is harmless: a 404 response's .text() resolves to an
+ * empty string, so the injected <script> is a no-op and album-promo.js (which
+ * still defines these itself until Ticket 1's Code PR lands) is unaffected.
  */
 (function (global) {
   function currentFixturesContainer() {
     const containers = document.querySelectorAll('[id="fixtures"]');
     return containers.length ? containers[containers.length - 1] : document.body;
+  }
+
+  async function loadScript(path) {
+    const response = await fetch(path);
+    const source = await response.text();
+    const script = document.createElement("script");
+    script.textContent = source;
+    document.body.appendChild(script);
+    document.body.removeChild(script);
   }
 
   async function loadAlbumPromo() {
@@ -20,13 +38,10 @@
     root.id = "album-promo-root";
     fixtures.appendChild(root);
 
-    const response = await fetch(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
-    const source = await response.text();
-
-    const script = document.createElement("script");
-    script.textContent = source;
-    document.body.appendChild(script);
-    document.body.removeChild(script);
+    await loadScript(global.__ALBUM_PROMO_SHARED_STATE_JS_PATH__ || "../shared/state.js");
+    await loadScript(global.__ALBUM_PROMO_SHARED_TRANSLATIONS_JS_PATH__ || "../shared/translations.js");
+    await loadScript(global.__ALBUM_PROMO_SHARED_HELPERS_JS_PATH__ || "../shared/helpers.js");
+    await loadScript(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
 
     if (global.__albumPromoI18nReady) await global.__albumPromoI18nReady;
 
