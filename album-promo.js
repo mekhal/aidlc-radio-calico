@@ -49,62 +49,10 @@
     },
   ];
 
-  // Distinct localStorage keys from app.js's "radioCalicoLanguage" (see
-  // app.js:39) — this page is standalone (AC6) and must not read/write the
-  // main app's stored preferences even though both share an origin.
-  const LANG_STORAGE_KEY = "chloeAlbumPromoLanguage";
-  const THEME_STORAGE_KEY = "chloeAlbumPromoTheme";
-
-  // Strings live in i18n/album-promo-en.json + i18n/album-promo-th.json,
-  // fetched below — kept as separate files from app.js's i18n/en.json +
-  // i18n/th.json (rather than merged in) so this page's copy set stays
-  // decoupled from the main app's keys, per the self-contained-page
-  // constraint from the issue #155 review. Follow-up review comment on PR
-  // #166 (2026-07-24) asked for the strings to live under i18n/ rather than
-  // inline in this file; mirrors app.js's loadTranslations() fetch pattern.
-  const ALBUM_PROMO_I18N_BASE_PATH = window.__ALBUM_PROMO_I18N_BASE_PATH__ || "i18n/";
   let TRANSLATIONS = null;
-
-  async function loadTranslations() {
-    const [enResponse, thResponse] = await Promise.all([
-      fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-en.json`),
-      fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-th.json`),
-    ]);
-    const [en, th] = await Promise.all([enResponse.json(), thResponse.json()]);
-    return { en, th };
-  }
 
   const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
   const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
-
-  function getStoredLanguage() {
-    return window.localStorage.getItem(LANG_STORAGE_KEY) === "th" ? "th" : "en";
-  }
-
-  // Dark is the default template theme (issue #155 review, 2026-07-24) —
-  // only an explicit stored "light" choice opts back out.
-  function getStoredTheme() {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) === "light" ? "light" : "dark";
-  }
-
-  function createIconLink({ testid, href, label, icon, external }) {
-    const link = document.createElement("a");
-    link.dataset.testid = testid;
-    link.href = href;
-    link.title = label;
-    link.setAttribute("aria-label", label);
-    if (external) {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    }
-
-    const iconEl = document.createElement("i");
-    iconEl.className = `bi ${icon}`;
-    iconEl.setAttribute("aria-hidden", "true");
-    link.appendChild(iconEl);
-
-    return link;
-  }
 
   // Follow-up review comment on PR #166 (2026-07-24): mirror app.js's sliding
   // "pill" switch (track + thumb, flanking on/off labels, role="switch")
@@ -1019,7 +967,7 @@
     const root = document.getElementById("album-promo-root");
     if (!root) return;
 
-    const state = { lang: getStoredLanguage(), theme: getStoredTheme(), onLanguageChange: [], nowPlaying: {} };
+    const state = createState();
     document.documentElement.lang = state.lang;
     document.documentElement.setAttribute("data-chloe-theme", state.theme);
 

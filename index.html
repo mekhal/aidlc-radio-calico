@@ -38,6 +38,13 @@
          <audio> playback (window.Hls) — must load before album-promo.js. -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
 
+    <!-- Issue #253 (Ticket 1): state/translations/helpers shared across the
+         upcoming logo/menu/sidebar/footer components (issue #245) — must
+         load before album-promo.js, which calls their globals. -->
+    <script src="shared/state.js"></script>
+    <script src="shared/translations.js"></script>
+    <script src="shared/helpers.js"></script>
+
     <script src="album-promo.js"></script>
   </body>
 </html>
