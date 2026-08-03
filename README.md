@@ -171,6 +171,7 @@ The AI then does **step 4** (Test PR) → Human **approves (step 5)** → AI **s
 - **Missed work → new issue** don't drag newly found work into the current loop; focus on closing the current issue. **Exception:** if it belongs to a related ticket already sequenced under the same parent story, comment it there instead — untagged (`@claude` not mentioned), so the human tags the AI themselves when that ticket's work starts.
 - **Separate PR types** the Test PR (step 4) and Code PR (step 6) are distinct PRs so review happens in layers — unless the human explicitly waives the Test PR at step 3; the AI may propose the waiver but never decide it unilaterally.
 - **Verify prior branches got a PR** on any new `@claude` trigger for a thread, the AI checks whether branches referenced in that thread's earlier turns actually got an opened PR, and flags any that didn't instead of silently moving on.
+- **Lead comments with a TL;DR** every substantive comment opens with **1. Done**, **2. Scope**, **3. Action Required** before any other detail — internal process bookkeeping (which gate/skill/rule applied) stays out of the human-facing summary and lives in `docs/decisions/`/`ai-review-evals/` instead.
 
 ---
 

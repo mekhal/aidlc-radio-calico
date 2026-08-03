@@ -45,6 +45,16 @@ The gate block to append verbatim (each command is its own code block so GitHub 
 ---
 `````
 
+### Comment format: lead with a TL;DR
+
+Per @mekhal's decision at issue #254's close (see `docs/decisions/2026-08-03-issue-254-tldr-comment-format.md`), every substantive comment (plan, review, Test PR / Code PR summary, close) leads with a short TL;DR before any other detail:
+
+1. **Done** — สิ่งที่ทำเสร็จแล้ว (what's already done)
+2. **Scope** — สิ่งที่จะทำต่อใน PR นี้ (what happens next / what this PR covers)
+3. **Action Required** — สิ่งที่ต้องการให้คนตัดสินใจ (the decision needed from the human)
+
+Do not lead with or dwell on internal process detail (which gate/skill/rule was applied, audit-trail bookkeeping) — that belongs in the commit history and `docs/decisions/`/`ai-review-evals/` files, not the human-facing summary. If a published skill materially shaped the output, a single short mention is fine, but it must not crowd out the TL;DR.
+
 ### What each command means
 
 | Command | What you do | Append gate block after? |

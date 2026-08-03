@@ -97,6 +97,25 @@
          here rather than into test-report-suite-files.js. -->
     <script src="player-real-audio-playback.test.js"></script>
 
+    <!-- issue #253 (Ticket 1): shared/state.js, shared/translations.js, and
+         shared/helpers.js each tested standalone (not through album-promo.js),
+         so — same category as the album-promo.js suites above — wired
+         directly here rather than into test-report-suite-files.js. -->
+    <script src="shared/load-shared-module.js"></script>
+    <script src="shared/shared-state.test.js"></script>
+    <script src="shared/shared-translations.test.js"></script>
+    <script src="shared/shared-helpers.test.js"></script>
+
+    <!-- issue #254 (Ticket 2 of #245): logo/logo.js tested standalone via
+         shared/load-shared-module.js's generic loader (reused, not
+         duplicated under tests/logo/ — same reasoning as the shared/ block
+         above), plus an integration check against the mounted
+         album-promo.js header — same category as the album-promo.js/shared
+         suites above, so wired directly here rather than into
+         test-report-suite-files.js. -->
+    <script src="logo/logo.test.js"></script>
+    <script src="logo/logo-header-integration.test.js"></script>
+
     <!-- issue #228: elapsed-time counter (cumulative, not per-play) +
          autoplay-on-mount for PlayerControls — same category as the #220
          suite above, so wired directly here too. -->

@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
     <link rel="stylesheet" href="album-promo.css" />
+    <link rel="stylesheet" href="logo/logo.css" />
   </head>
   <body>
     <!-- Ticket A (issue #155): header, fixed footer-links sidebar, and footer content are
@@ -37,6 +38,17 @@
     <!-- Issue #220 (Option B): hls.js for the Music Player Card's real
          <audio> playback (window.Hls) — must load before album-promo.js. -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
+
+    <!-- Issue #253 (Ticket 1): state/translations/helpers shared across the
+         upcoming logo/menu/sidebar/footer components (issue #245) — must
+         load before album-promo.js, which calls their globals. -->
+    <script src="shared/state.js"></script>
+    <script src="shared/translations.js"></script>
+    <script src="shared/helpers.js"></script>
+
+    <!-- Issue #254 (Ticket 2 of #245): logo component — must load before
+         album-promo.js, which calls buildLogo() when building the header. -->
+    <script src="logo/logo.js"></script>
 
     <script src="album-promo.js"></script>
   </body>
