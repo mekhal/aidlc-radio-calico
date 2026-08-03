@@ -1,0 +1,187 @@
+/* Fixed vertical footer-links sidebar + theme/language toggles — issue #256
+   (Ticket 4 of #245): moved out of album-promo.css:34-159 (plus the
+   max-width: 767.98px media rule) verbatim, alongside the sidebar/sidebar.js
+   component extraction. --chloe-sidebar-w/--chloe-sidebar-bar-h stay
+   declared in album-promo.css's :root (also read by .chloe-page there) —
+   see issue #256 review discussion. */
+.chloe-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--chloe-sidebar-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+  background: transparent;
+  z-index: 1030;
+}
+
+.chloe-sidebar__icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.chloe-sidebar__icons a {
+  color: var(--chloe-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.chloe-sidebar__icons a:hover {
+  color: var(--chloe-pink-deep);
+}
+
+.chloe-sidebar__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Follow-up review comment on PR #166 (2026-07-24): theme/language controls
+   redone as app.js's sliding "pill" switch (track + thumb, flanking on/off
+   labels) instead of a plain icon-button/select pair — oriented vertically
+   since the sidebar is a narrow fixed column (desktop), flipped to
+   horizontal on the mobile bottom bar below (more width there, less
+   height). Colors come from this page's own --chloe-* palette rather than
+   app.js's --rc-* vars, per the self-contained-page constraint. */
+.chloe-switch {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--chloe-ink);
+}
+
+.chloe-switch-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.5;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+.chloe-switch-label.is-active {
+  opacity: 1;
+}
+
+.chloe-switch-track {
+  position: relative;
+  width: 22px;
+  height: 38px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.chloe-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.chloe-switch--theme .chloe-switch-track {
+  background: var(--chloe-pink-deep);
+}
+
+.chloe-switch--theme[aria-checked="true"] .chloe-switch-track {
+  background: var(--chloe-ink);
+}
+
+.chloe-switch--theme[aria-checked="false"] .chloe-switch-thumb {
+  transform: translateY(0);
+}
+
+.chloe-switch--theme[aria-checked="true"] .chloe-switch-thumb {
+  transform: translateY(18px);
+}
+
+.chloe-switch--lang .chloe-switch-track {
+  background: var(--chloe-mint);
+}
+
+.chloe-switch--lang[aria-checked="false"] .chloe-switch-thumb {
+  transform: translateY(0);
+}
+
+.chloe-switch--lang[aria-checked="true"] .chloe-switch-thumb {
+  transform: translateY(18px);
+}
+
+/* --- mobile — sidebar collapses to a bottom bar --- */
+@media (max-width: 767.98px) {
+  .chloe-sidebar {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--chloe-sidebar-bar-h);
+    flex-direction: row;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .chloe-sidebar__icons {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 1.25rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0 0.75rem;
+  }
+
+  .chloe-sidebar__controls {
+    flex-direction: row;
+    margin-top: 0;
+    padding-top: 0;
+    padding-left: 0.75rem;
+    border-top: none;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .chloe-switch {
+    flex-direction: row;
+    gap: 0.35rem;
+  }
+
+  .chloe-switch-track {
+    width: 38px;
+    height: 22px;
+  }
+
+  .chloe-switch--theme[aria-checked="false"] .chloe-switch-thumb,
+  .chloe-switch--lang[aria-checked="false"] .chloe-switch-thumb {
+    transform: translateX(0);
+  }
+
+  .chloe-switch--theme[aria-checked="true"] .chloe-switch-thumb,
+  .chloe-switch--lang[aria-checked="true"] .chloe-switch-thumb {
+    transform: translateX(18px);
+  }
+}
