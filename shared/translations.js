@@ -6,6 +6,13 @@
  * ALBUM_PROMO_I18N_BASE_PATH uses `var` and loadTranslations() is a plain
  * function declaration, both of which attach to `window` automatically. See
  * tests/shared/shared-translations.test.js.
+ *
+ * Issue #255 (Ticket 3): ALBUM_PROMO_TRANSLATIONS added as a shared
+ * resolved-translations cache, set as a side effect inside
+ * loadTranslations(), so menu/menu.js (and album-promo.js itself, replacing
+ * its former private `let TRANSLATIONS`) can read translated strings
+ * without depending on album-promo.js's internals — same "shared global"
+ * precedent createState() set on issue #253.
  */
 "use strict";
 
@@ -18,11 +25,14 @@
 // inline in this file; mirrors app.js's loadTranslations() fetch pattern.
 var ALBUM_PROMO_I18N_BASE_PATH = window.__ALBUM_PROMO_I18N_BASE_PATH__ || "i18n/";
 
+var ALBUM_PROMO_TRANSLATIONS = null;
+
 async function loadTranslations() {
   const [enResponse, thResponse] = await Promise.all([
     fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-en.json`),
     fetch(`${ALBUM_PROMO_I18N_BASE_PATH}album-promo-th.json`),
   ]);
   const [en, th] = await Promise.all([enResponse.json(), thResponse.json()]);
-  return { en, th };
+  ALBUM_PROMO_TRANSLATIONS = { en, th };
+  return ALBUM_PROMO_TRANSLATIONS;
 }

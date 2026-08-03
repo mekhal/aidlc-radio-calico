@@ -1,0 +1,26 @@
+/* Primary nav — issue #255 (Ticket 3 of #245): moved out of
+   album-promo.css:181-197 (plus the max-width: 767.98px media rule)
+   verbatim, alongside the menu/menu.js component extraction. */
+.chloe-nav {
+  display: flex;
+  gap: 1.75rem;
+}
+
+.chloe-nav a {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--chloe-ink);
+  text-decoration: none;
+}
+
+.chloe-nav a:hover {
+  color: var(--chloe-pink-deep);
+}
+
+@media (max-width: 767.98px) {
+  .chloe-nav {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
