@@ -13,6 +13,10 @@
  * shared/ files exist is harmless: a 404 response's .text() resolves to an
  * empty string, so the injected <script> is a no-op and album-promo.js (which
  * still defines these itself until Ticket 1's Code PR lands) is unaffected.
+ *
+ * Issue #254 (Ticket 2), AC5: logo/logo.js is fetched and injected the same
+ * way, right before album-promo.js — same 404-is-a-harmless-no-op reasoning
+ * applies until this ticket's own Code PR creates logo/logo.js.
  */
 (function (global) {
   function currentFixturesContainer() {
@@ -41,6 +45,7 @@
     await loadScript(global.__ALBUM_PROMO_SHARED_STATE_JS_PATH__ || "../shared/state.js");
     await loadScript(global.__ALBUM_PROMO_SHARED_TRANSLATIONS_JS_PATH__ || "../shared/translations.js");
     await loadScript(global.__ALBUM_PROMO_SHARED_HELPERS_JS_PATH__ || "../shared/helpers.js");
+    await loadScript(global.__ALBUM_PROMO_LOGO_JS_PATH__ || "../logo/logo.js");
     await loadScript(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
 
     if (global.__albumPromoI18nReady) await global.__albumPromoI18nReady;
