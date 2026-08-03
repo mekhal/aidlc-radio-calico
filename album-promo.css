@@ -176,24 +176,9 @@ body {
 }
 
 /* Issue #254 (Ticket 2 of #245): .chloe-wordmark* rules moved to
-   logo/logo.css alongside the logo/logo.js component extraction. */
-
-.chloe-nav {
-  display: flex;
-  gap: 1.75rem;
-}
-
-.chloe-nav a {
-  font-family: "Cormorant Garamond", serif;
-  font-style: italic;
-  font-size: 1.1rem;
-  color: var(--chloe-ink);
-  text-decoration: none;
-}
-
-.chloe-nav a:hover {
-  color: var(--chloe-pink-deep);
-}
+   logo/logo.css alongside the logo/logo.js component extraction.
+   Issue #255 (Ticket 3 of #245): .chloe-nav* rules moved to menu/menu.css
+   alongside the menu/menu.js component extraction. */
 
 .chloe-main {
   flex: 1 0 auto;
@@ -660,10 +645,5 @@ body {
   .chloe-header {
     justify-content: center;
     text-align: center;
-  }
-
-  .chloe-nav {
-    justify-content: center;
-    flex-wrap: wrap;
   }
 }
