@@ -701,31 +701,6 @@
     return main;
   }
 
-  function buildFooter(state) {
-    const footer = document.createElement("footer");
-    footer.className = "chloe-footer";
-
-    const disclaimer = document.createElement("p");
-    disclaimer.className = "chloe-footer__disclaimer";
-
-    const copy = document.createElement("p");
-    copy.className = "chloe-footer__copy";
-
-    function render() {
-      if (!ALBUM_PROMO_TRANSLATIONS) return;
-      disclaimer.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].disclaimer;
-      copy.innerHTML = ALBUM_PROMO_TRANSLATIONS[state.lang].copyright;
-    }
-
-    render();
-    state.onLanguageChange.push(render);
-
-    footer.appendChild(disclaimer);
-    footer.appendChild(copy);
-
-    return footer;
-  }
-
   function initAlbumPromo() {
     const root = document.getElementById("album-promo-root");
     if (!root) return;

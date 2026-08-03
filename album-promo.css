@@ -439,27 +439,6 @@ body {
   accent-color: var(--chloe-pink-deep);
 }
 
-/* --- Ticket A review (2026-07-24): copyright/disclaimer moved out of the
-   sidebar into their own bottom-centered footer (AC4 revision) --- */
-.chloe-footer {
-  flex-shrink: 0;
-  text-align: center;
-  padding: 1.5rem 2rem 2rem;
-}
-
-.chloe-footer__disclaimer {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin: 0 0 0.35rem;
-}
-
-.chloe-footer__copy {
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  opacity: 0.7;
-  margin: 0;
-}
-
 /* --- Ticket A: mobile — page-shell adjustments for the sidebar's bottom-bar
    collapse (sidebar's own rules moved to sidebar/sidebar.css, issue #256) --- */
 @media (max-width: 767.98px) {
