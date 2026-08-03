@@ -5,6 +5,14 @@
  *
  * Written before shared/translations.js exists, per TDD — fails until
  * Ticket 1's Code PR (step 6) creates it.
+ *
+ * Issue #255 (Ticket 3), AC2: shared/translations.js additionally gains a
+ * resolved-translations cache (ALBUM_PROMO_TRANSLATIONS, set as a side
+ * effect inside loadTranslations()) so menu/menu.js (and album-promo.js
+ * itself, replacing its private `let TRANSLATIONS`) can read translated
+ * strings without depending on album-promo.js's internals — same "shared
+ * global" precedent createState() set on issue #253. New cases appended
+ * below, existing cases above left untouched.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -32,6 +40,20 @@
       expect(typeof translations.th).toBe("object");
       expect(typeof translations.en.themeToggleLabel).toBe("string");
       expect(typeof translations.th.themeToggleLabel).toBe("string");
+    });
+
+    it("initializes ALBUM_PROMO_TRANSLATIONS to null before loadTranslations() resolves (issue #255, AC2)", async () => {
+      await loadSharedTranslations();
+
+      expect(window.ALBUM_PROMO_TRANSLATIONS).toBe(null);
+    });
+
+    it("loadTranslations() sets the shared ALBUM_PROMO_TRANSLATIONS cache to the resolved { en, th } data (issue #255, AC2)", async () => {
+      await loadSharedTranslations();
+
+      const translations = await window.loadTranslations();
+
+      expect(window.ALBUM_PROMO_TRANSLATIONS).toEqual(translations);
     });
   });
 })();
