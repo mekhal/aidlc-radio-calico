@@ -223,17 +223,7 @@
     const header = document.createElement("header");
     header.className = "chloe-header";
 
-    const wordmark = document.createElement("span");
-    wordmark.className = "chloe-wordmark";
-
-    const logo = document.createElement("img");
-    logo.className = "chloe-wordmark__logo";
-    logo.src = "RadioCalicoStyle/RadioCalicoLogoTM.png";
-    logo.alt = "Radio Calico logo";
-
-    wordmark.appendChild(document.createTextNode("Radio"));
-    wordmark.appendChild(logo);
-    wordmark.appendChild(document.createTextNode("Calico"));
+    const wordmark = buildLogo();
 
     const nav = document.createElement("nav");
     nav.className = "chloe-nav";

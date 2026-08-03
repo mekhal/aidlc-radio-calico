@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
     <link rel="stylesheet" href="album-promo.css" />
+    <link rel="stylesheet" href="logo/logo.css" />
   </head>
   <body>
     <!-- Ticket A (issue #155): header, fixed footer-links sidebar, and footer content are
@@ -44,6 +45,10 @@
     <script src="shared/state.js"></script>
     <script src="shared/translations.js"></script>
     <script src="shared/helpers.js"></script>
+
+    <!-- Issue #254 (Ticket 2 of #245): logo component — must load before
+         album-promo.js, which calls buildLogo() when building the header. -->
+    <script src="logo/logo.js"></script>
 
     <script src="album-promo.js"></script>
   </body>
