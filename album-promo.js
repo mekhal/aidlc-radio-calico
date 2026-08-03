@@ -49,10 +49,10 @@
     },
   ];
 
-  let TRANSLATIONS = null;
-
-  const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
-  const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
+  // Issue #255 (Ticket 3 of #245): private `TRANSLATIONS` and
+  // NAV_KEYS/NAV_HREFS moved out — this file now reads the shared
+  // ALBUM_PROMO_TRANSLATIONS cache (shared/translations.js), and
+  // NAV_KEYS/NAV_HREFS live as private constants inside menu/menu.js.
 
   // Follow-up review comment on PR #166 (2026-07-24): mirror app.js's sliding
   // "pill" switch (track + thumb, flanking on/off labels, role="switch")
@@ -145,8 +145,8 @@
     applyThemeState();
 
     function render() {
-      if (!TRANSLATIONS) return;
-      const t = TRANSLATIONS[state.lang];
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
       wrapper.setAttribute("aria-label", t.themeToggleLabel);
       offLabel.textContent = t.themeLabelLight;
       onLabel.textContent = t.themeLabelDark;
@@ -178,8 +178,8 @@
     applyLangState();
 
     function render() {
-      if (!TRANSLATIONS) return;
-      const t = TRANSLATIONS[state.lang];
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
       wrapper.setAttribute("aria-label", t.languageToggleLabel);
       offLabel.textContent = t.langLabelEn;
       onLabel.textContent = t.langLabelTh;
@@ -224,28 +224,7 @@
     header.className = "chloe-header";
 
     const wordmark = buildLogo();
-
-    const nav = document.createElement("nav");
-    nav.className = "chloe-nav";
-    nav.setAttribute("aria-label", "Primary");
-
-    const navLinks = {};
-    NAV_KEYS.forEach((key) => {
-      const a = document.createElement("a");
-      a.href = NAV_HREFS[key];
-      navLinks[key] = a;
-      nav.appendChild(a);
-    });
-
-    function render() {
-      if (!TRANSLATIONS) return;
-      NAV_KEYS.forEach((key) => {
-        navLinks[key].textContent = TRANSLATIONS[state.lang].nav[key];
-      });
-    }
-
-    render();
-    state.onLanguageChange.push(render);
+    const nav = buildMenu(state);
 
     header.appendChild(wordmark);
     header.appendChild(nav);
@@ -442,8 +421,8 @@
     status.hidden = true;
 
     function renderMeta() {
-      if (!TRANSLATIONS) return;
-      const t = TRANSLATIONS[state.lang];
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
       const md = state.nowPlaying.lastMetadata;
       title.textContent = md ? md.title || "" : t.playerLoading;
       artist.textContent = md ? md.artist || "" : t.playerLoading;
@@ -791,7 +770,7 @@
 
   async function refreshNowPlaying(state) {
     const elements = state.nowPlaying;
-    const t = TRANSLATIONS[state.lang];
+    const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
 
     try {
       const metadata = await fetchNowPlayingMetadata();
@@ -858,7 +837,7 @@
   // properties (album-promo.css) rather than a hardcoded palette, so the
   // modal tracks the light/dark toggle automatically (AC5).
   function openRecentlyPlayedModal(state, trigger) {
-    const t = TRANSLATIONS[state.lang];
+    const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
     let closed = false;
 
     const backdrop = document.createElement("div");
@@ -939,9 +918,9 @@
     copy.className = "chloe-footer__copy";
 
     function render() {
-      if (!TRANSLATIONS) return;
-      disclaimer.textContent = TRANSLATIONS[state.lang].disclaimer;
-      copy.innerHTML = TRANSLATIONS[state.lang].copyright;
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      disclaimer.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].disclaimer;
+      copy.innerHTML = ALBUM_PROMO_TRANSLATIONS[state.lang].copyright;
     }
 
     render();
@@ -973,8 +952,7 @@
     // Exposed as a named promise (mirrors app.js's window.__i18nReady) so a
     // future test suite for this page could deterministically await it
     // instead of racing an arbitrary number of ticks against the fetch.
-    window.__albumPromoI18nReady = loadTranslations().then((data) => {
-      TRANSLATIONS = data;
+    window.__albumPromoI18nReady = loadTranslations().then(() => {
       state.onLanguageChange.forEach((fn) => fn());
       startNowPlayingUpdates(state);
     });
