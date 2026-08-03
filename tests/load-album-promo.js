@@ -17,6 +17,10 @@
  * Issue #254 (Ticket 2), AC5: logo/logo.js is fetched and injected the same
  * way, right before album-promo.js — same 404-is-a-harmless-no-op reasoning
  * applies until this ticket's own Code PR creates logo/logo.js.
+ *
+ * Issue #255 (Ticket 3), AC5: menu/menu.js is fetched and injected right
+ * after logo/logo.js, same 404-is-a-harmless-no-op reasoning, until this
+ * ticket's own Code PR creates menu/menu.js.
  */
 (function (global) {
   function currentFixturesContainer() {
@@ -46,6 +50,7 @@
     await loadScript(global.__ALBUM_PROMO_SHARED_TRANSLATIONS_JS_PATH__ || "../shared/translations.js");
     await loadScript(global.__ALBUM_PROMO_SHARED_HELPERS_JS_PATH__ || "../shared/helpers.js");
     await loadScript(global.__ALBUM_PROMO_LOGO_JS_PATH__ || "../logo/logo.js");
+    await loadScript(global.__ALBUM_PROMO_MENU_JS_PATH__ || "../menu/menu.js");
     await loadScript(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
 
     if (global.__albumPromoI18nReady) await global.__albumPromoI18nReady;
