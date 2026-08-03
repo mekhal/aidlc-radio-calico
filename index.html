@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="logo/logo.css" />
     <link rel="stylesheet" href="menu/menu.css" />
     <link rel="stylesheet" href="sidebar/sidebar.css" />
+    <link rel="stylesheet" href="footer/footer.css" />
   </head>
   <body>
     <!-- Ticket A (issue #155): header, fixed footer-links sidebar, and footer content are
@@ -59,6 +60,10 @@
     <!-- Issue #256 (Ticket 4 of #245): sidebar component — must load before
          album-promo.js, which calls buildSidebar() when mounting the page. -->
     <script src="sidebar/sidebar.js"></script>
+
+    <!-- Issue #257 (Ticket 5 of #245): footer component — must load before
+         album-promo.js, which calls buildFooter() when mounting the page. -->
+    <script src="footer/footer.js"></script>
 
     <script src="album-promo.js"></script>
   </body>
