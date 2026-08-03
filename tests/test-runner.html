@@ -126,6 +126,14 @@
     <script src="menu/menu.test.js"></script>
     <script src="menu/menu-header-integration.test.js"></script>
 
+    <!-- issue #256 (Ticket 4 of #245): sidebar/sidebar.js tested standalone
+         via shared/load-shared-module.js's generic loader (reused, not
+         duplicated under tests/sidebar/ — same reasoning as the shared/,
+         logo/, and menu/ blocks above) — same category as the album-promo.js
+         suites above, so wired directly here rather than into
+         test-report-suite-files.js. -->
+    <script src="sidebar/sidebar.test.js"></script>
+
     <!-- issue #228: elapsed-time counter (cumulative, not per-play) +
          autoplay-on-mount for PlayerControls — same category as the #220
          suite above, so wired directly here too. -->
