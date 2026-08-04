@@ -1,0 +1,24 @@
+:root {
+  --chloe-sidebar-w: 88px;
+  --chloe-sidebar-bar-h: 64px;
+  --chloe-pink: #f0c6d2;
+  --chloe-pink-deep: #d98fa3;
+  --chloe-mint: #d8f2d5;
+  --chloe-sage: #eaf1e6;
+  --chloe-ink: #2f2a2c;
+  --chloe-player-box-bg: #2f2a2c;
+  --chloe-player-box-fg: #f5eee0;
+  --chloe-live-dot: #e5484d;
+  --chloe-sans: "Montserrat", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Ticket A review (2026-07-24): dark theme toggled via [data-chloe-theme]
+   on <html>, scoped to this page only — index.html/app.js/styles.css are
+   untouched (AC6), so this doesn't share app.js's own theme system. */
+[data-chloe-theme="dark"] {
+  --chloe-sage: #201c1e;
+  --chloe-ink: #f5eee0;
+  --chloe-pink-deep: #f0b8c9;
+  --chloe-player-box-bg: #3a3339;
+  --chloe-player-box-fg: #f5eee0;
+}
