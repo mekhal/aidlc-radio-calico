@@ -29,8 +29,8 @@
       expect(report.timestamp).toBe(1234);
       expect(report.summary).toEqual({ total: 2, passed: 1, failed: 1 });
       expect(report.results).toEqual([
-        { name: "a", passed: true, error: null },
-        { name: "b", passed: false, error: "boom" },
+        { name: "a", passed: true, error: null, category: "index/app" },
+        { name: "b", passed: false, error: "boom", category: "index/app" },
       ]);
 
       window.localStorage.removeItem(STORAGE_KEY);

@@ -126,19 +126,148 @@
     return empty;
   }
 
-  // AC-B1: "Reload Test" button — reused for both the manual click and the
-  // AC-B3 auto-run, via the onReload callback passed in from initTestReportDashboard.
-  function buildReloadButton(onReload) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "report-reload-button";
-    button.dataset.testid = "report-reload-button";
-    button.textContent = "Reload Test";
-    button.addEventListener("click", onReload);
-    return button;
+  const DEFAULT_CATEGORY = "index/app";
+
+  function groupResultsByCategory(results) {
+    const groups = {};
+    results.forEach((result) => {
+      const category = result.category || DEFAULT_CATEGORY;
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(result);
+    });
+    return groups;
   }
 
-  function renderDashboardContent(container, report, onReload) {
+  // AC-C2: a small pass/fail donut, built with raw SVG (no charting
+  // dependency — this page has no build step to pull one in via npm).
+  function buildCategoryDonut(passed, total) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const size = 72;
+    const radius = 28;
+    const circumference = 2 * Math.PI * radius;
+    const passRatio = total ? passed / total : 0;
+    const passLength = circumference * passRatio;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+    svg.setAttribute("width", String(size));
+    svg.setAttribute("height", String(size));
+    svg.setAttribute("data-testid", "report-category-donut");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", `${passed} of ${total} passed`);
+
+    const track = document.createElementNS(svgNS, "circle");
+    track.setAttribute("cx", String(size / 2));
+    track.setAttribute("cy", String(size / 2));
+    track.setAttribute("r", String(radius));
+    track.setAttribute("fill", "none");
+    track.setAttribute("stroke", "var(--chloe-pink)");
+    track.setAttribute("stroke-width", "10");
+    svg.appendChild(track);
+
+    const passArc = document.createElementNS(svgNS, "circle");
+    passArc.setAttribute("cx", String(size / 2));
+    passArc.setAttribute("cy", String(size / 2));
+    passArc.setAttribute("r", String(radius));
+    passArc.setAttribute("fill", "none");
+    passArc.setAttribute("stroke", "var(--chloe-mint)");
+    passArc.setAttribute("stroke-width", "10");
+    passArc.setAttribute("stroke-dasharray", `${passLength} ${circumference - passLength}`);
+    passArc.setAttribute("stroke-dashoffset", String(circumference / 4));
+    passArc.setAttribute("transform", `rotate(-90 ${size / 2} ${size / 2})`);
+    svg.appendChild(passArc);
+
+    return svg;
+  }
+
+  // AC-C3: drill-down modal, scoped to one category's results — appended to
+  // document.body (not the dashboard root) so it overlays the whole page,
+  // same pattern as PR B's loading backdrop.
+  function openCategoryModal(category, results) {
+    const existing = document.querySelector('[data-testid="report-category-modal"]');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "report-category-modal-backdrop";
+    backdrop.dataset.testid = "report-category-modal";
+
+    const dialog = document.createElement("div");
+    dialog.className = "report-category-modal";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-label", `${category} test results`);
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "report-category-modal__close";
+    closeButton.dataset.testid = "report-category-modal-close";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => {
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    });
+
+    const heading = document.createElement("h2");
+    heading.className = "report-category-modal__heading";
+    heading.textContent = category;
+
+    dialog.appendChild(closeButton);
+    dialog.appendChild(heading);
+    dialog.appendChild(buildResultsList(results));
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+  }
+
+  // AC-C2: one card per category present in the stored results, laid out in
+  // a Bootstrap col-md-4 grid so more categories fit later without a layout
+  // change. The outer col carries the category-specific testid + click
+  // handler (what AC-C3's drill-down click targets); the inner card carries
+  // the generic testid used to count all cards regardless of category.
+  function buildCategoryCard(category, results) {
+    const total = results.length;
+    const passed = results.filter((result) => result.passed).length;
+    const failed = total - passed;
+
+    const col = document.createElement("div");
+    col.className = "col-md-4 report-category-card-col";
+    col.dataset.testid = `report-category-card-${category}`;
+    col.setAttribute("role", "button");
+    col.setAttribute("tabindex", "0");
+    col.addEventListener("click", () => openCategoryModal(category, results));
+
+    const card = document.createElement("div");
+    card.className = "report-category-card";
+    card.dataset.testid = "report-category-card";
+
+    const title = document.createElement("p");
+    title.className = "report-category-card__title";
+    title.textContent = category;
+
+    const counts = document.createElement("p");
+    counts.className = "report-category-card__counts";
+    counts.textContent = `${total} total · ${passed} passed · ${failed} failed`;
+
+    card.appendChild(title);
+    card.appendChild(buildCategoryDonut(passed, total));
+    card.appendChild(counts);
+    col.appendChild(card);
+
+    return col;
+  }
+
+  function buildCategoryGrid(results) {
+    const grid = document.createElement("div");
+    grid.className = "row report-category-grid";
+    grid.dataset.testid = "report-category-grid";
+
+    const groups = groupResultsByCategory(results);
+    Object.keys(groups)
+      .sort()
+      .forEach((category) => grid.appendChild(buildCategoryCard(category, groups[category])));
+
+    return grid;
+  }
+
+  function renderDashboardContent(container, report) {
     container.textContent = "";
 
     const heading = document.createElement("h1");
@@ -154,6 +283,7 @@
 
     container.appendChild(buildTimestampLine(report.timestamp));
     container.appendChild(buildStatsRow(report.summary));
+    container.appendChild(buildCategoryGrid(report.results));
     container.appendChild(buildResultsList(report.results));
   }
 

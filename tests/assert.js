@@ -15,16 +15,31 @@
     currentSuite = previousSuite;
   }
 
+  // Issue #205, PR C (AC-C1): tags each recorded result with the
+  // page/component its registering *.test.js file belongs to, grouped by
+  // test folder — everything else (files directly under tests/, covering
+  // index.html/app.js) buckets to "index/app". Pure/testable on its own so
+  // it can be unit-tested without needing a real <script> load.
+  function categorizeScriptPath(url) {
+    if (!url) return "index/app";
+    const match = url.match(/\/tests\/(shared|logo|menu|sidebar|footer)\//);
+    return match ? match[1] : "index/app";
+  }
+
   function it(name, fn) {
     const fullName = currentSuite ? `${currentSuite} > ${name}` : name;
+    // Captured synchronously at registration time — document.currentScript
+    // is only meaningful while the registering <script> is still executing,
+    // not once the queued async test body below actually runs.
+    const category = categorizeScriptPath(document.currentScript && document.currentScript.src);
     const promise = queue.then(async () => {
       try {
         await fn();
-        results.push({ name: fullName, passed: true });
+        results.push({ name: fullName, passed: true, category });
         console.log(`PASS: ${fullName}`);
       } catch (error) {
         const message = error && error.message ? error.message : String(error);
-        results.push({ name: fullName, passed: false, error: message });
+        results.push({ name: fullName, passed: false, error: message, category });
         console.log(`FAIL: ${fullName} — ${message}`);
       }
     });
@@ -82,5 +97,6 @@
     expect,
     allSettled,
     getResults: () => results.slice(),
+    categorizeScriptPath,
   };
 })(window);
