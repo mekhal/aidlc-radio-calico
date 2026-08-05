@@ -13,7 +13,37 @@
   font-style: italic;
   font-size: 2rem;
   color: var(--chloe-ink);
-  margin: 0 0 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.report-reload-button {
+  font-family: var(--chloe-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--chloe-mint);
+  color: var(--chloe-ink);
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.report-loading-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.report-loading-backdrop__label {
+  font-family: var(--chloe-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
 }
 
 .report-timestamp {

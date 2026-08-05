@@ -15,9 +15,47 @@
     return new Promise((resolve) => setTimeout(resolve, 0));
   }
 
+  // Issue #205, PR B (AC-B3): an empty localStorage now makes the dashboard
+  // auto-run the suite via a real <iframe src="test-runner.html">. Since
+  // this suite itself runs INSIDE test-runner.html (as a fixture), an
+  // unstubbed iframe here would let the browser actually navigate and
+  // recurse the whole outer suite into itself — same risk/fix documented in
+  // tests/test-report-dashboard-reload.test.js.
+  function stubIframeNavigation() {
+    const originalDescriptor =
+      Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src") ||
+      Object.getOwnPropertyDescriptor(HTMLElement.prototype, "src");
+
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", {
+      configurable: true,
+      set(value) {
+        this.setAttribute("data-stubbed-src", value);
+      },
+      get() {
+        return this.getAttribute("data-stubbed-src");
+      },
+    });
+
+    return {
+      restore() {
+        if (originalDescriptor) {
+          Object.defineProperty(HTMLIFrameElement.prototype, "src", originalDescriptor);
+        }
+      },
+    };
+  }
+
+  function cleanupStray() {
+    const backdrop = document.querySelector('[data-testid="report-loading-backdrop"]');
+    if (backdrop) backdrop.remove();
+    const iframe = document.querySelector('[data-testid="report-test-runner-iframe"]');
+    if (iframe) iframe.remove();
+  }
+
   describe("Test Report Dashboard (issue #205)", () => {
     it("reuses the same header/sidebar/footer chrome as index.html", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
+      const stub = stubIframeNavigation();
       const root = await loadTestReportDashboard();
       await nextTick();
 
@@ -27,10 +65,13 @@
       expect(root.querySelector(".chloe-page")).toBeTruthy();
 
       unloadTestReportDashboard(root);
+      stub.restore();
+      cleanupStray();
     });
 
     it("shows an empty state when no test run has been saved yet", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
+      const stub = stubIframeNavigation();
       const root = await loadTestReportDashboard();
       await nextTick();
 
@@ -39,6 +80,8 @@
       expect(root.querySelector('[data-testid="report-stats-row"]')).toBeFalsy();
 
       unloadTestReportDashboard(root);
+      stub.restore();
+      cleanupStray();
     });
 
     it("renders summary stat tiles, the results list, and a timestamp from the stored report", async () => {
