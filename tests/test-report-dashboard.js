@@ -267,7 +267,19 @@
     return grid;
   }
 
-  function renderDashboardContent(container, report) {
+  // AC-B1: the "Reload Test" button that kicks off startTestRun() via the
+  // onReload callback threaded in from initTestReportDashboard()/startTestRun().
+  function buildReloadButton(onReload) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "report-reload-button";
+    button.dataset.testid = "report-reload-button";
+    button.textContent = "Reload Test";
+    button.addEventListener("click", onReload);
+    return button;
+  }
+
+  function renderDashboardContent(container, report, onReload) {
     container.textContent = "";
 
     const heading = document.createElement("h1");
