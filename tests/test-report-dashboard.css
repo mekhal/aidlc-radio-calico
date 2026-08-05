@@ -130,3 +130,70 @@
   font-size: 1rem;
   opacity: 0.8;
 }
+
+.report-category-grid {
+  margin: 0 0 2rem;
+  row-gap: 1rem;
+}
+
+.report-category-card-col {
+  cursor: pointer;
+}
+
+.report-category-card {
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+  border-radius: 16px;
+  padding: 1rem;
+  text-align: center;
+  height: 100%;
+}
+
+.report-category-card__title {
+  font-family: var(--chloe-sans);
+  font-weight: 700;
+  text-transform: capitalize;
+  margin: 0 0 0.5rem;
+}
+
+.report-category-card__counts {
+  font-family: var(--chloe-sans);
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin: 0.5rem 0 0;
+}
+
+.report-category-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.report-category-modal {
+  background: var(--chloe-cream, #fff);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.report-category-modal__heading {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  text-transform: capitalize;
+  margin: 0 0 1rem;
+}
+
+.report-category-modal__close {
+  float: right;
+  font-family: var(--chloe-sans);
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
