@@ -126,13 +126,26 @@
     return empty;
   }
 
-  function renderDashboardContent(container, report) {
+  // AC-B1: "Reload Test" button — reused for both the manual click and the
+  // AC-B3 auto-run, via the onReload callback passed in from initTestReportDashboard.
+  function buildReloadButton(onReload) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "report-reload-button";
+    button.dataset.testid = "report-reload-button";
+    button.textContent = "Reload Test";
+    button.addEventListener("click", onReload);
+    return button;
+  }
+
+  function renderDashboardContent(container, report, onReload) {
     container.textContent = "";
 
     const heading = document.createElement("h1");
     heading.className = "report-heading";
     heading.textContent = "Test Report Dashboard";
     container.appendChild(heading);
+    container.appendChild(buildReloadButton(onReload));
 
     if (!report) {
       container.appendChild(buildEmptyState());
@@ -142,6 +155,52 @@
     container.appendChild(buildTimestampLine(report.timestamp));
     container.appendChild(buildStatsRow(report.summary));
     container.appendChild(buildResultsList(report.results));
+  }
+
+  // AC-B1: drives a fresh suite run through a hidden <iframe> pointed at
+  // test-runner.html, rather than re-running the suite in this document —
+  // this page already mounts its own chrome/globals, which would collide
+  // with test-runner.html's fixtures if run inline (see the module doc
+  // comment in tests/test-report-dashboard-reload.test.js).
+  function buildLoadingBackdrop() {
+    const backdrop = document.createElement("div");
+    backdrop.className = "report-loading-backdrop";
+    backdrop.dataset.testid = "report-loading-backdrop";
+
+    const label = document.createElement("p");
+    label.className = "report-loading-backdrop__label";
+    label.textContent = "Running tests…";
+    backdrop.appendChild(label);
+
+    const iframe = document.createElement("iframe");
+    iframe.dataset.testid = "report-test-runner-iframe";
+    iframe.title = "Test suite runner";
+    iframe.hidden = true;
+    iframe.setAttribute("aria-hidden", "true");
+    backdrop.appendChild(iframe);
+
+    document.body.appendChild(backdrop);
+    // AC-B2: test-runner.html calls window.parent.onTestRunComplete() (set
+    // below) once it has saved its results — only meaningful once the
+    // iframe is actually in the document, so src is set last.
+    iframe.src = "test-runner.html";
+
+    return backdrop;
+  }
+
+  // AC-B1/AC-B2/AC-B3: shared by the Reload Test button click and the
+  // empty-storage auto-run — shows the backdrop+iframe, and wires
+  // window.onTestRunComplete (AC-B2's contract with test-runner.html) to
+  // hide the backdrop and re-render `main` from the freshly-saved report.
+  function startTestRun(main) {
+    if (document.querySelector('[data-testid="report-loading-backdrop"]')) return;
+
+    const backdrop = buildLoadingBackdrop();
+
+    window.onTestRunComplete = function () {
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      renderDashboardContent(main, window.TestReportStorage.loadTestReport(), () => startTestRun(main));
+    };
   }
 
   function initTestReportDashboard() {
@@ -161,15 +220,19 @@
     const main = document.createElement("main");
     main.className = "chloe-main report-dashboard-main";
     main.dataset.testid = "report-dashboard-main";
-    renderDashboardContent(main, window.TestReportStorage.loadTestReport());
+
+    const initialReport = window.TestReportStorage.loadTestReport();
+    renderDashboardContent(main, initialReport, () => startTestRun(main));
     page.appendChild(main);
 
     page.appendChild(buildFooter(state));
     root.appendChild(page);
 
-    window.__testReportDashboardI18nReady = loadTranslations().then(() => {
-      state.onLanguageChange.forEach((fn) => fn());
-    });
+    // AC-B3: auto-run only when nothing has ever been stored yet; otherwise
+    // require the human to press Reload Test themselves.
+    if (!initialReport) {
+      startTestRun(main);
+    }
   }
 
   initTestReportDashboard();

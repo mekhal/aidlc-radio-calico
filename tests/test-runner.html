@@ -191,6 +191,15 @@
         // full suite finishes — the Test Report Dashboard reads only this.
         window.TestReportStorage.saveTestReport(results);
 
+        // issue #205, AC-B2: when this page is embedded in the dashboard's
+        // hidden <iframe> (PR B's "Reload Test"/auto-run flow), tell it the
+        // run is saved so it can hide its loading backdrop and re-render.
+        // Guarded so this page still works standalone (opened directly, no
+        // parent dashboard listening).
+        if (window.parent && window.parent !== window && typeof window.parent.onTestRunComplete === "function") {
+          window.parent.onTestRunComplete();
+        }
+
         results.forEach((result) => {
           const item = document.createElement("li");
           item.className = result.passed ? "pass" : "fail";
