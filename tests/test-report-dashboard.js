@@ -4,17 +4,22 @@
  * re-running the suite itself (AC3, confirmed at step-3 approval: the
  * dashboard must not depend on tests/test-runner.html as its data source).
  *
- * AC2: reuses the same header/sidebar/footer chrome (chloe-header/
- * chloe-sidebar/chloe-footer classes + album-promo.css) that index.html
- * ships via album-promo.js, so this page visually matches the live site.
- * Kept as its own self-contained script (mirrors album-promo.js's own
- * decision to duplicate rather than import from app.js) rather than pulling
- * in album-promo.js directly — that module also builds the Hero/Now
- * Playing/player-controls React island, none of which this page needs or
- * loads (AC2: "no player/now-playing/hero content").
+ * AC-A1/AC-A2/AC-A3 (2026-08-05 revised AC, issue #205 PR A): the header/
+ * sidebar/footer chrome is no longer a private duplicate — this page now
+ * composes the same reusable globals index.html/album-promo.js do:
+ * createState() (shared/state.js), buildLogo() (logo/logo.js), buildMenu()
+ * (menu/menu.js), buildSidebar(state) (sidebar/sidebar.js), buildFooter()
+ * (footer/footer.js). This page's own buildHeader() mirrors album-promo.js's
+ * private buildHeader(state) composition (there is no single reusable
+ * "buildHeader" global — buildLogo/buildMenu are the reusable pieces).
  *
- * AC5: sidebar's "Test Report" link is replaced with a "Home" link back to
- * the live site, since linking to this page from itself has no purpose.
+ * AC-A2: the shared menu's in-page anchors (#home/#about/...) only resolve
+ * on index.html itself, so they're rewritten here to `../index.html#...`
+ * once mounted on this page (which lives one directory down, in tests/).
+ *
+ * AC-A3: buildSidebar(state) brings its own theme/language toggle switches
+ * along "for free" — no separate wiring needed here (a deliberate reversal
+ * of PR #207's original no-toggle decision, confirmed at this AC revision).
  *
  * Loaded as a plain <script> global (no npm/imports), like the rest of
  * tests/*.js. Functions stay small/testable via the DOM behavior they
@@ -23,135 +28,25 @@
 (function () {
   "use strict";
 
-  const SIDEBAR_LINKS = [
-    {
-      testid: "dashboard-sidebar-home-link",
-      href: "../index.html",
-      label: "Radio Calico Home",
-      icon: "bi-house",
-      external: false,
-    },
-    {
-      testid: "dashboard-sidebar-site-link",
-      href: "https://www.radio-calico.com/",
-      label: "radio-calico.com",
-      icon: "bi-broadcast",
-      external: true,
-    },
-    {
-      testid: "dashboard-sidebar-lint-report-link",
-      href: "../reports/lint/megalinter-report.html",
-      label: "Lint Report",
-      icon: "bi-brush",
-      external: true,
-    },
-    {
-      testid: "dashboard-sidebar-security-report-link",
-      href: "../reports/security/trivy.sarif",
-      label: "Security Scan Report",
-      icon: "bi-shield-check",
-      external: true,
-    },
-    {
-      testid: "dashboard-sidebar-github-link",
-      href: "https://github.com/mekhal/aidlc-radio-calico",
-      label: "GitHub",
-      icon: "bi-github",
-      external: true,
-    },
-    {
-      testid: "dashboard-sidebar-linkedin-link",
-      href: "https://www.linkedin.com/in/mekhalomlao/",
-      label: "LinkedIn",
-      icon: "bi-linkedin",
-      external: true,
-    },
-  ];
-
   const EMPTY_STATE_MESSAGE = "No test run recorded yet — run tests/test-runner.html first.";
 
-  function createIconLink({ testid, href, label, icon, external }) {
-    const link = document.createElement("a");
-    link.dataset.testid = testid;
-    link.href = href;
-    link.title = label;
-    link.setAttribute("aria-label", label);
-    if (external) {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    }
-
-    const iconEl = document.createElement("i");
-    iconEl.className = `bi ${icon}`;
-    iconEl.setAttribute("aria-hidden", "true");
-    link.appendChild(iconEl);
-
-    return link;
-  }
-
-  function buildHeader() {
+  function buildHeader(state) {
     const header = document.createElement("header");
     header.className = "chloe-header";
 
-    const wordmark = document.createElement("span");
-    wordmark.className = "chloe-wordmark";
+    const wordmark = buildLogo();
+    const logoImg = wordmark.querySelector("img");
+    if (logoImg) logoImg.setAttribute("src", `../${logoImg.getAttribute("src")}`);
 
-    const logo = document.createElement("img");
-    logo.className = "chloe-wordmark__logo";
-    logo.src = "../RadioCalicoStyle/RadioCalicoLogoTM.png";
-    logo.alt = "Radio Calico logo";
-
-    wordmark.appendChild(document.createTextNode("Radio"));
-    wordmark.appendChild(logo);
-    wordmark.appendChild(document.createTextNode("Calico"));
-
-    const nav = document.createElement("nav");
-    nav.className = "chloe-nav";
-    nav.setAttribute("aria-label", "Primary");
-
-    const homeLink = document.createElement("a");
-    homeLink.href = "../index.html";
-    homeLink.textContent = "Home";
-    homeLink.dataset.testid = "dashboard-header-home-link";
-    nav.appendChild(homeLink);
+    const nav = buildMenu(state);
+    Array.from(nav.querySelectorAll("a")).forEach((link) => {
+      link.setAttribute("href", `../index.html${link.getAttribute("href")}`);
+    });
 
     header.appendChild(wordmark);
     header.appendChild(nav);
 
     return header;
-  }
-
-  function buildSidebar() {
-    const aside = document.createElement("aside");
-    aside.className = "chloe-sidebar";
-    aside.setAttribute("aria-label", "Site links");
-
-    const nav = document.createElement("nav");
-    nav.className = "chloe-sidebar__icons";
-    nav.setAttribute("aria-label", "Site links");
-    SIDEBAR_LINKS.forEach((entry) => nav.appendChild(createIconLink(entry)));
-
-    aside.appendChild(nav);
-    return aside;
-  }
-
-  function buildFooter() {
-    const footer = document.createElement("footer");
-    footer.className = "chloe-footer";
-
-    const disclaimer = document.createElement("p");
-    disclaimer.className = "chloe-footer__disclaimer";
-    disclaimer.textContent =
-      "Radio Calico is an independent internet radio stream. All music remains the property of its respective owners.";
-
-    const copy = document.createElement("p");
-    copy.className = "chloe-footer__copy";
-    copy.innerHTML = "&copy; 2026 Radio Calico. Released under the MIT License.";
-
-    footer.appendChild(disclaimer);
-    footer.appendChild(copy);
-
-    return footer;
   }
 
   function buildStatTile(label, value, modifierClass) {
@@ -231,6 +126,147 @@
     return empty;
   }
 
+  const DEFAULT_CATEGORY = "index/app";
+
+  function groupResultsByCategory(results) {
+    const groups = {};
+    results.forEach((result) => {
+      const category = result.category || DEFAULT_CATEGORY;
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(result);
+    });
+    return groups;
+  }
+
+  // AC-C2: a small pass/fail donut, built with raw SVG (no charting
+  // dependency — this page has no build step to pull one in via npm).
+  function buildCategoryDonut(passed, total) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const size = 72;
+    const radius = 28;
+    const circumference = 2 * Math.PI * radius;
+    const passRatio = total ? passed / total : 0;
+    const passLength = circumference * passRatio;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+    svg.setAttribute("width", String(size));
+    svg.setAttribute("height", String(size));
+    svg.setAttribute("data-testid", "report-category-donut");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", `${passed} of ${total} passed`);
+
+    const track = document.createElementNS(svgNS, "circle");
+    track.setAttribute("cx", String(size / 2));
+    track.setAttribute("cy", String(size / 2));
+    track.setAttribute("r", String(radius));
+    track.setAttribute("fill", "none");
+    track.setAttribute("stroke", "var(--chloe-pink)");
+    track.setAttribute("stroke-width", "10");
+    svg.appendChild(track);
+
+    const passArc = document.createElementNS(svgNS, "circle");
+    passArc.setAttribute("cx", String(size / 2));
+    passArc.setAttribute("cy", String(size / 2));
+    passArc.setAttribute("r", String(radius));
+    passArc.setAttribute("fill", "none");
+    passArc.setAttribute("stroke", "var(--chloe-mint)");
+    passArc.setAttribute("stroke-width", "10");
+    passArc.setAttribute("stroke-dasharray", `${passLength} ${circumference - passLength}`);
+    passArc.setAttribute("stroke-dashoffset", String(circumference / 4));
+    passArc.setAttribute("transform", `rotate(-90 ${size / 2} ${size / 2})`);
+    svg.appendChild(passArc);
+
+    return svg;
+  }
+
+  // AC-C3: drill-down modal, scoped to one category's results — appended to
+  // document.body (not the dashboard root) so it overlays the whole page,
+  // same pattern as PR B's loading backdrop.
+  function openCategoryModal(category, results) {
+    const existing = document.querySelector('[data-testid="report-category-modal"]');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "report-category-modal-backdrop";
+    backdrop.dataset.testid = "report-category-modal";
+
+    const dialog = document.createElement("div");
+    dialog.className = "report-category-modal";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-label", `${category} test results`);
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "report-category-modal__close";
+    closeButton.dataset.testid = "report-category-modal-close";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => {
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    });
+
+    const heading = document.createElement("h2");
+    heading.className = "report-category-modal__heading";
+    heading.textContent = category;
+
+    dialog.appendChild(closeButton);
+    dialog.appendChild(heading);
+    dialog.appendChild(buildResultsList(results));
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+  }
+
+  // AC-C2: one card per category present in the stored results, laid out in
+  // a Bootstrap col-md-4 grid so more categories fit later without a layout
+  // change. The outer col carries the category-specific testid + click
+  // handler (what AC-C3's drill-down click targets); the inner card carries
+  // the generic testid used to count all cards regardless of category.
+  function buildCategoryCard(category, results) {
+    const total = results.length;
+    const passed = results.filter((result) => result.passed).length;
+    const failed = total - passed;
+
+    const col = document.createElement("div");
+    col.className = "col-md-4 report-category-card-col";
+    col.dataset.testid = `report-category-card-${category}`;
+    col.setAttribute("role", "button");
+    col.setAttribute("tabindex", "0");
+    col.addEventListener("click", () => openCategoryModal(category, results));
+
+    const card = document.createElement("div");
+    card.className = "report-category-card";
+    card.dataset.testid = "report-category-card";
+
+    const title = document.createElement("p");
+    title.className = "report-category-card__title";
+    title.textContent = category;
+
+    const counts = document.createElement("p");
+    counts.className = "report-category-card__counts";
+    counts.textContent = `${total} total · ${passed} passed · ${failed} failed`;
+
+    card.appendChild(title);
+    card.appendChild(buildCategoryDonut(passed, total));
+    card.appendChild(counts);
+    col.appendChild(card);
+
+    return col;
+  }
+
+  function buildCategoryGrid(results) {
+    const grid = document.createElement("div");
+    grid.className = "row report-category-grid";
+    grid.dataset.testid = "report-category-grid";
+
+    const groups = groupResultsByCategory(results);
+    Object.keys(groups)
+      .sort()
+      .forEach((category) => grid.appendChild(buildCategoryCard(category, groups[category])));
+
+    return grid;
+  }
+
   function renderDashboardContent(container, report) {
     container.textContent = "";
 
@@ -238,6 +274,7 @@
     heading.className = "report-heading";
     heading.textContent = "Test Report Dashboard";
     container.appendChild(heading);
+    container.appendChild(buildReloadButton(onReload));
 
     if (!report) {
       container.appendChild(buildEmptyState());
@@ -246,27 +283,86 @@
 
     container.appendChild(buildTimestampLine(report.timestamp));
     container.appendChild(buildStatsRow(report.summary));
+    container.appendChild(buildCategoryGrid(report.results));
     container.appendChild(buildResultsList(report.results));
+  }
+
+  // AC-B1: drives a fresh suite run through a hidden <iframe> pointed at
+  // test-runner.html, rather than re-running the suite in this document —
+  // this page already mounts its own chrome/globals, which would collide
+  // with test-runner.html's fixtures if run inline (see the module doc
+  // comment in tests/test-report-dashboard-reload.test.js).
+  function buildLoadingBackdrop() {
+    const backdrop = document.createElement("div");
+    backdrop.className = "report-loading-backdrop";
+    backdrop.dataset.testid = "report-loading-backdrop";
+
+    const label = document.createElement("p");
+    label.className = "report-loading-backdrop__label";
+    label.textContent = "Running tests…";
+    backdrop.appendChild(label);
+
+    const iframe = document.createElement("iframe");
+    iframe.dataset.testid = "report-test-runner-iframe";
+    iframe.title = "Test suite runner";
+    iframe.hidden = true;
+    iframe.setAttribute("aria-hidden", "true");
+    backdrop.appendChild(iframe);
+
+    document.body.appendChild(backdrop);
+    // AC-B2: test-runner.html calls window.parent.onTestRunComplete() (set
+    // below) once it has saved its results — only meaningful once the
+    // iframe is actually in the document, so src is set last.
+    iframe.src = "test-runner.html";
+
+    return backdrop;
+  }
+
+  // AC-B1/AC-B2/AC-B3: shared by the Reload Test button click and the
+  // empty-storage auto-run — shows the backdrop+iframe, and wires
+  // window.onTestRunComplete (AC-B2's contract with test-runner.html) to
+  // hide the backdrop and re-render `main` from the freshly-saved report.
+  function startTestRun(main) {
+    if (document.querySelector('[data-testid="report-loading-backdrop"]')) return;
+
+    const backdrop = buildLoadingBackdrop();
+
+    window.onTestRunComplete = function () {
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      renderDashboardContent(main, window.TestReportStorage.loadTestReport(), () => startTestRun(main));
+    };
   }
 
   function initTestReportDashboard() {
     const root = document.getElementById("test-report-dashboard-root");
     if (!root) return;
 
-    root.appendChild(buildSidebar());
+    const state = createState();
+    document.documentElement.lang = state.lang;
+    document.documentElement.setAttribute("data-chloe-theme", state.theme);
+
+    root.appendChild(buildSidebar(state));
 
     const page = document.createElement("div");
     page.className = "chloe-page";
-    page.appendChild(buildHeader());
+    page.appendChild(buildHeader(state));
 
     const main = document.createElement("main");
     main.className = "chloe-main report-dashboard-main";
     main.dataset.testid = "report-dashboard-main";
-    renderDashboardContent(main, window.TestReportStorage.loadTestReport());
+
+    const initialReport = window.TestReportStorage.loadTestReport();
+    renderDashboardContent(main, initialReport, () => startTestRun(main));
     page.appendChild(main);
 
-    page.appendChild(buildFooter());
+    page.appendChild(buildFooter(state));
     root.appendChild(page);
+
+    // AC-B3: auto-run only when nothing has ever been stored yet; otherwise
+    // require the human to press Reload Test themselves.
+    if (!initialReport) {
+      startTestRun(main);
+    }
   }
 
   initTestReportDashboard();

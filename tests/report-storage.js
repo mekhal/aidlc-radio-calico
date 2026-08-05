@@ -5,9 +5,16 @@
  * tests/*.js. Consumed by tests/test-runner.html (writer) and
  * tests/test-report-dashboard.html (reader) — the dashboard never re-runs
  * the suite itself, it only reads whatever was last saved here.
+ *
+ * Issue #205 PR C (AC-C1): each result also carries a `category` field
+ * (the page/component it belongs to, tagged by assert.js's it() via
+ * TestHarness.categorizeScriptPath()). Results saved without one already
+ * set (e.g. hand-built arrays in tests) default to "index/app" — the same
+ * fallback categorizeScriptPath() itself uses for uncategorized paths.
  */
 (function (global) {
   const STORAGE_KEY = "radioCalicoTestReport";
+  const DEFAULT_CATEGORY = "index/app";
 
   function summarize(results) {
     const total = results.length;
@@ -22,6 +29,7 @@
         name: r.name,
         passed: r.passed,
         error: r.error || null,
+        category: r.category || DEFAULT_CATEGORY,
       })),
       summary: summarize(results),
       timestamp,
