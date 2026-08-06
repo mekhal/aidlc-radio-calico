@@ -84,7 +84,7 @@
       cleanupStray();
     });
 
-    it("renders summary stat tiles, the results list, and a timestamp from the stored report", async () => {
+    it("renders summary stat tiles and a timestamp from the stored report", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
       saveTestReport(
         [
@@ -110,14 +110,45 @@
         "50%"
       );
 
-      const items = root.querySelectorAll('[data-testid="report-result-item"]');
+      const timestamp = root.querySelector('[data-testid="report-timestamp"]');
+      expect(timestamp.textContent.length).toBeGreaterThan(0);
+
+      window.localStorage.removeItem(STORAGE_KEY);
+      unloadTestReportDashboard(root);
+    });
+
+    // Issue #294 (AC4): the flat results list is no longer duplicated on the
+    // main page — only the category grid + its drill-down modal (already
+    // shipped in #205) render individual results now.
+    it("does not duplicate the results list on the main page — only the category modal shows individual results", async () => {
+      window.localStorage.removeItem(STORAGE_KEY);
+      saveTestReport(
+        [
+          { name: "test one", passed: true },
+          { name: "test two", passed: false, error: "went wrong" },
+        ],
+        1700000000000
+      );
+
+      const root = await loadTestReportDashboard();
+      await nextTick();
+
+      expect(root.querySelectorAll('[data-testid="report-result-item"]').length).toBe(0);
+
+      root.querySelector('[data-testid="report-category-card-index/app"]').click();
+      await nextTick();
+
+      const modal = document.querySelector('[data-testid="report-category-modal"]');
+      expect(modal).toBeTruthy();
+
+      const items = modal.querySelectorAll('[data-testid="report-result-item"]');
       expect(items.length).toBe(2);
       expect(items[0].className).toContain("is-pass");
       expect(items[1].className).toContain("is-fail");
       expect(items[1].querySelector(".report-list__error").textContent).toBe("went wrong");
 
-      const timestamp = root.querySelector('[data-testid="report-timestamp"]');
-      expect(timestamp.textContent.length).toBeGreaterThan(0);
+      const closeButton = modal.querySelector('[data-testid="report-category-modal-close"]');
+      if (closeButton) closeButton.click();
 
       window.localStorage.removeItem(STORAGE_KEY);
       unloadTestReportDashboard(root);
@@ -130,9 +161,16 @@
       const root = await loadTestReportDashboard();
       await nextTick();
 
-      const items = root.querySelectorAll('[data-testid="report-result-item"]');
+      root.querySelector('[data-testid="report-category-card-index/app"]').click();
+      await nextTick();
+
+      const modal = document.querySelector('[data-testid="report-category-modal"]');
+      const items = modal.querySelectorAll('[data-testid="report-result-item"]');
       expect(items.length).toBe(1);
       expect(items[0].textContent).toContain("only this one");
+
+      const closeButton = modal.querySelector('[data-testid="report-category-modal-close"]');
+      if (closeButton) closeButton.click();
 
       window.localStorage.removeItem(STORAGE_KEY);
       unloadTestReportDashboard(root);

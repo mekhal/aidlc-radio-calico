@@ -20,8 +20,8 @@
   font-family: var(--chloe-sans);
   font-size: 0.85rem;
   font-weight: 700;
-  background: var(--chloe-mint);
-  color: var(--chloe-ink);
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
   border: none;
   border-radius: 999px;
   padding: 0.5rem 1.1rem;
@@ -109,15 +109,16 @@
   margin-bottom: 0.4rem;
   font-family: var(--chloe-sans);
   font-size: 0.9rem;
-  color: var(--chloe-ink);
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
 }
 
 .report-list__item.is-pass {
-  background: var(--chloe-mint);
+  border-left: 4px solid var(--chloe-mint);
 }
 
 .report-list__item.is-fail {
-  background: var(--chloe-pink);
+  border-left: 4px solid var(--chloe-pink-deep);
 }
 
 .report-list__error {
@@ -174,7 +175,8 @@
 }
 
 .report-category-modal {
-  background: var(--chloe-cream, #fff);
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
   border-radius: 16px;
   padding: 1.5rem;
   max-width: 600px;
