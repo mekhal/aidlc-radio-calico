@@ -259,7 +259,23 @@ AI ทำงานใน feature branch → **Developer หรือ Tester** re
 
 ---
 
-## 10. มาตรฐาน Production-grade
+## 10. Autonomy ที่ควบคุมด้วยความรู้ (Human-in-the-Loop)
+
+เมื่อความรู้ที่เชื่อถือได้สะสมมากขึ้น AI สามารถทำงานประจำ (routine work) ได้เองโดยอัตโนมัติสูงสุดถึง 80% ส่วนอีก 20% ที่เหลือ การตัดสินใจที่มีความเสี่ยงสูง ความมั่นใจต่ำ หรือกระทบต่อธุรกิจอย่างมีนัยสำคัญ ยังคงต้องผ่านการ review และอนุมัติจากมนุษย์
+
+Autonomy นี้ **ถูกควบคุมด้วยความรู้ ไม่ใช่เปิดกว้างแบบไม่มีขอบเขต**: การตัดสินใจจะมีสิทธิ์ถูกนำมาใช้ซ้ำแบบอัตโนมัติได้ก็ต่อเมื่อ loop ที่มันมาจากผ่าน **Quality & Safety Gates** เดียวกับที่ Code PR ต้องผ่านมาแล้ว (Security, Quality, Reviewability, Traceability) ดู [ข้อ 7](#7-skill-capture--reuse) และ [ข้อ 12](#12-quality--safety-gates-เกณฑ์คุณภาพและความปลอดภัย) โดยเฉพาะ **Traceability** คือสิ่งที่ทำให้ autonomy ที่เพิ่มขึ้นยังคงตรวจสอบย้อนกลับได้ ทุกการทำงานอัตโนมัติยังคงอ้างอิงกลับไปยัง skill/decision ที่อนุญาตให้ทำ และ PR/issue ที่สร้าง skill นั้นขึ้นมา
+
+| ระดับความมั่นใจ | การจัดเส้นทาง |
+|---|---|
+| **สูง (High)** | Auto-execute AI ใช้ skill/decision ที่เชื่อถือได้ทำงานจนจบ end-to-end |
+| **ปานกลาง/ต่ำ (Medium/Low)** | Human review ส่งเคสให้มนุษย์ตัดสินใจก่อนดำเนินการต่อ |
+| **ล้มเหลว/มีความเสี่ยงเชิงนโยบาย (Fail/Policy risk)** | Escalate ส่งตรงให้มนุษย์ ไม่มีการทำงานอัตโนมัติ |
+
+> **หมายเหตุ:** ภาพประกอบ "Transition Flow" สำหรับหัวข้อนี้ยังไม่ได้ฝังไว้ — ดูเหตุผลใน PR description
+
+---
+
+## 11. มาตรฐาน Production-grade
 
 <div align="center">
   <img src="code-pr-gates.png" alt="ขั้น 6: Code PR Gates — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อน Human Merge" width="900" />
@@ -276,9 +292,9 @@ AI ทำงานใน feature branch → **Developer หรือ Tester** re
 
 ---
 
-## 11. Quality & Safety Gates (เกณฑ์คุณภาพและความปลอดภัย)
+## 12. Quality & Safety Gates (เกณฑ์คุณภาพและความปลอดภัย)
 
-นี่คือเครื่องมือและ workflow จริงที่รองรับ 4 gate ใน [ข้อ 10](#10-มาตรฐาน-production-grade) ด้านบน:
+นี่คือเครื่องมือและ workflow จริงที่รองรับ 4 gate ใน [ข้อ 11](#11-มาตรฐาน-production-grade) ด้านบน:
 
 | Gate | เครื่องมือ | สิ่งที่ทำงานอยู่ตอนนี้ |
 |---|---|---|
@@ -290,7 +306,7 @@ AI ทำงานใน feature branch → **Developer หรือ Tester** re
 
 ---
 
-## 12. อ้างอิงและกิตติกรรมประกาศ (References & Acknowledgements)
+## 13. อ้างอิงและกิตติกรรมประกาศ (References & Acknowledgements)
 
 - แนวคิดและกระบวนการในโปรเจกต์นี้ได้แรงบันดาลใจจากคอร์ส **"Claude Code: Building Faster with AI, from Prototype to Prod"** บน Udemy ขอบคุณ **Frank Kane**
 - ขอบคุณ **คุณ Kunaruk Osatapirat** (Speaker) สำหรับหัวข้อ **"AI-driven architecture: Designing distributed systems at scale"** ในงาน **AWS Summit Bangkok 2026**
