@@ -259,7 +259,23 @@ Decided under issue #20 (see `docs/decisions/`):
 
 ---
 
-## 10. Production-grade Standards
+## 10. Knowledge-Governed Autonomy (Human-in-the-Loop)
+
+As trusted knowledge accumulates, AI can autonomously execute up to 80% of routine work. The remaining 20% high-risk, low-confidence, or business-critical decisions continues to require human review and approval.
+
+This autonomy is **knowledge-governed, not open-ended**: a decision only becomes eligible for autonomous reuse once the loop it came from has already cleared the same **Quality & Safety Gates** (Security, Quality, Reviewability, Traceability) as a Code PR see [Section 7](#7-skill-capture--reuse) and [Section 12](#12-quality--safety-gates). **Traceability** is what keeps growing autonomy auditable rather than opaque every autonomous execution still traces back to the specific skill/decision that authorized it, and to the PR/issue that produced it.
+
+| Confidence | Routing |
+|---|---|
+| **High** | Auto-execute AI applies the trusted skill/decision end-to-end. |
+| **Medium / Low** | Human review the case is surfaced for a human decision before proceeding. |
+| **Fail / Policy risk** | Escalate routed straight to a human, no autonomous attempt. |
+
+> **Note:** the illustrative "Transition Flow" infographic for this section could not be embedded yet — see the PR description for why.
+
+---
+
+## 11. Production-grade Standards
 
 <div align="center">
   <img src="code-pr-gates.png" alt="Step 6: Code PR Gates — Security, Quality, Reviewability, and Traceability, all required before Human Merge" width="900" />
@@ -276,9 +292,9 @@ Every Code PR (step 6) must pass **all four gates** below — Security, Quality,
 
 ---
 
-## 11. Quality & Safety Gates
+## 12. Quality & Safety Gates
 
-These are the concrete tools and workflows that back the four gates in [Section 10](#10-production-grade-standards) above:
+These are the concrete tools and workflows that back the four gates in [Section 11](#11-production-grade-standards) above:
 
 | Gate | Tooling | What it does today |
 |---|---|---|
@@ -290,7 +306,7 @@ These are the concrete tools and workflows that back the four gates in [Section 
 
 ---
 
-## 12. References & Acknowledgements
+## 13. References & Acknowledgements
 
 - The ideas and process in this project were inspired by the Udemy course **"Claude Code: Building Faster with AI, from Prototype to Prod"** thanks to **Frank Kane**.
 - Thanks to **Kunaruk Osatapirat** (speaker) for the talk **"AI-driven architecture: Designing distributed systems at scale"** at **AWS Summit Bangkok 2026**.
