@@ -271,7 +271,9 @@ Autonomy นี้ **ถูกควบคุมด้วยความรู�
 | **ปานกลาง/ต่ำ (Medium/Low)** | Human review ส่งเคสให้มนุษย์ตัดสินใจก่อนดำเนินการต่อ |
 | **ล้มเหลว/มีความเสี่ยงเชิงนโยบาย (Fail/Policy risk)** | Escalate ส่งตรงให้มนุษย์ ไม่มีการทำงานอัตโนมัติ |
 
-> **หมายเหตุ:** ภาพประกอบ "Transition Flow" สำหรับหัวข้อนี้ยังไม่ได้ฝังไว้ — ดูเหตุผลใน PR description
+<div align="center">
+  <img src="images/knowledge-governed-autonomy.jfif" alt="ภาพ Transition Flow ของ Knowledge-Governed Autonomy: ความรู้ที่เชื่อถือได้สะสมผ่าน Quality & Safety Gates แล้วจัดเส้นทางงานที่มั่นใจสูงไปสู่การทำงานอัตโนมัติ ส่วนที่เหลือส่งให้มนุษย์ review" width="900" />
+</div>
 
 ---
 
