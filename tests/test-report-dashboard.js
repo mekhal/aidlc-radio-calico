@@ -296,7 +296,6 @@
     container.appendChild(buildTimestampLine(report.timestamp));
     container.appendChild(buildStatsRow(report.summary));
     container.appendChild(buildCategoryGrid(report.results));
-    container.appendChild(buildResultsList(report.results));
   }
 
   // AC-B1: drives a fresh suite run through a hidden <iframe> pointed at
