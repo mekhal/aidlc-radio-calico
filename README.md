@@ -271,7 +271,9 @@ This autonomy is **knowledge-governed, not open-ended**: a decision only becomes
 | **Medium / Low** | Human review the case is surfaced for a human decision before proceeding. |
 | **Fail / Policy risk** | Escalate routed straight to a human, no autonomous attempt. |
 
-> **Note:** the illustrative "Transition Flow" infographic for this section could not be embedded yet — see the PR description for why.
+<div align="center">
+  <img src="images/knowledge-governed-autonomy.jfif" alt="Knowledge-Governed Autonomy transition flow: trusted knowledge accumulates through Quality & Safety Gates, routing high-confidence work to autonomous execution and the rest to human review" width="900" />
+</div>
 
 ---
 
