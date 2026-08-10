@@ -15,8 +15,18 @@
  * FOOTER_LINKS renamed SIDEBAR_LINKS in this move (issue #256 AC2): it only
  * ever rendered inside buildSidebar(), never app.js's actual <footer>, so
  * the old name was misleading (see issue #256's review discussion).
+ *
+ * Issue #299 (AC1-AC4): the Test Report/Lint Report/Security Scan Report
+ * hrefs are relative to the site root, so they 404 on pages one directory
+ * below root (e.g. tests/test-report-dashboard.html). SIDEBAR_BASE_PATH
+ * mirrors shared/translations.js's window.__ALBUM_PROMO_I18N_BASE_PATH__
+ * override pattern, defaulting to "" (root-relative, unchanged behavior)
+ * and set to "../" on pages one level below root. Only those three hrefs
+ * are prefixed; the absolute Site/GitHub/LinkedIn links are untouched.
  */
 "use strict";
+
+var SIDEBAR_BASE_PATH = window.__SIDEBAR_BASE_PATH__ || "";
 
 const SIDEBAR_LINKS = [
   {
@@ -27,19 +37,19 @@ const SIDEBAR_LINKS = [
   },
   {
     testid: "sidebar-footer-test-report-link",
-    href: "tests/test-report-dashboard.html",
+    href: `${SIDEBAR_BASE_PATH}tests/test-report-dashboard.html`,
     label: "Test Report",
     icon: "bi-clipboard-check",
   },
   {
     testid: "sidebar-footer-lint-report-link",
-    href: "reports/lint/megalinter-report.html",
+    href: `${SIDEBAR_BASE_PATH}reports/lint/megalinter-report.html`,
     label: "Lint Report",
     icon: "bi-brush",
   },
   {
     testid: "sidebar-footer-security-report-link",
-    href: "reports/security/trivy.sarif",
+    href: `${SIDEBAR_BASE_PATH}reports/security/trivy.sarif`,
     label: "Security Scan Report",
     icon: "bi-shield-check",
   },

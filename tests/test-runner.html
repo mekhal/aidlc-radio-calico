@@ -65,9 +65,12 @@
          directory under the repo root (unlike the live index.html, which
          app.js's default "i18n/" path assumes), so it needs the "../" prefix
          — mirrors the existing window.__APP_JS_PATH__ override pattern. -->
+    <!-- Issue #299 (AC3): same "one directory below root" reasoning as the
+         i18n override above, applied to sidebar/sidebar.js's base path. -->
     <script>
       window.__I18N_BASE_PATH__ = "../i18n/";
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
+      window.__SIDEBAR_BASE_PATH__ = "../";
     </script>
 
     <script src="assert.js"></script>
