@@ -32,9 +32,12 @@
 
     <!-- This page lives one directory below the repo root (tests/), so the
          i18n fetch base path (shared/translations.js, default "i18n/") must
-         be overridden the same way tests/test-runner.html does. -->
+         be overridden the same way tests/test-runner.html does. Same reason
+         for the sidebar base path (sidebar/sidebar.js, issue #299): without
+         it, the Test/Lint/Security Scan sidebar links 404 here. -->
     <script>
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
+      window.__SIDEBAR_BASE_PATH__ = "../";
     </script>
 
     <!-- AC-A1: same reusable chrome globals index.html/album-promo.js
