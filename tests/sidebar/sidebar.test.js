@@ -19,6 +19,20 @@
  *
  * Written before sidebar/sidebar.js exists, per TDD — fails until this
  * ticket's Code PR (step 6) creates it.
+ *
+ * Issue #299 (AC1-AC4): the three site-root-relative links above
+ * (Test Report, Lint Report, Security Scan Report) 404 on any page one
+ * directory below root (e.g. tests/test-report-dashboard.html), because
+ * SIDEBAR_LINKS hardcodes them relative to the site root. Fix mirrors the
+ * existing window.__ALBUM_PROMO_I18N_BASE_PATH__ override pattern
+ * (shared/translations.js, see tests/shared/shared-translations.test.js):
+ * a new window.__SIDEBAR_BASE_PATH__ override, defaulting to "" (AC1,
+ * unchanged on index.html/album-promo.html), prefixes only those three
+ * relative hrefs — the absolute links (Site, GitHub, LinkedIn) are
+ * untouched (AC4). New cases appended below; existing cases above left
+ * untouched. Written before the base-path support exists in
+ * sidebar/sidebar.js, per TDD — fail until this ticket's Code PR (step 6)
+ * implements it.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -154,6 +168,44 @@
       const second = window.buildSidebar(state);
 
       expect(first === second).toBeFalsy();
+    });
+
+    it("exposes SIDEBAR_BASE_PATH as a global, defaulting to '' when window.__SIDEBAR_BASE_PATH__ is unset (issue #299, AC1)", async () => {
+      delete window.__SIDEBAR_BASE_PATH__;
+      await loadSidebarModule();
+
+      expect(window.SIDEBAR_BASE_PATH).toBe("");
+    });
+
+    it("honors window.__SIDEBAR_BASE_PATH__, prefixing only the Test/Lint/Security Scan links (issue #299, AC2 + AC3)", async () => {
+      window.__SIDEBAR_BASE_PATH__ = "../";
+      await loadSidebarModule();
+      const state = window.createState();
+
+      const aside = window.buildSidebar(state);
+      const nav = aside.querySelector("nav.chloe-sidebar__icons");
+
+      expect(nav.querySelector('[data-testid="sidebar-footer-test-report-link"]').getAttribute("href")).toBe(
+        "../tests/test-report-dashboard.html"
+      );
+      expect(nav.querySelector('[data-testid="sidebar-footer-lint-report-link"]').getAttribute("href")).toBe(
+        "../reports/lint/megalinter-report.html"
+      );
+      expect(nav.querySelector('[data-testid="sidebar-footer-security-report-link"]').getAttribute("href")).toBe(
+        "../reports/security/trivy.sarif"
+      );
+
+      expect(nav.querySelector('[data-testid="sidebar-footer-site-link"]').getAttribute("href")).toBe(
+        "https://www.radio-calico.com/"
+      );
+      expect(nav.querySelector('[data-testid="sidebar-footer-github-link"]').getAttribute("href")).toBe(
+        "https://github.com/mekhal/aidlc-radio-calico"
+      );
+      expect(nav.querySelector('[data-testid="sidebar-footer-linkedin-link"]').getAttribute("href")).toBe(
+        "https://www.linkedin.com/in/mekhalomlao/"
+      );
+
+      delete window.__SIDEBAR_BASE_PATH__;
     });
   });
 })();
