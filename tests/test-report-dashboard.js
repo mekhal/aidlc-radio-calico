@@ -374,6 +374,16 @@
     if (!initialReport) {
       startTestRun(main);
     }
+
+    // Issue #305: mirrors album-promo.js's initAlbumPromo() — buildMenu()/
+    // buildFooter() both no-op their render() until ALBUM_PROMO_TRANSLATIONS
+    // is populated, so without this call the shared Menu/Footer chrome stays
+    // empty on this page. Exposed as a named promise (mirrors
+    // window.__albumPromoI18nReady) so a test suite can deterministically
+    // await it instead of racing the fetch.
+    window.__testReportDashboardI18nReady = loadTranslations().then(() => {
+      state.onLanguageChange.forEach((fn) => fn());
+    });
   }
 
   initTestReportDashboard();
