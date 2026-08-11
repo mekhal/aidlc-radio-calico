@@ -227,7 +227,7 @@ body {
   position: relative;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(255 255 255 / 0.2);
   overflow: hidden;
 }
 
@@ -253,7 +253,7 @@ body {
 .chloe-recently-played-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 0.5);
   z-index: 1000;
 }
 
@@ -271,7 +271,7 @@ body {
   padding: 1.5rem;
   z-index: 1001;
   font-family: var(--chloe-sans);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
 }
 
 .chloe-recently-played-modal__header {
@@ -319,7 +319,7 @@ body {
 
 .chloe-recently-played__item {
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgb(0 0 0 / 0.08);
   font-family: var(--chloe-sans);
   font-size: 0.95rem;
 }
