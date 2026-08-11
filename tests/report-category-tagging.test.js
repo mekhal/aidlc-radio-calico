@@ -30,7 +30,7 @@
       );
     });
 
-    it('categorizes tests/logo/, tests/menu/, tests/sidebar/, and tests/footer/ script paths', () => {
+    it("categorizes tests/logo/, tests/menu/, tests/sidebar/, and tests/footer/ script paths", () => {
       expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/logo/logo.test.js")).toBe("logo");
       expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/menu/menu.test.js")).toBe("menu");
       expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/sidebar/sidebar.test.js")).toBe(
