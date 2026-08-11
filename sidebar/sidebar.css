@@ -44,7 +44,7 @@
   gap: 0.75rem;
   margin-top: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgb(0 0 0 / 0.08);
 }
 
 /* Follow-up review comment on PR #166 (2026-07-24): theme/language controls
@@ -162,7 +162,7 @@
     padding-top: 0;
     padding-left: 0.75rem;
     border-top: none;
-    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 1px solid rgb(0 0 0 / 0.08);
   }
 
   .chloe-switch {
