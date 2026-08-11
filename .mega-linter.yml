@@ -1,4 +1,5 @@
-# Mega-Linter config (issue #120, rescoped under issue #314).
+# Mega-Linter config (issue #120, rescoped under issue #314, JS flavor
+# rescoped again under issue #317).
 #
 # ENABLE is scoped to this repo's "Core Components" per issue #314's
 # decision: JS + CSS (+ YAML/POWERSHELL, left untouched from issue #120 since
@@ -21,5 +22,22 @@ ENABLE:
   - YAML
   - POWERSHELL
 
-# Generated/binary/report output — never source to lint.
-FILTER_REGEX_EXCLUDE: "(reports/|megalinter-reports/|RadioCalicoStyle/.*\\.png$)"
+# Issue #317: JAVASCRIPT_STANDARD flagged 5,693 violations because this
+# repo's actual house style (double quotes, semicolons, no space before a
+# named function's paren) is deliberate but isn't Standard Style, and
+# `standard` can't be configured to match it. Disabled here (rather than via
+# the global ENABLE_LINTERS whitelist, which would also silently drop the
+# still-wanted CSS/YAML/POWERSHELL linters) so JAVASCRIPT_ES (plain ESLint,
+# config at .eslintrc.json) is the one enforcing house style, while every
+# other language's default linters stay untouched. JAVASCRIPT_PRETTIER also
+# drops out — it would just re-flag the same style choices from a different
+# angle.
+DISABLE_LINTERS:
+  - JAVASCRIPT_STANDARD
+  - JAVASCRIPT_PRETTIER
+
+# Generated/binary/report output, plus Claude Code skill-authoring scripts
+# under .claude/skills/ (issue #317) — Node-target helper scripts, not app
+# code, that don't follow this repo's browser house style — are never
+# source to lint.
+FILTER_REGEX_EXCLUDE: "(reports/|megalinter-reports/|RadioCalicoStyle/.*\\.png$|\\.claude/skills/)"
