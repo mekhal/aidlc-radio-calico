@@ -66,7 +66,7 @@ body {
   margin: 0 auto;
 }
 
-@media (max-width: 575.98px) {
+@media (width <= 575.98px) {
   .chloe-hero__portrait {
     max-width: 240px;
   }
@@ -87,7 +87,7 @@ body {
    (flex) and `col-lg-6` only applies at >=992px, so below that these columns
    have no Bootstrap-applied width and shrink-to-fit their content — leaving
    `justify-content: center` with no full-width box to center within. */
-@media (max-width: 991.98px) {
+@media (width <= 991.98px) {
   .chloe-hero__portrait-col,
   .chloe-hero__player-col {
     width: 100%;
@@ -186,7 +186,7 @@ body {
    existing .chloe-now-playing__rating flex row, above the audio controls. */
 .chloe-now-playing__recently-played-trigger {
   margin-left: auto;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
   background: transparent;
   color: var(--chloe-ink);
   font-family: var(--chloe-sans);
@@ -227,7 +227,7 @@ body {
   position: relative;
   height: 4px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 20%);
   overflow: hidden;
 }
 
@@ -253,7 +253,7 @@ body {
 .chloe-recently-played-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 0.5);
+  background: rgb(0 0 0 / 50%);
   z-index: 1000;
 }
 
@@ -271,7 +271,7 @@ body {
   padding: 1.5rem;
   z-index: 1001;
   font-family: var(--chloe-sans);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
 }
 
 .chloe-recently-played-modal__header {
@@ -292,7 +292,7 @@ body {
 }
 
 .chloe-recently-played-modal__close {
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
   background: transparent;
   color: var(--chloe-ink);
   font-family: var(--chloe-sans);
@@ -319,7 +319,7 @@ body {
 
 .chloe-recently-played__item {
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgb(0 0 0 / 0.08);
+  border-bottom: 1px solid rgb(0 0 0 / 8%);
   font-family: var(--chloe-sans);
   font-size: 0.95rem;
 }
@@ -360,7 +360,7 @@ body {
   border-radius: 50%;
   border: none;
   background: var(--chloe-pink-deep);
-  color: #ffffff;
+  color: #fff;
   font-size: 1rem;
   cursor: pointer;
 }
@@ -392,6 +392,7 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.4;
     transform: scale(0.75);
@@ -416,7 +417,7 @@ body {
 
 /* --- Ticket A: mobile — page-shell adjustments for the sidebar's bottom-bar
    collapse (sidebar's own rules moved to sidebar/sidebar.css, issue #256) --- */
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   .chloe-page {
     padding-left: 0;
     padding-bottom: var(--chloe-sidebar-bar-h);

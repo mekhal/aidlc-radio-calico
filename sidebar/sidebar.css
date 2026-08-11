@@ -44,7 +44,7 @@
   gap: 0.75rem;
   margin-top: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgb(0 0 0 / 0.08);
+  border-top: 1px solid rgb(0 0 0 / 8%);
 }
 
 /* Follow-up review comment on PR #166 (2026-07-24): theme/language controls
@@ -94,7 +94,7 @@
   height: 18px;
   border-radius: 50%;
   overflow: hidden;
-  background: #ffffff;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,6 +105,10 @@
 
 .chloe-switch--theme .chloe-switch-track {
   background: var(--chloe-pink-deep);
+}
+
+.chloe-switch--lang .chloe-switch-track {
+  background: var(--chloe-mint);
 }
 
 .chloe-switch--theme[aria-checked="true"] .chloe-switch-track {
@@ -119,10 +123,6 @@
   transform: translateY(18px);
 }
 
-.chloe-switch--lang .chloe-switch-track {
-  background: var(--chloe-mint);
-}
-
 .chloe-switch--lang[aria-checked="false"] .chloe-switch-thumb {
   transform: translateY(0);
 }
@@ -132,12 +132,9 @@
 }
 
 /* --- mobile — sidebar collapses to a bottom bar --- */
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   .chloe-sidebar {
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: auto 0 0;
     width: 100%;
     height: var(--chloe-sidebar-bar-h);
     flex-direction: row;
@@ -146,8 +143,7 @@
   }
 
   .chloe-sidebar__icons {
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex-flow: row nowrap;
     flex-shrink: 0;
     align-items: center;
     gap: 1.25rem;
@@ -162,7 +158,7 @@
     padding-top: 0;
     padding-left: 0.75rem;
     border-top: none;
-    border-left: 1px solid rgb(0 0 0 / 0.08);
+    border-left: 1px solid rgb(0 0 0 / 8%);
   }
 
   .chloe-switch {

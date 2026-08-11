@@ -27,7 +27,7 @@
   cursor: default;
 }
 
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   .chloe-nav {
     justify-content: center;
     flex-wrap: wrap;

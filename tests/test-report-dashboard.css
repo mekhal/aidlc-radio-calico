@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 0.6);
+  background: rgb(0 0 0 / 60%);
 }
 
 .report-loading-backdrop__label {
@@ -171,7 +171,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 0.6);
+  background: rgb(0 0 0 / 60%);
 }
 
 .report-category-modal {

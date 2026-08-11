@@ -21,5 +21,23 @@ ENABLE:
   - YAML
   - POWERSHELL
 
+# Issue #314 (second round): narrow each Core descriptor down to the one
+# linter this repo actually wants findings from, instead of every linter
+# Mega-Linter bundles under that descriptor (e.g. YAML's prettier/v8r, which
+# just add noise on top of yamllint). POWERSHELL has no linter listed here —
+# there are no .ps1 files in this repo yet, so the descriptor never
+# activates regardless; add its specific linter key once a script exists to
+# verify against.
+ENABLE_LINTERS:
+  - JAVASCRIPT_STANDARD
+  - CSS_STYLELINT
+  - YAML_YAMLLINT
+
+# COPYPASTE (jscpd) already doesn't run today — it isn't in ENABLE above —
+# but disabling it explicitly keeps that intent from silently changing if
+# ENABLE is ever broadened.
+DISABLE_LINTERS:
+  - COPYPASTE_JSCPD
+
 # Generated/binary/report output — never source to lint.
 FILTER_REGEX_EXCLUDE: "(reports/|megalinter-reports/|RadioCalicoStyle/.*\\.png$)"

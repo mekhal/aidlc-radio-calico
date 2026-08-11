@@ -9,7 +9,7 @@
   --chloe-player-box-bg: #2f2a2c;
   --chloe-player-box-fg: #f5eee0;
   --chloe-live-dot: #e5484d;
-  --chloe-sans: "Montserrat", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --chloe-sans: "Montserrat", "Open Sans", -apple-system, blinkmacsystemfont, "Segoe UI", sans-serif;
 }
 
 /* Ticket A review (2026-07-24): dark theme toggled via [data-chloe-theme]
