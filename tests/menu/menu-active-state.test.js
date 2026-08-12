@@ -15,16 +15,29 @@
  * it, and "no navigation" is verified via the standard Event.defaultPrevented
  * flag, not by stubbing a native method. Each test restores
  * window.location.hash afterwards so it doesn't leak into later tests.
+ *
+ * Issue #322 (Ticket 1 of #203): NAV_KEYS/NAV_HREFS gain the `caseStudy`
+ * entry (AC1); the existing `.forEach(NAV_KEYS)` assertions below cover its
+ * active/inactive behavior automatically (AC5 — no drift from the other
+ * items). Written before menu/menu.js implements it, per TDD.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadSharedModule } = window.SharedModuleTestHelpers;
 
-  const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
-  const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
+  const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
+  const NAV_HREFS = {
+    home: "#home",
+    about: "#about",
+    whatsThis: "#whats-this",
+    caseStudy: "#case-study",
+    contact: "#contact",
+  };
 
   const SAMPLE_TRANSLATIONS = {
-    en: { nav: { home: "Home", about: "About", whatsThis: "What's this", contact: "Contact" } },
+    en: {
+      nav: { home: "Home", about: "About", whatsThis: "What's this", caseStudy: "Case Study", contact: "Contact" },
+    },
   };
 
   async function loadMenuModule() {
