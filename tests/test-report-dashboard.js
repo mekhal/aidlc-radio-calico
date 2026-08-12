@@ -210,9 +210,19 @@
     heading.className = "report-category-modal__heading";
     heading.textContent = category;
 
-    dialog.appendChild(closeButton);
-    dialog.appendChild(heading);
-    dialog.appendChild(buildResultsList(results));
+    // Issue #328: heading + Close live in a fixed header row so Close stays
+    // visible; only the results list (in its own scrollable body) scrolls.
+    const header = document.createElement("div");
+    header.className = "report-category-modal__header";
+    header.appendChild(heading);
+    header.appendChild(closeButton);
+
+    const body = document.createElement("div");
+    body.className = "report-category-modal__body";
+    body.appendChild(buildResultsList(results));
+
+    dialog.appendChild(header);
+    dialog.appendChild(body);
     backdrop.appendChild(dialog);
     document.body.appendChild(backdrop);
   }
