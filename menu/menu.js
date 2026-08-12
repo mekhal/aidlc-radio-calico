@@ -20,11 +20,25 @@
  * empty hash to "#home" since that's index.html's real landing state, and
  * re-evaluates on "hashchange" so it keeps working once About/What's
  * this/Contact become real pages. See tests/menu/menu-active-state.test.js.
+ *
+ * Issue #322 (Ticket 1 of #203): a `caseStudy` entry sits between
+ * `whatsThis` and `contact` (AC1). The href has no rendered section yet
+ * (Tickets 2-3 add that) — nav-only for this ticket. index.html (the
+ * deployed page, see album-promo.html's own header comment) mounts
+ * buildMenu() from this shared module with no page-specific nav markup, so
+ * the new tab's active-state/translation behavior needs no page-specific
+ * change (AC5).
  */
 "use strict";
 
-const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
-const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
+const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
+const NAV_HREFS = {
+  home: "#home",
+  about: "#about",
+  whatsThis: "#whats-this",
+  caseStudy: "#case-study",
+  contact: "#contact",
+};
 
 function getActiveNavKey() {
   const hash = window.location.hash || "#home";
