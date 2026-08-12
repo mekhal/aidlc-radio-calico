@@ -207,5 +207,49 @@
 
       delete window.__SIDEBAR_BASE_PATH__;
     });
+
+    // Issue #330: sidebar.js is fetched and re-injected as a fresh <script>
+    // tag on every test that mounts it (loadSidebarModule() above, and every
+    // other page that reuses it — see tests/test-report-dashboard.js).
+    // Before the IIFE fix, SIDEBAR_LINKS/FLAG_ICONS were plain top-level
+    // `const`s, which live in the shared global lexical environment;
+    // re-injecting the script a second time throws "Identifier
+    // 'SIDEBAR_LINKS' has already been declared" as an uncaught global error
+    // (window's "error" event — synchronous script-instantiation errors
+    // don't propagate back to the appendChild() call that injected them).
+    it("can be injected as a <script> more than once without an uncaught global redeclaration error", async () => {
+      let caught = null;
+      const onError = (event) => {
+        caught = (event.error && event.error.message) || event.message;
+      };
+      window.addEventListener("error", onError);
+
+      await loadSidebarModule();
+      await loadSidebarModule();
+
+      window.removeEventListener("error", onError);
+      expect(caught).toBeFalsy();
+    });
+
+    // Issue #330: the redeclaration error above means the *whole* script
+    // fails to re-run on the second injection (not just the conflicting
+    // `const`s) — so SIDEBAR_BASE_PATH silently keeps whatever value the
+    // first injection computed, even once window.__SIDEBAR_BASE_PATH__
+    // changes. This is the same failure mode already implicated in the
+    // "honors window.__SIDEBAR_BASE_PATH__" test above being test #7 in this
+    // suite (six prior re-injections have already tripped the bug by then).
+    // Two consecutive injections here (default, then overridden) isolate it
+    // to a minimal repro.
+    it("re-executes on every injection, so SIDEBAR_BASE_PATH picks up a changed override on the very next load", async () => {
+      delete window.__SIDEBAR_BASE_PATH__;
+      await loadSidebarModule();
+      expect(window.SIDEBAR_BASE_PATH).toBe("");
+
+      window.__SIDEBAR_BASE_PATH__ = "../";
+      await loadSidebarModule();
+      expect(window.SIDEBAR_BASE_PATH).toBe("../");
+
+      delete window.__SIDEBAR_BASE_PATH__;
+    });
   });
 })();
