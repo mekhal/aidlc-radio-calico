@@ -187,6 +187,14 @@ Introduced as an experimental trial under issue #119, **promoted to standard pra
 - This is the evidence trail behind the "Ask when in doubt" rule above: low scores or review notes recorded here are what justify (or don't yet justify) moving a class of AI decision from Human Review Everything to Human Review Risk.
 - **The close-step branch carrying the decision doc + eval entry must get a real PR opened (`gh pr create --base develop`) before the close comment is considered done** — see the `@claude close` row above and `docs/decisions/2026-07-21-verify-close-step-branches-get-a-pr-opened.md`. A branch with these files committed and pushed but no PR opened leaves them stranded and never reaching `develop` (issue #135).
 
+## Case study showcase
+
+Decided under issue #203 (see `docs/decisions/2026-08-11-issue-203-case-study-data-source-and-ticket-breakdown.md`): the Case Study nav tab renders from a hand-curated `data/case-studies.json` (2–3 highlight cards of fully closed loops, not every issue) rather than parsing `ai-review-evals/` at runtime.
+
+- When handling `@claude close`, once `data/case-studies.json` exists, also consider whether this issue's closed loop is a good candidate for that showcase — a clean, illustrative end-to-end example of the AI-DLC loop.
+- If it is, propose an entry (or an update to an existing one) and ask the human to confirm before adding it — do not write to `data/case-studies.json` unprompted, same as any other over-implementing risk under "Ask when in doubt."
+- Not every closed issue belongs in the showcase; it stays a small, curated set, not a running log.
+
 ## Source of truth & keeping docs in sync
 
 **`CLAUDE.md` is the operating source of truth** for the agent's practical rules — read and act on it. `README.md` (English) and `README.th.md` (Thai) are the human-facing explanation and mirror each other section-for-section; **Thai is canonical**. When you change an operating rule in `CLAUDE.md`, sync the change back into both README files so the human docs stay consistent.

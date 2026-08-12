@@ -13,6 +13,12 @@
  * fetch+inject shared/logo/menu/sidebar/footer ahead of
  * test-report-dashboard.js, mirroring tests/load-album-promo.js's own
  * precedent).
+ *
+ * Issue #322 (Ticket 1 of #203): the shared menu component gains a
+ * `caseStudy` entry between `whatsThis` and `contact` (AC1); since this
+ * dashboard reuses that component as-is (reuse-first), its rendered nav
+ * picks up the same 5th link automatically (AC5 — no drift). Written before
+ * menu/menu.js implements it, per TDD.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -36,7 +42,7 @@
   ];
 
   describe("Test Report Dashboard reuses shared chrome (issue #205, PR A)", () => {
-    it("renders the full primary nav menu (home/about/whats-this/contact) via the shared menu component", async () => {
+    it("renders the full primary nav menu (home/about/whats-this/case-study/contact) via the shared menu component", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
       const root = await loadTestReportDashboard();
       await nextTick();
@@ -44,7 +50,7 @@
       const nav = root.querySelector(".chloe-nav");
       expect(nav).toBeTruthy();
       const links = nav.querySelectorAll("a");
-      expect(links.length).toBe(4);
+      expect(links.length).toBe(5);
 
       unloadTestReportDashboard(root);
     });
@@ -59,6 +65,7 @@
         "../index.html#home",
         "../index.html#about",
         "../index.html#whats-this",
+        "../index.html#case-study",
         "../index.html#contact",
       ]);
 

@@ -198,6 +198,8 @@ Integration test: HLS player โหลด stream URL สำเร็จ
 
 **AI review evaluations:** เลื่อนสถานะจาก trial ทดลอง มาเป็นแนวปฏิบัติมาตรฐาน ตอนปิด issue #99 ทุกครั้งที่ `@claude close` จะบันทึกไฟล์ใหม่หนึ่งไฟล์ไว้ที่ [`ai-review-evals/`](ai-review-evals/README.md) — AI กรอก `Metadata`, `Task`, `Original User Request`, และ `AI Decision`/`Decision Type` ตอนปิดงาน (`Risk Level` ตั้งต้นเป็น `Medium`) ส่วน `Instruction Fidelity` และ `Result Satisfaction` เว้นว่างไว้ให้มนุษย์ให้คะแนนย้อนหลัง (เว้นแต่มนุษย์จะระบุคะแนนมาเองในคอมเมนต์ `@claude close`) — AI จะไม่ให้คะแนนงานตัวเอง ใช้เป็นหลักฐานประกอบการตัดสินใจว่าการตัดสินใจแบบไหนของ AI จะย้ายจาก Human Review Everything ไปเป็น Human Review Risk ได้ **branch ของขั้น close ที่มีไฟล์เหล่านี้ต้องเปิด PR จริง (`--base develop`) ก่อนคอมเมนต์ปิดงานจะถือว่าเสร็จ** — แค่โพสต์ compare link ไม่พอ ไม่งั้นไฟล์จะค้างอยู่นอก `develop` (issue #135)
 
+**Case study showcase:** ตัดสินใจไว้ที่ issue #203 — Tab "Case Study" จะดึงข้อมูลจากไฟล์ `data/case-studies.json` ที่คัดสรรด้วยมือ เป็น highlight card เด่น ๆ 2–3 เคส ไม่ใช่ทุก issue เมื่อไฟล์นี้มีอยู่แล้ว ขั้นตอน `@claude close` จะพิจารณาด้วยว่า loop ที่กำลังปิดนี้เหมาะเป็นเคสตัวอย่างหรือไม่ แล้วเสนอ entry ให้มนุษย์ยืนยันก่อน ไม่เขียนลงไฟล์เองโดยไม่ถาม
+
 ---
 
 ## 8. โครงสร้าง Repository

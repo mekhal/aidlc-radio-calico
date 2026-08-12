@@ -18,17 +18,32 @@
  *
  * Written before menu/menu.js exists, per TDD — fails until this ticket's
  * Code PR (step 6) creates it.
+ *
+ * Issue #322 (Ticket 1 of #203): a `caseStudy` entry is inserted between
+ * `whatsThis` and `contact` (NAV_KEYS order + NAV_HREFS `#case-study`), AC1.
+ * Written before menu/menu.js implements it, per TDD — fails until this
+ * ticket's Code PR (step 6) adds it.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadSharedModule } = window.SharedModuleTestHelpers;
 
-  const NAV_KEYS = ["home", "about", "whatsThis", "contact"];
-  const NAV_HREFS = { home: "#home", about: "#about", whatsThis: "#whats-this", contact: "#contact" };
+  const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
+  const NAV_HREFS = {
+    home: "#home",
+    about: "#about",
+    whatsThis: "#whats-this",
+    caseStudy: "#case-study",
+    contact: "#contact",
+  };
 
   const SAMPLE_TRANSLATIONS = {
-    en: { nav: { home: "Home", about: "About", whatsThis: "What's this", contact: "Contact" } },
-    th: { nav: { home: "หน้าแรก", about: "เกี่ยวกับ", whatsThis: "นี่คืออะไร", contact: "ติดต่อ" } },
+    en: {
+      nav: { home: "Home", about: "About", whatsThis: "What's this", caseStudy: "Case Study", contact: "Contact" },
+    },
+    th: {
+      nav: { home: "หน้าแรก", about: "เกี่ยวกับ", whatsThis: "นี่คืออะไร", caseStudy: "กรณีศึกษา", contact: "ติดต่อ" },
+    },
   };
 
   async function loadMenuModule() {
@@ -38,7 +53,7 @@
   }
 
   describe("menu/menu.js (issue #255, Ticket 3)", () => {
-    it("buildMenu(state) returns a nav.chloe-nav with aria-label Primary and 4 links in NAV_KEYS order", async () => {
+    it("buildMenu(state) returns a nav.chloe-nav with aria-label Primary and 5 links in NAV_KEYS order", async () => {
       await loadMenuModule();
       const state = window.createState();
 

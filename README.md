@@ -198,6 +198,8 @@ The heart of making the agent "keep getting better" is turning **human decisions
 
 **AI review evaluations:** promoted from an experimental trial to standard practice at issue #99's close. Every `@claude close` also logs one new entry in [`ai-review-evals/`](ai-review-evals/README.md) — the AI fills in `Metadata`, `Task`, `Original User Request`, and `AI Decision`/`Decision Type` at close time (`Risk Level` defaults to `Medium`), while `Instruction Fidelity` and `Result Satisfaction` are left blank for a human to score afterward (unless the human supplies them directly in the close comment) — the AI never grades its own homework. This is the evidence trail for deciding whether a class of AI decision can move from Human Review Everything to Human Review Risk. **The close-step branch carrying these files must get a real PR opened (`--base develop`) before the close comment is done** — a posted compare link alone is not enough, or the files stay stranded off `develop` (issue #135).
 
+**Case study showcase:** decided under issue #203, the Case Study nav tab renders from a hand-curated `data/case-studies.json` — a small set of 2–3 highlight cards for fully closed loops, not every issue. Once that file exists, `@claude close` also considers whether the closing loop is a good showcase candidate, and proposes an entry for the human to confirm rather than writing to it unprompted.
+
 ---
 
 ## 8. Repository Structure
