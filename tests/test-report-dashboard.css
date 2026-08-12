@@ -181,6 +181,22 @@
   padding: 1.5rem;
   max-width: 600px;
   max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Issue #328: fixed header (heading + Close) stays visible; only
+   .report-category-modal__body below scrolls, so Close never scrolls away. */
+.report-category-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+.report-category-modal__body {
   overflow-y: auto;
 }
 
@@ -188,14 +204,14 @@
   font-family: "Playfair Display", serif;
   font-style: italic;
   text-transform: capitalize;
-  margin: 0 0 1rem;
+  margin: 0;
 }
 
 .report-category-modal__close {
-  float: right;
   font-family: var(--chloe-sans);
   font-weight: 700;
   background: none;
   border: none;
   cursor: pointer;
+  flex-shrink: 0;
 }
