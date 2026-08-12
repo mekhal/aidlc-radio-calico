@@ -122,5 +122,28 @@
 
       expect(first === second).toBeFalsy();
     });
+
+    // Issue #330: menu.js is fetched and re-injected as a fresh <script> tag
+    // on every test that mounts it (loadMenuModule() above, and every other
+    // page that reuses it — see tests/test-report-dashboard.js). Before the
+    // IIFE fix, NAV_KEYS/NAV_HREFS were plain top-level `const`s, which live
+    // in the shared global lexical environment; re-injecting the script a
+    // second time throws "Identifier 'NAV_KEYS' has already been declared"
+    // as an uncaught global error (window's "error" event — synchronous
+    // script-instantiation errors don't propagate back to the appendChild()
+    // call that injected them).
+    it("can be injected as a <script> more than once without an uncaught global redeclaration error", async () => {
+      let caught = null;
+      const onError = (event) => {
+        caught = (event.error && event.error.message) || event.message;
+      };
+      window.addEventListener("error", onError);
+
+      await loadMenuModule();
+      await loadMenuModule();
+
+      window.removeEventListener("error", onError);
+      expect(caught).toBeFalsy();
+    });
   });
 })();
