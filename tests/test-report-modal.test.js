@@ -334,5 +334,39 @@
 
       unloadApp(root);
     });
+
+    // Issue #354 (root cause #3): runTestReportSuite() sets
+    // window.__APP_JS_PATH__ = "app.js" (so its own injected suite fetches
+    // tests/app.js the same way test-runner.html's suite fetches ../app.js)
+    // but never restores it in its finally block — only
+    // window.__radioCalicoTestReportRunning is reset there. A leftover
+    // "app.js" value then makes any suite that reads __APP_JS_PATH__
+    // afterwards (tests/load-app.js, tests/skills-storage-in-repo.test.js)
+    // fetch the wrong path. RED until app.js's Code PR fix restores it.
+    it("restores window.__APP_JS_PATH__ to its original value after the suite finishes (issue #354)", async () => {
+      window.installMockHls();
+      const root = await loadApp();
+      await nextTick();
+
+      const originalAppJsPath = window.__APP_JS_PATH__;
+
+      const button = findFooterTestReportButton(root);
+      await openModal(button);
+
+      await waitFor(
+        () => {
+          const el = document.querySelector('[data-testid="test-report-summary"]');
+          return el && /\d+\s*\/\s*\d+\s*passed/i.test(el.textContent || "") ? el : null;
+        },
+        { timeout: 10000 }
+      );
+
+      expect(window.__APP_JS_PATH__).toBe(originalAppJsPath);
+
+      const closeButton = findModalClose();
+      if (closeButton) closeButton.click();
+
+      unloadApp(root);
+    });
   });
 })();

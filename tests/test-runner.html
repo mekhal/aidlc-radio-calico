@@ -111,6 +111,11 @@
          rather than into test-report-suite-files.js. -->
     <script src="album-promo-case-study-removed.test.js"></script>
 
+    <!-- issue #354 (root cause #2): regression check that the loader above
+         injects footer/footer.js so buildFooter() is defined — same
+         category as the album-promo.js DOM-surface suites above. -->
+    <script src="album-promo-footer-loaded.test.js"></script>
+
     <!-- issue #253 (Ticket 1): shared/state.js, shared/translations.js, and
          shared/helpers.js each tested standalone (not through album-promo.js),
          so — same category as the album-promo.js suites above — wired
@@ -143,6 +148,9 @@
     <!-- issue #306: active nav item's aria-current/no-op-click state,
          same standalone-loader pattern as the menu/ block above — wired
          directly here rather than into test-report-suite-files.js. -->
+    <!-- issue #354 (root cause #1): shared clickAndCheckPrevented() helper,
+         loaded before the two menu click tests below that consume it. -->
+    <script src="menu/click-and-check-prevented.js"></script>
     <script src="menu/menu-active-state.test.js"></script>
 
     <!-- issue #323 (rework, 2026-08-13): caseStudy's nav item switches from
@@ -151,6 +159,10 @@
          dedicated file since it doesn't share menu-active-state.test.js's
          hash-based detection. -->
     <script src="menu/menu-case-study-link.test.js"></script>
+
+    <!-- issue #354 (root cause #1): dedicated coverage for the shared
+         click-and-check-prevented.js helper above. -->
+    <script src="menu/click-and-check-prevented.test.js"></script>
 
     <!-- issue #256 (Ticket 4 of #245): sidebar/sidebar.js tested standalone
          via shared/load-shared-module.js's generic loader (reused, not

@@ -32,10 +32,17 @@
  * its own dedicated coverage in tests/menu/menu-case-study-link.test.js,
  * matching this file's existing convention of one dedicated file per nav
  * item's special-cased behavior.
+ *
+ * Issue #354 (root cause #1): clickAndCheckPrevented() moved to the shared
+ * tests/menu/click-and-check-prevented.js (reuse-first, was duplicated
+ * verbatim in this file and menu-case-study-link.test.js) — see that file
+ * for why a plain "did menu.js call preventDefault()" check was unsafe on
+ * its own.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadSharedModule } = window.SharedModuleTestHelpers;
+  const { clickAndCheckPrevented } = window.MenuTestHelpers;
 
   const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
   const NAV_HREFS = {
@@ -67,12 +74,6 @@
 
   function linkFor(nav, key) {
     return nav.querySelector(`a[href="${NAV_HREFS[key]}"]`);
-  }
-
-  function clickAndCheckPrevented(link) {
-    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
-    link.dispatchEvent(event);
-    return event.defaultPrevented;
   }
 
   function setHash(value) {
