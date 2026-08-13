@@ -1,3 +1,14 @@
+/**
+ * Issue #354 fix (root cause #4): the "with visible label" it() was left
+ * open with an "icon-only" it() nested inside it instead of closed as a
+ * sibling, and its body's two conflicting assertions
+ * (toBe("GitHub") then toBe("")) belonged to two different, never-written
+ * tests — SyntaxError: Unexpected end of input, so none of this describe's
+ * 3 tests were ever registered. app.js's createIconLink() always sets a
+ * visible label (see app.js's footer GitHub/LinkedIn wiring), so the
+ * icon-only variant never matched production behavior; removed rather than
+ * fixed up.
+ */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadApp, unloadApp } = window.AppTestHelpers;
@@ -12,7 +23,6 @@
 
   describe("Footer GitHub/LinkedIn links", () => {
     it("GitHub link opens the repo in a new tab, with visible label", async () => {
-    it("GitHub link opens the repo in a new tab, icon-only", async () => {
       window.installMockHls();
       const root = await loadApp();
       await nextTick();
@@ -26,7 +36,6 @@
       expect(link.getAttribute("rel")).toContain("noopener");
       expect(link.getAttribute("rel")).toContain("noreferrer");
       expect(link.textContent.trim()).toBe("GitHub");
-      expect(link.textContent.trim()).toBe("");
 
       unloadApp(root);
     });
