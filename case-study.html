@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Radio Calico</title>
+    <title>Radio Calico — Case Study</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,50 +22,44 @@
     <link rel="stylesheet" href="menu/menu.css" />
     <link rel="stylesheet" href="sidebar/sidebar.css" />
     <link rel="stylesheet" href="footer/footer.css" />
+    <link rel="stylesheet" href="case-study/case-study.css" />
   </head>
   <body>
-    <!-- Ticket A (issue #155): header, fixed footer-links sidebar, and footer content are
-         all rendered by album-promo.js (same DOM-construction pattern as
-         app.js's initApp()) rather than hard-coded here. -->
-    <div id="album-promo-root"></div>
-
-    <!-- Ticket C (issue #157 review, 2026-07-25): React + ReactDOM UMD builds
-         via CDN only (no npm install, no JSX/build step) — a scoped
-         exception to the vanilla-JS/jQuery stack decision (issue #20) for
-         the Music Player Card's playback-controls island only, matching the
-         same exception already locked for Ticket D's cover-art component
-         (issue #158). Must load before album-promo.js, which references the
-         React/ReactDOM globals when mounting the controls. -->
-    <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-
-    <!-- Issue #220 (Option B): hls.js for the Music Player Card's real
-         <audio> playback (window.Hls) — must load before album-promo.js. -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
+    <!-- Issue #323 (rework, 2026-08-13): standalone Case Study page — header,
+         sidebar, footer, and the Case Study section are all rendered by
+         case-study/case-study-page.js (reusing index.html/album-promo.js's
+         same shared chrome globals), same DOM-construction pattern as
+         index.html and tests/test-report-dashboard.html. -->
+    <div id="case-study-root"></div>
 
     <!-- Issue #253 (Ticket 1): state/translations/helpers shared across the
-         upcoming logo/menu/sidebar/footer components (issue #245) — must
-         load before album-promo.js, which calls their globals. -->
+         logo/menu/sidebar/footer components — must load before
+         case-study-page.js, which calls their globals. -->
     <script src="shared/state.js"></script>
     <script src="shared/translations.js"></script>
     <script src="shared/helpers.js"></script>
 
     <!-- Issue #254 (Ticket 2 of #245): logo component — must load before
-         album-promo.js, which calls buildLogo() when building the header. -->
+         case-study-page.js, which calls buildLogo() when building the header. -->
     <script src="logo/logo.js"></script>
 
     <!-- Issue #255 (Ticket 3 of #245): menu component — must load before
-         album-promo.js, which calls buildMenu() when building the header. -->
+         case-study-page.js, which calls buildMenu() when building the header. -->
     <script src="menu/menu.js"></script>
 
     <!-- Issue #256 (Ticket 4 of #245): sidebar component — must load before
-         album-promo.js, which calls buildSidebar() when mounting the page. -->
+         case-study-page.js, which calls buildSidebar() when mounting the page. -->
     <script src="sidebar/sidebar.js"></script>
 
     <!-- Issue #257 (Ticket 5 of #245): footer component — must load before
-         album-promo.js, which calls buildFooter() when mounting the page. -->
+         case-study-page.js, which calls buildFooter() when mounting the page. -->
     <script src="footer/footer.js"></script>
 
-    <script src="album-promo.js"></script>
+    <!-- Issue #323 (Ticket 2 of #203): Case Study Highlight Cards — must
+         load before case-study-page.js, which calls buildCaseStudySection()
+         when mounting the page's <main>. -->
+    <script src="case-study/case-study.js"></script>
+
+    <script src="case-study/case-study-page.js"></script>
   </body>
 </html>

@@ -17,6 +17,12 @@
  * on index.html itself, so they're rewritten here to `../index.html#...`
  * once mounted on this page (which lives one directory down, in tests/).
  *
+ * Issue #323 (rework, 2026-08-13): the shared menu's caseStudy item is now a
+ * real page href ("case-study.html", not a hash anchor) — this page prefixes
+ * it with "../" only (`../case-study.html`), the same one-directory-down
+ * rewrite already applied to the logo image src above, rather than the
+ * hash-anchor rewrite the other four items get.
+ *
  * AC-A3: buildSidebar(state) brings its own theme/language toggle switches
  * along "for free" — no separate wiring needed here (a deliberate reversal
  * of PR #207's original no-toggle decision, confirmed at this AC revision).
@@ -40,7 +46,8 @@
 
     const nav = buildMenu(state);
     Array.from(nav.querySelectorAll("a")).forEach((link) => {
-      link.setAttribute("href", `../index.html${link.getAttribute("href")}`);
+      const href = link.getAttribute("href");
+      link.setAttribute("href", href.startsWith("#") ? `../index.html${href}` : `../${href}`);
     });
 
     header.appendChild(wordmark);
