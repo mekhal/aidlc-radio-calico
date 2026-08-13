@@ -1,0 +1,40 @@
+{
+  "caseStudies": [
+    {
+      "issue": 245,
+      "title": "Component Split Architecture",
+      "category": "Architecture",
+      "problem": "The issue asked for a literal 4-folder split (logo/menu/sidebar/footer) based on a screenshot mockup.",
+      "aiAction": "Read the actual code first, found one IIFE sharing state across all 4 sections, surfaced the mismatch as a question instead of deciding silently, then reshaped the plan into a 5-folder (+shared/), 6-ticket breakdown after human confirmation.",
+      "outcome": "Closed end-to-end across 6 sub-tickets, no rework cycles. Instruction Fidelity 5 / Result Satisfaction 5.",
+      "metrics": { "instructionFidelity": 5, "resultSatisfaction": 5 },
+      "decisionDocUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/docs/decisions/2026-08-04-issue-245-component-split-architecture-and-ticket-breakdown.md",
+      "evalUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/ai-review-evals/2026-08-04_1626_issue-245_parent-story-close.md",
+      "date": "2026-08-04"
+    },
+    {
+      "issue": 294,
+      "title": "Dark-theme Token Fix",
+      "category": "Bug Fix",
+      "problem": "Test Report Dashboard text was unreadable in dark theme — shared color tokens (--chloe-mint/--chloe-pink/--chloe-cream) used as solid backgrounds had no dark-theme-aware text pairing.",
+      "aiAction": "Confirmed the root cause, shipped AC1-AC4 through a Test PR to Code PR loop, then at close captured the fix as a new reusable skill (theme-token-background-audit).",
+      "outcome": "Shipped and released to production, plus a new published skill so the same bug class gets caught earlier next time. Instruction Fidelity 5 / Result Satisfaction 5.",
+      "metrics": { "instructionFidelity": 5, "resultSatisfaction": 5 },
+      "decisionDocUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/docs/decisions/2026-08-08-issue-294-close-scores-and-style-token-skill.md",
+      "evalUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/ai-review-evals/2026-08-08_0305_issue-294_dark-theme-token-fix-close.md",
+      "date": "2026-08-08"
+    },
+    {
+      "issue": 158,
+      "title": "Now Playing & Recently Played (Data Fetch & Metadata Rendering)",
+      "category": "Feature",
+      "problem": "Now Playing card needed live stream metadata + cover art, but the 10s poll caused a visible cover-art flicker on every refresh tick.",
+      "aiAction": "Root-caused the flicker (unconditional cache-bust on every poll), then proposed a labeled menu of fix options (SHA-256 hash compare vs. ETag) with tradeoffs, implementing only after the human's pick.",
+      "outcome": "Fixed and merged — though a new function shipped without proactively offering a unit test, an honest gap the human flagged afterward. Instruction Fidelity 4 / Result Satisfaction 5.",
+      "metrics": { "instructionFidelity": 4, "resultSatisfaction": 5 },
+      "decisionDocUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/docs/decisions/2026-07-29-ticket-d-hide-recently-played-and-cover-art-flicker-fix.md",
+      "evalUrl": "https://github.com/mekhal/aidlc-radio-calico/blob/develop/ai-review-evals/2026-07-29_1323_issue-158_ticket-d-now-playing-close.md",
+      "date": "2026-07-29"
+    }
+  ]
+}
