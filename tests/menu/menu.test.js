@@ -23,6 +23,14 @@
  * `whatsThis` and `contact` (NAV_KEYS order + NAV_HREFS `#case-study`), AC1.
  * Written before menu/menu.js implements it, per TDD — fails until this
  * ticket's Code PR (step 6) adds it.
+ *
+ * Issue #323 (rework, 2026-08-13): caseStudy moves off index.html onto its
+ * own standalone page — NAV_HREFS.caseStudy becomes the real page
+ * "case-study.html" (was the hash anchor "#case-study"). This file's own
+ * local NAV_HREFS copy is updated to match, same as
+ * tests/menu/menu-active-state.test.js's own local copy (updated in the
+ * rework's Test PR, #346) — the href-order/label assertions below are
+ * otherwise unchanged.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -33,7 +41,7 @@
     home: "#home",
     about: "#about",
     whatsThis: "#whats-this",
-    caseStudy: "#case-study",
+    caseStudy: "case-study.html",
     contact: "#contact",
   };
 

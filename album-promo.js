@@ -693,39 +693,14 @@
     modal.focus();
   }
 
-  // Issue #323 (Ticket 2 of #203): Case Study Highlight Cards. The section
-  // + grid container mount synchronously (matching menu.js's "#case-study"
-  // nav anchor); loadCaseStudies() fills the grid once data/case-studies.json
-  // resolves. No `state` argument passed to loadCaseStudies()/
-  // buildCaseStudyGrid() — cards render fixed English report text, not
-  // app-chrome i18n (see case-study/case-study.js).
-  function buildCaseStudySection() {
-    const section = document.createElement("section");
-    section.id = "case-study";
-    section.className = "chloe-case-study";
-
-    const title = document.createElement("h2");
-    title.className = "chloe-case-study__title";
-    title.textContent = "Case Study";
-
-    const grid = document.createElement("div");
-    grid.className = "row case-study-grid";
-
-    section.appendChild(title);
-    section.appendChild(grid);
-
-    loadCaseStudies().then((entries) => {
-      grid.replaceWith(buildCaseStudyGrid(entries));
-    });
-
-    return section;
-  }
-
+  // Issue #323 rework (2026-08-13): Case Study moved off index.html onto its
+  // own standalone page (case-study.html, see case-study/case-study-page.js)
+  // — buildMain() no longer renders it inline. buildCaseStudySection() now
+  // lives in case-study/case-study.js (see tests/album-promo-case-study-removed.test.js).
   function buildMain(state) {
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
-    main.appendChild(buildCaseStudySection());
     createRecentlyPlayedListElement(state);
     return main;
   }

@@ -25,6 +25,14 @@
  * precedent as tests/test-report-dashboard.js's buildCategoryCard()/
  * buildCategoryGrid()) rather than inventing new breakpoints, per AC4
  * (cards only).
+ *
+ * Issue #323 rework (2026-08-13): buildCaseStudySection() moved here from
+ * album-promo.js's private helper of the same name — Case Study now lives on
+ * its own standalone page (case-study.html, see
+ * case-study/case-study-page.js) rather than an in-page section on
+ * index.html, so the section wrapper (title + grid) needs to be reusable
+ * from this module instead of album-promo.js's buildMain(). See
+ * tests/album-promo-case-study-removed.test.js.
  */
 (function () {
   "use strict";
@@ -132,7 +140,30 @@
     return grid;
   }
 
+  function buildCaseStudySection() {
+    const section = document.createElement("section");
+    section.id = "case-study";
+    section.className = "chloe-case-study";
+
+    const title = document.createElement("h2");
+    title.className = "chloe-case-study__title";
+    title.textContent = "Case Study";
+
+    const grid = document.createElement("div");
+    grid.className = "row case-study-grid";
+
+    section.appendChild(title);
+    section.appendChild(grid);
+
+    loadCaseStudies().then((entries) => {
+      grid.replaceWith(buildCaseStudyGrid(entries));
+    });
+
+    return section;
+  }
+
   window.loadCaseStudies = loadCaseStudies;
   window.buildCaseStudyCard = buildCaseStudyCard;
   window.buildCaseStudyGrid = buildCaseStudyGrid;
+  window.buildCaseStudySection = buildCaseStudySection;
 })();

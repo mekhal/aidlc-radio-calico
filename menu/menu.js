@@ -22,12 +22,24 @@
  * this/Contact become real pages. See tests/menu/menu-active-state.test.js.
  *
  * Issue #322 (Ticket 1 of #203): a `caseStudy` entry sits between
- * `whatsThis` and `contact` (AC1). The href has no rendered section yet
- * (Tickets 2-3 add that) — nav-only for this ticket. index.html (the
- * deployed page, see album-promo.html's own header comment) mounts
- * buildMenu() from this shared module with no page-specific nav markup, so
- * the new tab's active-state/translation behavior needs no page-specific
- * change (AC5).
+ * `whatsThis` and `contact` (AC1). index.html (the deployed page, see
+ * album-promo.html's own header comment) mounts buildMenu() from this shared
+ * module with no page-specific nav markup, so the new tab's active-state/
+ * translation behavior needs no page-specific change (AC5).
+ *
+ * Issue #323 (rework, 2026-08-13): caseStudy moves off index.html onto its
+ * own standalone page (case-study.html), so its href becomes that real page
+ * (was the hash anchor "#case-study") and its active state is judged by page
+ * path, not hash — a real page has no hash to compare, and unlike every
+ * other item it can be active independently of whatever the current hash is
+ * (see tests/menu/menu-case-study-link.test.js's "independent of the other
+ * items' existing hash-based active state" case). Per
+ * docs/knowledge-asset/published/test-pr-native-api-and-self-ref-checklist.md
+ * a test can't safely stub real navigation/window.location.pathname
+ * directly, so this reads an application-level seam,
+ * window.__MENU_CURRENT_PATH__ || window.location.pathname — same
+ * seam-over-native-override pattern as case-study.js's existing
+ * window.__CASE_STUDY_DATA_PATH__.
  *
  * Issue #330: wrapped in an IIFE (matching album-promo.js's pattern) so
  * NAV_KEYS/NAV_HREFS don't live in the shared global lexical environment —
@@ -45,13 +57,23 @@
     home: "#home",
     about: "#about",
     whatsThis: "#whats-this",
-    caseStudy: "#case-study",
+    caseStudy: "case-study.html",
     contact: "#contact",
   };
 
-  function getActiveNavKey() {
+  function isCaseStudyActive() {
+    const path = window.__MENU_CURRENT_PATH__ || window.location.pathname;
+    return path.endsWith("case-study.html");
+  }
+
+  function isKeyActive(key, hash) {
+    if (key === "caseStudy") return isCaseStudyActive();
+    return NAV_HREFS[key] === hash;
+  }
+
+  function getActiveNavKeys() {
     const hash = window.location.hash || "#home";
-    return NAV_KEYS.find((key) => NAV_HREFS[key] === hash) || "home";
+    return new Set(NAV_KEYS.filter((key) => isKeyActive(key, hash)));
   }
 
   function buildMenu(state) {
@@ -59,22 +81,22 @@
     nav.className = "chloe-nav";
     nav.setAttribute("aria-label", "Primary");
 
-    let activeKey = null;
+    let activeKeys = new Set();
     const navLinks = {};
     NAV_KEYS.forEach((key) => {
       const a = document.createElement("a");
       a.href = NAV_HREFS[key];
       a.addEventListener("click", (event) => {
-        if (key === activeKey) event.preventDefault();
+        if (activeKeys.has(key)) event.preventDefault();
       });
       navLinks[key] = a;
       nav.appendChild(a);
     });
 
     function updateActiveState() {
-      activeKey = getActiveNavKey();
+      activeKeys = getActiveNavKeys();
       NAV_KEYS.forEach((key) => {
-        const isActive = key === activeKey;
+        const isActive = activeKeys.has(key);
         navLinks[key].classList.toggle("chloe-nav-active", isActive);
         if (isActive) {
           navLinks[key].setAttribute("aria-current", "page");

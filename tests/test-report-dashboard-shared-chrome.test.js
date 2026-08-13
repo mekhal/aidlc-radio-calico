@@ -19,6 +19,11 @@
  * dashboard reuses that component as-is (reuse-first), its rendered nav
  * picks up the same 5th link automatically (AC5 — no drift). Written before
  * menu/menu.js implements it, per TDD.
+ *
+ * Issue #323 (rework, 2026-08-13): caseStudy's href is now the real page
+ * "case-study.html" (was the hash anchor "#case-study"), so this page's own
+ * buildHeader() (test-report-dashboard.js) rewrites it to "../case-study.html"
+ * instead of the "../index.html#..." rewrite the other four items get.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -65,7 +70,7 @@
         "../index.html#home",
         "../index.html#about",
         "../index.html#whats-this",
-        "../index.html#case-study",
+        "../case-study.html",
         "../index.html#contact",
       ]);
 
