@@ -701,6 +701,7 @@
     const main = document.createElement("main");
     main.className = "chloe-main";
     main.appendChild(buildHero(state));
+    main.appendChild(buildCaseStudySection());
     createRecentlyPlayedListElement(state);
     return main;
   }
