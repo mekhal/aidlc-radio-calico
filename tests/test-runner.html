@@ -194,6 +194,11 @@
     <script src="harness-serialization.test.js"></script>
     <script src="skills-storage-in-repo.test.js"></script>
 
+    <!-- issue #340: standing regression check for the issue #330 IIFE-safety
+         bug — same doc-content-assertion category as the two suites above,
+         so wired directly here rather than into test-report-suite-files.js. -->
+    <script src="reused-js-iife-safety.test.js"></script>
+
     <!-- issue #205: report-storage.js/test-report-dashboard.js have no
          app.js DOM surface (same category as the two files above), so their
          suites are wired directly here too. -->
