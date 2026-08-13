@@ -20,6 +20,18 @@
  * entry (AC1); the existing `.forEach(NAV_KEYS)` assertions below cover its
  * active/inactive behavior automatically (AC5 — no drift from the other
  * items). Written before menu/menu.js implements it, per TDD.
+ *
+ * Issue #323 (rework, 2026-08-13): caseStudy's href changes from the hash
+ * anchor "#case-study" to the real page "case-study.html" (Case Study moves
+ * to its own page). The generic assertions below still hold unchanged for
+ * every item, including caseStudy, since none of them set
+ * window.__MENU_CURRENT_PATH__ (the seam the caseStudy item's own
+ * page-based active-state check reads) — caseStudy simply stays inactive
+ * here the same way it always did under a hash it doesn't match. The
+ * caseStudy-specific active-state behavior (path-based, not hash-based) has
+ * its own dedicated coverage in tests/menu/menu-case-study-link.test.js,
+ * matching this file's existing convention of one dedicated file per nav
+ * item's special-cased behavior.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -30,7 +42,7 @@
     home: "#home",
     about: "#about",
     whatsThis: "#whats-this",
-    caseStudy: "#case-study",
+    caseStudy: "case-study.html",
     contact: "#contact",
   };
 
