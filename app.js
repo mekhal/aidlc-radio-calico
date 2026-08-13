@@ -179,6 +179,7 @@
       return;
     }
     window.__radioCalicoTestReportRunning = true;
+    const previousAppJsPath = window.__APP_JS_PATH__;
     window.__APP_JS_PATH__ = "app.js";
     try {
       if (isClosed()) return;
@@ -206,6 +207,7 @@
       if (!isClosed()) summaryEl.textContent = "Test run failed to complete.";
     } finally {
       window.__radioCalicoTestReportRunning = false;
+      window.__APP_JS_PATH__ = previousAppJsPath;
     }
   }
 
