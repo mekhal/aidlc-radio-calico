@@ -21,6 +21,14 @@
  * Issue #255 (Ticket 3), AC5: menu/menu.js is fetched and injected right
  * after logo/logo.js, same 404-is-a-harmless-no-op reasoning, until this
  * ticket's own Code PR creates menu/menu.js.
+ *
+ * Issue #340 fix (2026-08-13): Issue #256 (Ticket 4 of #245) moved
+ * buildSidebar()/buildThemeToggle()/buildLanguageToggle() out of
+ * album-promo.js into sidebar/sidebar.js — initAlbumPromo() has called the
+ * global buildSidebar() ever since, but this loader never injected
+ * sidebar/sidebar.js, so every suite using AlbumPromoTestHelpers threw
+ * "buildSidebar is not defined". Fetched and injected right after
+ * menu/menu.js, same path-override convention as the others.
  */
 (function (global) {
   function currentFixturesContainer() {
@@ -51,6 +59,7 @@
     await loadScript(global.__ALBUM_PROMO_SHARED_HELPERS_JS_PATH__ || "../shared/helpers.js");
     await loadScript(global.__ALBUM_PROMO_LOGO_JS_PATH__ || "../logo/logo.js");
     await loadScript(global.__ALBUM_PROMO_MENU_JS_PATH__ || "../menu/menu.js");
+    await loadScript(global.__ALBUM_PROMO_SIDEBAR_JS_PATH__ || "../sidebar/sidebar.js");
     await loadScript(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
 
     if (global.__albumPromoI18nReady) await global.__albumPromoI18nReady;
