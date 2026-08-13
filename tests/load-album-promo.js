@@ -29,6 +29,14 @@
  * sidebar/sidebar.js, so every suite using AlbumPromoTestHelpers threw
  * "buildSidebar is not defined". Fetched and injected right after
  * menu/menu.js, same path-override convention as the others.
+ *
+ * Issue #354 fix (root cause #2, 2026-08-13): same gap as the #340 fix
+ * above, for footer/footer.js — issue #257 (Ticket 5 of #245) moved
+ * buildFooter() out of album-promo.js the same way, and initAlbumPromo()
+ * has called the global buildFooter() ever since, but this loader never
+ * injected footer/footer.js either, so ~26 suites threw
+ * "ReferenceError: buildFooter is not defined". Fetched and injected right
+ * after sidebar/sidebar.js, same path-override convention as the others.
  */
 (function (global) {
   function currentFixturesContainer() {
@@ -60,6 +68,7 @@
     await loadScript(global.__ALBUM_PROMO_LOGO_JS_PATH__ || "../logo/logo.js");
     await loadScript(global.__ALBUM_PROMO_MENU_JS_PATH__ || "../menu/menu.js");
     await loadScript(global.__ALBUM_PROMO_SIDEBAR_JS_PATH__ || "../sidebar/sidebar.js");
+    await loadScript(global.__ALBUM_PROMO_FOOTER_JS_PATH__ || "../footer/footer.js");
     await loadScript(global.__ALBUM_PROMO_JS_PATH__ || "../album-promo.js");
 
     if (global.__albumPromoI18nReady) await global.__albumPromoI18nReady;

@@ -25,10 +25,17 @@
  *
  * Written before menu/menu.js implements this, per TDD — fails until this
  * issue's Code PR (step 6) adds the path-based check for caseStudy.
+ *
+ * Issue #354 (root cause #1): clickAndCheckPrevented() moved to the shared
+ * tests/menu/click-and-check-prevented.js (reuse-first, was duplicated
+ * verbatim in this file and menu-active-state.test.js) — see that file for
+ * why a plain "did menu.js call preventDefault()" check was unsafe on its
+ * own.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadSharedModule } = window.SharedModuleTestHelpers;
+  const { clickAndCheckPrevented } = window.MenuTestHelpers;
 
   const SAMPLE_TRANSLATIONS = {
     en: {
@@ -51,12 +58,6 @@
 
   function caseStudyLink(nav) {
     return nav.querySelector('a[href="case-study.html"]');
-  }
-
-  function clickAndCheckPrevented(link) {
-    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
-    link.dispatchEvent(event);
-    return event.defaultPrevented;
   }
 
   async function withCurrentPath(value, fn) {
