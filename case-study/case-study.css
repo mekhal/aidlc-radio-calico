@@ -1,0 +1,95 @@
+/* Issue #323 (Ticket 2 of #203): Case Study Highlight Cards section.
+   Card background/text use --chloe-sage/--chloe-ink — both have a
+   [data-chloe-theme="dark"] override in shared/tokens.css, so they flip
+   together (per docs/knowledge-asset/published/theme-token-background-audit.md,
+   applied here to avoid the #294 class of bug). The category pill uses
+   --chloe-pink-deep as a border/text accent rather than a full background,
+   so the fixed-hue accent stays isolated from text-contrast responsibility. */
+
+.chloe-case-study {
+  padding: 2rem;
+}
+
+.chloe-case-study__title {
+  font-family: "Montserrat", sans-serif;
+  color: var(--chloe-ink);
+  margin: 0 0 1.5rem;
+}
+
+.case-study-card-col {
+  margin-bottom: 1.5rem;
+}
+
+.case-study-card {
+  height: 100%;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.case-study-card__issue {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0 0 0.25rem;
+}
+
+.case-study-card__title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.case-study-card__category {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--chloe-pink-deep);
+  border: 1px solid var(--chloe-pink-deep);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  margin: 0 0 1rem;
+  align-self: flex-start;
+}
+
+.case-study-card__flow {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-study-card__step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.case-study-card__step-text {
+  font-size: 0.9rem;
+  margin: 0.15rem 0 0;
+}
+
+.case-study-card__connector {
+  color: var(--chloe-pink-deep);
+  text-align: center;
+  line-height: 1;
+  margin: 0.5rem 0;
+}
+
+.case-study-card__metrics {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--chloe-pink-deep);
+}
+
+@media (max-width: 767.98px) {
+  .chloe-case-study {
+    padding: 1.25rem;
+  }
+}

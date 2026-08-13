@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="menu/menu.css" />
     <link rel="stylesheet" href="sidebar/sidebar.css" />
     <link rel="stylesheet" href="footer/footer.css" />
+    <link rel="stylesheet" href="case-study/case-study.css" />
   </head>
   <body>
     <!-- Ticket A (issue #155): header, fixed footer-links sidebar, and footer content are
@@ -65,6 +66,11 @@
     <!-- Issue #257 (Ticket 5 of #245): footer component — must load before
          album-promo.js, which calls buildFooter() when mounting the page. -->
     <script src="footer/footer.js"></script>
+
+    <!-- Issue #323 (Ticket 2 of #203): Case Study Highlight Cards — must
+         load before album-promo.js, which calls loadCaseStudies()/
+         buildCaseStudyGrid() when mounting the "#case-study" section. -->
+    <script src="case-study/case-study.js"></script>
 
     <script src="album-promo.js"></script>
   </body>
