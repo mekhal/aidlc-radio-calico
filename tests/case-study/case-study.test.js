@@ -196,6 +196,26 @@
       expect(first === second).toBeFalsy();
     });
 
+    // Issue #323 rework (2026-08-13, confirmed on the issue thread at
+    // 06:42): Case Study moves off index.html onto its own case-study.html
+    // page, so the section wrapper (title + grid) that used to be
+    // album-promo.js's private buildCaseStudySection() moves here instead —
+    // reuse-first, so case-study/case-study-page.js (the new page's thin
+    // init script) can compose it without duplicating the title/section
+    // markup. album-promo.js's buildMain() stops calling it (see
+    // tests/album-promo-case-study-removed.test.js).
+    it("buildCaseStudySection() wraps the Highlight Cards grid in a <section id=\"case-study\"> with a title (moved from album-promo.js)", async () => {
+      await loadCaseStudyModule();
+
+      const section = window.buildCaseStudySection();
+
+      expect(section.tagName).toBe("SECTION");
+      expect(section.id).toBe("case-study");
+      expect(section.className).toContain("chloe-case-study");
+      expect(section.querySelector(".chloe-case-study__title").textContent).toBe("Case Study");
+      expect(section.querySelector(".case-study-grid")).toBeTruthy();
+    });
+
     // Issue #330's IIFE-redeclaration lesson (recorded for menu.js) applies
     // to every module reused via loadSharedModule's fetch+inject-<script>
     // pattern, so the same regression guard is written in here up front
