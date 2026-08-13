@@ -67,10 +67,14 @@
          — mirrors the existing window.__APP_JS_PATH__ override pattern. -->
     <!-- Issue #299 (AC3): same "one directory below root" reasoning as the
          i18n override above, applied to sidebar/sidebar.js's base path. -->
+    <!-- Issue #323 (Ticket 2 of #203): same "one directory below root"
+         reasoning, applied to case-study/case-study.js's data/ fetch base
+         path (mirrors __ALBUM_PROMO_I18N_BASE_PATH__ above). -->
     <script>
       window.__I18N_BASE_PATH__ = "../i18n/";
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
       window.__SIDEBAR_BASE_PATH__ = "../";
+      window.__CASE_STUDY_DATA_PATH__ = "../data/";
     </script>
 
     <script src="assert.js"></script>
@@ -155,6 +159,14 @@
          autoplay-on-mount for PlayerControls — same category as the #220
          suite above, so wired directly here too. -->
     <script src="player-timer-and-autoplay.test.js"></script>
+
+    <!-- issue #323 (Ticket 2 of #203): case-study/case-study.js tested
+         standalone via shared/load-shared-module.js's generic loader
+         (reused, not duplicated under tests/case-study/ — same reasoning as
+         the shared/, logo/, menu/, sidebar/, and footer/ blocks above) —
+         same category as the album-promo.js/shared suites above, so wired
+         directly here rather than into test-report-suite-files.js. -->
+    <script src="case-study/case-study.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of
