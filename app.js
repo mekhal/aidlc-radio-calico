@@ -200,6 +200,7 @@
     }
     activeTestReportRun = isClosed;
     window.__radioCalicoTestReportRunning = true;
+    const previousAppJsPath = window.__APP_JS_PATH__;
     window.__APP_JS_PATH__ = "app.js";
     try {
       if (isClosed()) return;
