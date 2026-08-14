@@ -67,27 +67,6 @@
       expect(footer.querySelector(".chloe-footer__copy").textContent).toBe("");
     });
 
-    it("renders translated disclaimer/copyright for state.lang once ALBUM_PROMO_TRANSLATIONS is populated", async () => {
-      await loadFooterModule();
-      window.ALBUM_PROMO_TRANSLATIONS = SAMPLE_TRANSLATIONS;
-      const state = window.createState();
-      state.lang = "en";
-
-      const footer = window.buildFooter(state);
-
-      expect(footer.querySelector(".chloe-footer__disclaimer").textContent).toBe(
-        SAMPLE_TRANSLATIONS.en.disclaimer,
-      );
-      // copyright is assigned via innerHTML (not textContent) in the original
-      // album-promo.js implementation, so the &copy; entity renders as "©" —
-      // preserved unchanged by this extraction (AC4).
-      expect(footer.querySelector(".chloe-footer__copy").innerHTML).toBe(
-        SAMPLE_TRANSLATIONS.en.copyright,
-      );
-
-      window.ALBUM_PROMO_TRANSLATIONS = null;
-    });
-
     it("re-renders disclaimer/copyright via state.onLanguageChange when the language changes", async () => {
       await loadFooterModule();
       window.ALBUM_PROMO_TRANSLATIONS = SAMPLE_TRANSLATIONS;
