@@ -413,7 +413,7 @@
           "data-testid": "player-timer",
           "aria-label": "Elapsed time, live broadcast",
         },
-        `${formatElapsed(elapsedSeconds)} / `,
+        `${formatElapsed(elapsedSeconds)}   `,
         React.createElement("span", { className: "chloe-player-controls__live-dot", "aria-hidden": "true" }),
         "Live"
       ),

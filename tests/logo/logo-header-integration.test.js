@@ -53,7 +53,7 @@
         const nav = header.querySelector(".chloe-nav");
         expect(nav).toBeTruthy();
         expect(nav.getAttribute("aria-label")).toBe("Primary");
-        expect(nav.querySelectorAll("a").length).toBe(4);
+        expect(nav.querySelectorAll("a").length).toBe(5);
       } finally {
         unloadAlbumPromo(root);
       }
