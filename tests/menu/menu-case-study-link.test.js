@@ -31,6 +31,20 @@
  * verbatim in this file and menu-active-state.test.js) — see that file for
  * why a plain "did menu.js call preventDefault()" check was unsafe on its
  * own.
+ *
+ * Issue #375 (bug): opening case-study.html directly leaves
+ * window.location.hash empty (no in-page anchor is ever set on that page),
+ * and getActiveNavKeys() in menu.js still defaults an empty hash to "#home"
+ * unconditionally — a holdover from before issue #323 moved Case Study onto
+ * its own real page. That default was only ever correct for index.html, so
+ * on case-study.html it makes Home active at the same time as Case Study
+ * (two boxed nav items — see the issue's screenshot). The case below covers
+ * the real trigger: hash simply empty on case-study.html, not an explicit
+ * non-home hash (menu-case-study-link's existing "independent of the other
+ * items' existing hash-based active state" case above already covers an
+ * explicit hash). Written before menu/menu.js implements the fix, per TDD —
+ * fails until this issue's Code PR (step 6) gates the "#home" fallback on
+ * actually being on index.html.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -116,6 +130,22 @@
           const nav = buildNav();
           const about = nav.querySelector('a[href="#about"]');
           expect(about.getAttribute("aria-current")).toBe("page");
+          expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
+        });
+      } finally {
+        window.location.hash = originalHash;
+      }
+    });
+
+    it("leaves Home inactive when the hash is empty on case-study.html, so only Case Study is active (issue #375)", async () => {
+      await loadMenuModule();
+      const originalHash = window.location.hash;
+      try {
+        window.location.hash = "";
+        await withCurrentPath("/case-study.html", async () => {
+          const nav = buildNav();
+          const home = nav.querySelector('a[href="#home"]');
+          expect(home.getAttribute("aria-current")).toBe(null);
           expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {
