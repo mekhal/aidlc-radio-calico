@@ -346,6 +346,37 @@
     return backdrop;
   }
 
+  // Issue #367: window.onTestRunComplete has no timeout/fallback, so a run
+  // that never calls back (for any future reason) leaves the dashboard stuck
+  // on "Running tests…" indefinitely. Overridable via
+  // window.__TEST_REPORT_RUN_TIMEOUT_MS__ so tests can trip it without a
+  // real-time wait, mirroring this repo's __ALBUM_PROMO_TIMER_TICK_MS__
+  // convention (docs/knowledge-asset/published/interval-tick-override-and-cleanup-pattern.md).
+  const DEFAULT_TEST_RUN_TIMEOUT_MS = 120000;
+
+  function buildRunTimeoutMessage() {
+    const message = document.createElement("p");
+    message.className = "report-run-timeout-message";
+    message.dataset.testid = "report-run-timeout-message";
+    message.textContent = "Test run timed out — click Reload Test to try again.";
+    return message;
+  }
+
+  // The loading backdrop is a full-screen overlay, so a timeout still needs
+  // to remove it (like a normal completion does) for the Reload Test button
+  // in `main` to stay reachable — this renders a distinct message there
+  // instead of swapping the backdrop's own label text in place.
+  function renderTestRunTimeoutState(main, onReload) {
+    main.textContent = "";
+
+    const heading = document.createElement("h1");
+    heading.className = "report-heading";
+    heading.textContent = "Test Report Dashboard";
+    main.appendChild(heading);
+    main.appendChild(buildReloadButton(onReload));
+    main.appendChild(buildRunTimeoutMessage());
+  }
+
   // AC-B1/AC-B2/AC-B3: shared by the Reload Test button click and the
   // empty-storage auto-run — shows the backdrop+iframe, and wires
   // window.onTestRunComplete (AC-B2's contract with test-runner.html) to
@@ -354,8 +385,21 @@
     if (document.querySelector('[data-testid="report-loading-backdrop"]')) return;
 
     const backdrop = buildLoadingBackdrop();
+    const timeoutMs = window.__TEST_REPORT_RUN_TIMEOUT_MS__ || DEFAULT_TEST_RUN_TIMEOUT_MS;
+    let settled = false;
+
+    const timeoutId = setTimeout(function () {
+      if (settled) return;
+      settled = true;
+      window.onTestRunComplete = null;
+      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      renderTestRunTimeoutState(main, () => startTestRun(main));
+    }, timeoutMs);
 
     window.onTestRunComplete = function () {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
       if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
       renderDashboardContent(main, window.TestReportStorage.loadTestReport(), () => startTestRun(main));
     };
