@@ -79,8 +79,8 @@
 
       expect(toggle).toBeTruthy();
       expect(toggle.getAttribute("role")).toBe("switch");
-      expect(toggle.tagName).not.toBe("BUTTON");
-      expect(toggle.tagName).not.toBe("SELECT");
+      expect(toggle.tagName === "BUTTON").toBeFalsy();
+      expect(toggle.tagName === "SELECT").toBeFalsy();
       expect(navBar.contains(toggle)).toBeTruthy();
       expect(navBar.contains(themeToggle)).toBeTruthy();
       expect(toggle.parentElement).toBe(themeToggle.parentElement);
