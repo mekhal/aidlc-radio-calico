@@ -173,13 +173,33 @@
     summaryEl.textContent = `${passed} / ${results.length} passed`;
   }
 
+  // Issue #362: a test can close the modal without awaiting the suite (e.g.
+  // "opens a modal and begins fetching the suite when clicked") and the next
+  // it() block opens a fresh one immediately after — so a newer run can
+  // start while an older one is still mid-fetch. activeTestReportRun tracks
+  // which run currently owns window.__APP_JS_PATH__/window.TestHarness (by
+  // its isClosed function, unique per modal instance); only the run that
+  // started the chain (isChainStart) snapshots the true pre-modal values,
+  // and only whichever run still owns activeTestReportRun when it reaches
+  // its finally restores them — a superseded run's finally is a no-op there
+  // instead of restoring its own (possibly already-overwritten) snapshot
+  // over the newer run's in-flight state.
+  let activeTestReportRun = null;
+  let testReportChainAppJsPath;
+  let testReportChainHarness;
+
   async function runTestReportSuite(summaryEl, listEl, isClosed) {
-    if (window.__radioCalicoTestReportRunning) {
+    if (activeTestReportRun && !activeTestReportRun()) {
       summaryEl.textContent = "A test run is already in progress.";
       return;
     }
+    const isChainStart = !activeTestReportRun;
+    if (isChainStart) {
+      testReportChainAppJsPath = window.__APP_JS_PATH__;
+      testReportChainHarness = window.TestHarness;
+    }
+    activeTestReportRun = isClosed;
     window.__radioCalicoTestReportRunning = true;
-    const previousAppJsPath = window.__APP_JS_PATH__;
     window.__APP_JS_PATH__ = "app.js";
     try {
       if (isClosed()) return;
@@ -206,8 +226,12 @@
     } catch (_error) {
       if (!isClosed()) summaryEl.textContent = "Test run failed to complete.";
     } finally {
-      window.__radioCalicoTestReportRunning = false;
-      window.__APP_JS_PATH__ = previousAppJsPath;
+      if (activeTestReportRun === isClosed) {
+        activeTestReportRun = null;
+        window.__radioCalicoTestReportRunning = false;
+        window.__APP_JS_PATH__ = testReportChainAppJsPath;
+        window.TestHarness = testReportChainHarness;
+      }
     }
   }
 
@@ -304,11 +328,13 @@
     function closeModal() {
       if (closed) return;
       closed = true;
-      // Clear the reentrancy flag synchronously on close (rather than only
-      // in runTestReportSuite's finally) so re-opening immediately starts a
-      // fresh run instead of racing the previous run's in-flight fetch to
-      // notice it was closed.
-      window.__radioCalicoTestReportRunning = false;
+      // Issue #362: no longer clears window.__radioCalicoTestReportRunning
+      // here — runTestReportSuite() now tracks run ownership itself via
+      // activeTestReportRun (keyed on isClosed), so an immediate reopen
+      // still isn't blocked (the guard checks the *active* run's isClosed(),
+      // not a plain boolean) and the old run's own finally safely no-ops
+      // once superseded, instead of both sides racing to clear/restore
+      // shared state.
       document.removeEventListener("keydown", onKeyDown);
       if (modal.parentNode) modal.parentNode.removeChild(modal);
       if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
