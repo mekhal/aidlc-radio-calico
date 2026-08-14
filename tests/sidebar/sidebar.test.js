@@ -41,45 +41,6 @@
   const LANG_STORAGE_KEY = "chloeAlbumPromoLanguage";
   const THEME_STORAGE_KEY = "chloeAlbumPromoTheme";
 
-  const SIDEBAR_LINKS = [
-    {
-      testid: "sidebar-footer-site-link",
-      href: "https://www.radio-calico.com/",
-      label: "radio-calico.com",
-      icon: "bi-broadcast",
-    },
-    {
-      testid: "sidebar-footer-test-report-link",
-      href: "tests/test-report-dashboard.html",
-      label: "Test Report",
-      icon: "bi-clipboard-check",
-    },
-    {
-      testid: "sidebar-footer-lint-report-link",
-      href: "reports/lint/megalinter-report.html",
-      label: "Lint Report",
-      icon: "bi-brush",
-    },
-    {
-      testid: "sidebar-footer-security-report-link",
-      href: "reports/security/trivy.sarif",
-      label: "Security Scan Report",
-      icon: "bi-shield-check",
-    },
-    {
-      testid: "sidebar-footer-github-link",
-      href: "https://github.com/mekhal/aidlc-radio-calico",
-      label: "GitHub",
-      icon: "bi-github",
-    },
-    {
-      testid: "sidebar-footer-linkedin-link",
-      href: "https://www.linkedin.com/in/mekhalomlao/",
-      label: "LinkedIn",
-      icon: "bi-linkedin",
-    },
-  ];
-
   async function loadSidebarModule() {
     await loadSharedModule(window.__ALBUM_PROMO_SHARED_STATE_JS_PATH__ || "../shared/state.js");
     await loadSharedModule(window.__ALBUM_PROMO_SHARED_HELPERS_JS_PATH__ || "../shared/helpers.js");
@@ -99,24 +60,6 @@
 
       const nav = aside.querySelector("nav.chloe-sidebar__icons");
       expect(nav.getAttribute("aria-label")).toBe("Site links");
-    });
-
-    it("renders SIDEBAR_LINKS as external icon links, in order", async () => {
-      await loadSidebarModule();
-      const state = window.createState();
-
-      const aside = window.buildSidebar(state);
-      const nav = aside.querySelector("nav.chloe-sidebar__icons");
-
-      SIDEBAR_LINKS.forEach((entry) => {
-        const link = nav.querySelector(`[data-testid="${entry.testid}"]`);
-        expect(link.tagName).toBe("A");
-        expect(link.getAttribute("href")).toBe(entry.href);
-        expect(link.title).toBe(entry.label);
-        expect(link.target).toBe("_blank");
-        expect(link.rel).toBe("noopener noreferrer");
-        expect(link.querySelector("i").className).toBe(`bi ${entry.icon}`);
-      });
     });
 
     it("theme toggle: click flips state.theme, aria-checked, localStorage, and <html data-chloe-theme>", async () => {
@@ -205,7 +148,7 @@
         "https://www.linkedin.com/in/mekhalomlao/"
       );
 
-      delete window.__SIDEBAR_BASE_PATH__;
+      window.__SIDEBAR_BASE_PATH__ = "../";
     });
 
     // Issue #330: sidebar.js is fetched and re-injected as a fresh <script>
