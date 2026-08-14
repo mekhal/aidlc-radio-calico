@@ -130,7 +130,7 @@
   }
 
   function parseElapsedSeconds(text) {
-    const match = /^(\d+):(\d{2}) \/ $/.exec(text);
+    const match = /^(\d+):(\d{2})\s+$/.exec(text);
     if (!match) throw new Error(`Unexpected timer text: ${text}`);
     return Number(match[1]) * 60 + Number(match[2]);
   }
@@ -148,7 +148,7 @@
 
         const button = findPlayerControls(root).querySelector('[data-testid="player-play-pause"]');
         expect(button.getAttribute("aria-pressed")).toBe("true");
-        expect(timerLeadingText(root)).toBe("0:00 / ");
+        expect(timerLeadingText(root)).toBe("0:00   ");
 
         await waitFor(() => timerLeadingText(root) !== "0:00 / ");
         expect(timerLeadingText(root) === "0:00 / ").toBeFalsy();
@@ -262,7 +262,7 @@
         const root2 = await loadAlbumPromo();
         await nextTick();
         try {
-          expect(timerLeadingText(root2)).toBe("0:00 / ");
+          expect(timerLeadingText(root2)).toBe("0:00   ");
         } finally {
           spy2.restore();
           unloadAlbumPromo(root2);
@@ -308,7 +308,7 @@
 
       try {
         await wait(80);
-        expect(timerLeadingText(root)).toBe("0:00 / ");
+        expect(timerLeadingText(root)).toBe("0:00   ");
       } finally {
         spy.restore();
         unloadAlbumPromo(root);
