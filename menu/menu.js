@@ -21,6 +21,13 @@
  * re-evaluates on "hashchange" so it keeps working once About/What's
  * this/Contact become real pages. See tests/menu/menu-active-state.test.js.
  *
+ * Issue #375 (bug fix): that "#home" fallback only holds on index.html.
+ * Once Case Study became its own real page (#323 below), opening it
+ * directly leaves the hash empty too, and the unconditional fallback made
+ * Home active at the same time as Case Study. getActiveNavKeys() now only
+ * applies the fallback when isCaseStudyActive() is false. See
+ * tests/menu/menu-case-study-link.test.js's issue #375 case.
+ *
  * Issue #322 (Ticket 1 of #203): a `caseStudy` entry sits between
  * `whatsThis` and `contact` (AC1). index.html (the deployed page, see
  * album-promo.html's own header comment) mounts buildMenu() from this shared
@@ -72,7 +79,10 @@
   }
 
   function getActiveNavKeys() {
-    const hash = window.location.hash || "#home";
+    // Issue #375: the empty-hash-means-home fallback only holds on
+    // index.html. On a standalone page like case-study.html, an empty hash
+    // is just "no anchor set" and must not also light up Home.
+    const hash = isCaseStudyActive() ? window.location.hash : window.location.hash || "#home";
     return new Set(NAV_KEYS.filter((key) => isKeyActive(key, hash)));
   }
 
