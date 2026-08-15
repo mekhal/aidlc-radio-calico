@@ -24,6 +24,11 @@
  * "case-study.html" (was the hash anchor "#case-study"), so this page's own
  * buildHeader() (test-report-dashboard.js) rewrites it to "../case-study.html"
  * instead of the "../index.html#..." rewrite the other four items get.
+ *
+ * Issue #151 (Ticket 1 of the About page story): about's href is now the
+ * real page "pages/about.html" (was the hash anchor "#about") — this page's
+ * generic non-hash rewrite rule (`../${href}`), already exercised by
+ * caseStudy above, applies unchanged and produces "../pages/about.html".
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -68,7 +73,7 @@
       const hrefs = Array.from(root.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
       expect(hrefs).toEqual([
         "../index.html#home",
-        "../index.html#about",
+        "../pages/about.html",
         "../index.html#whats-this",
         "../case-study.html",
         "../index.html#contact",

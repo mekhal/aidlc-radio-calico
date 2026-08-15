@@ -31,6 +31,14 @@
  * tests/menu/menu-active-state.test.js's own local copy (updated in the
  * rework's Test PR, #346) — the href-order/label assertions below are
  * otherwise unchanged.
+ *
+ * Issue #151 (Ticket 1 of the About page story): about moves off index.html
+ * onto its own standalone page the same way — NAV_HREFS.about becomes the
+ * real page "pages/about.html" (was the hash anchor "#about"). This file's
+ * local NAV_HREFS copy is updated to match; the href-order/label assertions
+ * below are otherwise unchanged (they only compare against NAV_HREFS[key],
+ * not against a hash literal). About's own path-based active-state behavior
+ * is covered separately in tests/menu/menu-about-link.test.js.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -39,7 +47,7 @@
   const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
   const NAV_HREFS = {
     home: "#home",
-    about: "#about",
+    about: "pages/about.html",
     whatsThis: "#whats-this",
     caseStudy: "case-study.html",
     contact: "#contact",
