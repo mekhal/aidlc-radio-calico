@@ -25,6 +25,14 @@
  *
  * Written before case-study/case-study-page.js exists, per TDD — fails
  * until this issue's Code PR (step 6) creates it.
+ *
+ * Issue #151 (Ticket 1 of the About page story): About's href changes from
+ * the hash anchor "#about" to the real page "pages/about.html" (About moves
+ * to its own standalone page, one directory down under pages/ — see
+ * tests/about/about-page.test.js). Since case-study.html sits at the repo
+ * root, this non-hash href needs no further rewrite here — the buildHeader()
+ * rule below only rewrites "#"-prefixed hrefs, so "pages/about.html" already
+ * resolves correctly as-is from the repo root.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -72,7 +80,7 @@
       const header = window.buildHeader(state);
       const hrefs = Array.from(header.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
 
-      expect(hrefs).toEqual(["index.html#home", "index.html#about", "index.html#whats-this", "case-study.html", "index.html#contact"]);
+      expect(hrefs).toEqual(["index.html#home", "pages/about.html", "index.html#whats-this", "case-study.html", "index.html#contact"]);
     });
 
     it("buildHeader(state) does not rewrite the logo's image path (case-study.html sits at the repo root, same as index.html)", async () => {

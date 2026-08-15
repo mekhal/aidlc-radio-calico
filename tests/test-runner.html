@@ -159,6 +159,13 @@
          hash-based detection. -->
     <script src="menu/menu-case-study-link.test.js"></script>
 
+    <!-- issue #151 (Ticket 1 of the About page story): about's nav item
+         switches from a same-page hash anchor to a real page href
+         (pages/about.html) — same standalone-loader pattern as the
+         menu-case-study-link.test.js block above, own dedicated file for
+         the same reason. -->
+    <script src="menu/menu-about-link.test.js"></script>
+
     <!-- issue #354 (root cause #1): dedicated coverage for the shared
          click-and-check-prevented.js helper above. -->
     <script src="menu/click-and-check-prevented.test.js"></script>
@@ -196,6 +203,11 @@
          new standalone case-study.html page's thin init script — same
          standalone-loader pattern as the case-study/ block above. -->
     <script src="case-study/case-study-page.test.js"></script>
+
+    <!-- issue #151 (Ticket 1 of the About page story): about/about-page.js,
+         the new standalone pages/about.html page's thin init script — same
+         standalone-loader pattern as the case-study/ block above. -->
+    <script src="about/about-page.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of
