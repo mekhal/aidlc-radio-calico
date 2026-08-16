@@ -160,5 +160,21 @@
         window.location.hash = originalHash;
       }
     });
+
+    it("leaves Home inactive when the hash is empty on case-study.html, so only Case Study is active (issue #375)", async () => {
+      await loadMenuModule();
+      const originalHash = window.location.hash;
+      try {
+        window.location.hash = "";
+        await withCurrentPath("/case-study.html", async () => {
+          const nav = buildNav();
+          const home = nav.querySelector('a[href="#home"]');
+          expect(home.getAttribute("aria-current")).toBe(null);
+          expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
+        });
+      } finally {
+        window.location.hash = originalHash;
+      }
+    });
   });
 })();
