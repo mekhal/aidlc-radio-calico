@@ -45,6 +45,14 @@
  * explicit hash). Written before menu/menu.js implements the fix, per TDD —
  * fails until this issue's Code PR (step 6) gates the "#home" fallback on
  * actually being on index.html.
+ *
+ * Issue #151 (Ticket 1 of the About page story): the "independent of the
+ * other items' existing hash-based active state" case below used "about" as
+ * its example of an unrelated hash-based nav item. About moves to its own
+ * standalone page (pages/about.html) under this issue, so it's no longer
+ * hash-based — swapped to "whatsThis" (#whats-this), which stays a hash
+ * placeholder, mirroring the same swap menu-active-state.test.js's generic
+ * cases made.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -125,11 +133,27 @@
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
-        window.location.hash = "#about";
+        window.location.hash = "#whats-this";
         await withCurrentPath("/case-study.html", async () => {
           const nav = buildNav();
-          const about = nav.querySelector('a[href="#about"]');
-          expect(about.getAttribute("aria-current")).toBe("page");
+          const whatsThis = nav.querySelector('a[href="#whats-this"]');
+          expect(whatsThis.getAttribute("aria-current")).toBe("page");
+          expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
+        });
+      } finally {
+        window.location.hash = originalHash;
+      }
+    });
+
+    it("leaves Home inactive when the hash is empty on case-study.html, so only Case Study is active (issue #375)", async () => {
+      await loadMenuModule();
+      const originalHash = window.location.hash;
+      try {
+        window.location.hash = "";
+        await withCurrentPath("/case-study.html", async () => {
+          const nav = buildNav();
+          const home = nav.querySelector('a[href="#home"]');
+          expect(home.getAttribute("aria-current")).toBe(null);
           expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {
