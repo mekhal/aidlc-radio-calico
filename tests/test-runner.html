@@ -75,6 +75,7 @@
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
       window.__SIDEBAR_BASE_PATH__ = "../";
       window.__CASE_STUDY_DATA_PATH__ = "../data/";
+      window.__ABOUT_CONTENT_DATA_PATH__ = "../data/";
     </script>
 
     <script src="assert.js"></script>
@@ -208,6 +209,13 @@
          the new standalone pages/about.html page's thin init script — same
          standalone-loader pattern as the case-study/ block above. -->
     <script src="about/about-page.test.js"></script>
+
+    <!-- issue #151 (Ticket 2 of the About page story): about/about.js's
+         Section 1 ("The Radio Calico Project") content builders — heading/
+         description copy (i18n) + the 5-swatch brand color palette, fetched
+         from data/about-content.json — same standalone-loader pattern as
+         the about/ block above. -->
+    <script src="about/about-content.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of
