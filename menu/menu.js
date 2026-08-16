@@ -55,6 +55,16 @@
  * an uncaught global redeclaration SyntaxError. buildMenu() is exposed on
  * `window` explicitly since it no longer auto-attaches from inside a
  * function scope. See tests/menu/menu.test.js.
+ *
+ * Issue #151 (Ticket 1 of the About page story): About goes through the same
+ * rework Case Study did under issue #323 — it moves off index.html onto its
+ * own standalone page (pages/about.html), so its href becomes that real page
+ * (was the hash anchor "#about") and its active state is judged by page path,
+ * not hash, via the same window.__MENU_CURRENT_PATH__ || window.location.pathname
+ * seam as isCaseStudyActive(). The issue #375 empty-hash-means-home fallback
+ * is extended to gate on either standalone page being active, since the same
+ * failure mode (Home lighting up alongside the real page) applies to
+ * about.html too. See tests/menu/menu-about-link.test.js.
  */
 (function () {
   "use strict";
@@ -62,7 +72,7 @@
   const NAV_KEYS = ["home", "about", "whatsThis", "caseStudy", "contact"];
   const NAV_HREFS = {
     home: "#home",
-    about: "#about",
+    about: "pages/about.html",
     whatsThis: "#whats-this",
     caseStudy: "case-study.html",
     contact: "#contact",
@@ -73,16 +83,24 @@
     return path.endsWith("case-study.html");
   }
 
+  function isAboutActive() {
+    const path = window.__MENU_CURRENT_PATH__ || window.location.pathname;
+    return path.endsWith("about.html");
+  }
+
   function isKeyActive(key, hash) {
     if (key === "caseStudy") return isCaseStudyActive();
+    if (key === "about") return isAboutActive();
     return NAV_HREFS[key] === hash;
   }
 
   function getActiveNavKeys() {
-    // Issue #375: the empty-hash-means-home fallback only holds on
-    // index.html. On a standalone page like case-study.html, an empty hash
-    // is just "no anchor set" and must not also light up Home.
-    const hash = isCaseStudyActive() ? window.location.hash : window.location.hash || "#home";
+    // Issue #375 (extended by issue #151): the empty-hash-means-home fallback
+    // only holds on index.html. On a standalone page like case-study.html or
+    // pages/about.html, an empty hash is just "no anchor set" and must not
+    // also light up Home.
+    const isStandalonePageActive = isCaseStudyActive() || isAboutActive();
+    const hash = isStandalonePageActive ? window.location.hash : window.location.hash || "#home";
     return new Set(NAV_KEYS.filter((key) => isKeyActive(key, hash)));
   }
 
