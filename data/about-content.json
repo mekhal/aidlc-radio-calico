@@ -1,0 +1,9 @@
+{
+  "colorPalette": [
+    { "name": "Mint", "hex": "#D8F2D5" },
+    { "name": "Forest Green", "hex": "#1F4E23" },
+    { "name": "Teal", "hex": "#38A29D" },
+    { "name": "Calico Orange", "hex": "#EFA63C" },
+    { "name": "Charcoal", "hex": "#231F20" }
+  ]
+}
