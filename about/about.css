@@ -1,0 +1,36 @@
+/* Issue #151 (Ticket 2 of the About page story): Section 1, "The Radio
+   Calico Project" — heading/description inherit the page's existing serif
+   font-family and --chloe-sage background from album-promo.css (already
+   linked by pages/about.html), so only the palette grid needs its own
+   rules here. Swatch fill colors come from data/about-content.json via
+   about/about.js's inline style.backgroundColor, not CSS, per AC2.2/AC2.3. */
+
+.chloe-about-project {
+  padding: 2rem;
+}
+
+.chloe-about-project__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.chloe-about-project__description {
+  max-width: 42rem;
+  margin: 0 0 2rem;
+}
+
+.about-palette__col {
+  margin-bottom: 1rem;
+}
+
+.about-palette__swatch {
+  border-radius: 0.5rem;
+  padding: 1.5rem 1rem;
+  min-height: 5rem;
+  display: flex;
+  align-items: flex-end;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}

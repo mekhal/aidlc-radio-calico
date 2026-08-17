@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="../menu/menu.css" />
     <link rel="stylesheet" href="../sidebar/sidebar.css" />
     <link rel="stylesheet" href="../footer/footer.css" />
+    <link rel="stylesheet" href="../about/about.css" />
   </head>
   <body>
     <!-- Issue #151 (Ticket 1 of the About page story): standalone About
@@ -41,9 +42,14 @@
          Same reason for the sidebar base path (sidebar/sidebar.js, issue
          #299): without it, the Test/Lint/Security Scan sidebar links 404
          here. -->
+    <!-- Issue #151 (Ticket 2): about/about.js's loadAboutContent() default
+         data path ("data/") also needs the same one-directory-down "../"
+         override, so it resolves to data/about-content.json rather than
+         pages/data/about-content.json. -->
     <script>
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
       window.__SIDEBAR_BASE_PATH__ = "../";
+      window.__ABOUT_DATA_PATH__ = "../data/";
     </script>
 
     <!-- Issue #253 (Ticket 1): state/translations/helpers shared across the
@@ -69,6 +75,10 @@
          about-page.js, which calls buildFooter() when mounting the page. -->
     <script src="../footer/footer.js"></script>
 
+    <!-- Issue #151 (Ticket 2 of the About page story): about/about.js's
+         section builders — must load before about-page.js, which calls
+         loadAboutContent()/buildProjectSection() when mounting the page. -->
+    <script src="../about/about.js"></script>
     <script src="../about/about-page.js"></script>
   </body>
 </html>

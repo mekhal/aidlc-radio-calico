@@ -37,11 +37,17 @@
  * Answer to 2.5 ("reuse theme & use i18n") plus the theme/language toggle
  * switches only existing today inside buildSidebar(state) — mounted here the
  * same way case-study.html/test-report-dashboard.html both already do, even
- * though the issue's own mockup only sketches header/content/footer. Flagged
- * as a judgment call in this ticket's Code PR summary; easy to drop later if
- * the human prefers no side rail.
+ * though the issue's own mockup only sketches header/content/footer. Merged
+ * into #383 with the sidebar mounted as submitted (confirmed by the human).
  *
- * See tests/about/about-page.test.js.
+ * Issue #151 (Ticket 2 of the About page story): mounts Section 1 ("The
+ * Radio Calico Project" — about/about.js's buildProjectSection()) into
+ * <main data-testid="about-main">. Mirrors the already-shipped
+ * window.__aboutPageI18nReady await pattern — loadAboutContent() is awaited
+ * once here (not inside about.js's synchronous, directly-testable section
+ * builders) before the section is built and appended.
+ *
+ * See tests/about/about-page.test.js and tests/about/about-content.test.js.
  */
 (function () {
   "use strict";
@@ -100,6 +106,10 @@
     // of racing the fetch.
     window.__aboutPageI18nReady = loadTranslations().then(() => {
       state.onLanguageChange.forEach((fn) => fn());
+    });
+
+    window.__aboutPageContentReady = loadAboutContent().then((content) => {
+      main.appendChild(buildProjectSection(state, content.colorPalette));
     });
   }
 
