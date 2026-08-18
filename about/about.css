@@ -49,3 +49,23 @@
   font-weight: 600;
   margin: 0 0 1rem;
 }
+
+/* Issue #151 (Ticket 4 of the About page story): Section 3, "References &
+   Acknowledgements" — list-group content/styling comes from Bootstrap's own
+   list-group classes; this only handles the section heading/spacing plus
+   the name/description layout within each item, matching Sections 1/2's
+   heading rules above. */
+
+.chloe-about-references {
+  padding: 2rem;
+}
+
+.chloe-about-references__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.chloe-about-references__name {
+  font-weight: 600;
+}
