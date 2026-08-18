@@ -22,6 +22,14 @@
  * IIFE per issue #330's IIFE-redeclaration lesson (the test harness
  * re-injects this file as a fresh <script> tag), with globals attached to
  * `window` explicitly. See tests/about/about-content.test.js.
+ *
+ * Issue #151 (Ticket 3 of the About page story): Section 2, "Production-grade
+ * Standards" — a Bootstrap table listing the four Code-PR gates from the
+ * issue body, data-driven from data/about-content.json's new
+ * `productionStandards` field (category/tool fixed by the issue body,
+ * description sourced from README.md sections 11/12). Table content is fixed
+ * English data (no state.lang branching); only buildStandardsSection()'s
+ * heading is i18n'd. See tests/about/about-standards.test.js.
  */
 (function () {
   "use strict";
@@ -93,7 +101,66 @@
     return section;
   }
 
+  // Fixed English content (category/tool/description all sourced from
+  // data/about-content.json) — same "plain data, no state.lang branching"
+  // precedent as case-study/case-study.js's cards. Only the section heading
+  // is i18n'd, via buildStandardsSection().
+  function buildProductionStandardsTable(standards) {
+    const table = document.createElement("table");
+    table.className = "table chloe-about-standards__table";
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = "<tr><th scope=\"col\">Category</th><th scope=\"col\">Tooling</th><th scope=\"col\">Description</th></tr>";
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    standards.forEach((standard) => {
+      const row = document.createElement("tr");
+
+      const category = document.createElement("td");
+      category.textContent = standard.category;
+
+      const tool = document.createElement("td");
+      tool.textContent = standard.tool;
+
+      const description = document.createElement("td");
+      description.textContent = standard.description;
+
+      row.appendChild(category);
+      row.appendChild(tool);
+      row.appendChild(description);
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+
+    return table;
+  }
+
+  function buildStandardsSection(state, standards) {
+    const section = document.createElement("section");
+    section.className = "chloe-about-standards";
+    section.dataset.testid = "about-standards-section";
+
+    const heading = document.createElement("h2");
+    heading.className = "chloe-about-standards__heading";
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].aboutStandardsHeading;
+    }
+
+    render();
+    state.onLanguageChange.push(render);
+
+    section.appendChild(heading);
+    section.appendChild(buildProductionStandardsTable(standards));
+
+    return section;
+  }
+
   window.loadAboutContent = loadAboutContent;
   window.buildColorPalette = buildColorPalette;
   window.buildProjectSection = buildProjectSection;
+  window.buildProductionStandardsTable = buildProductionStandardsTable;
+  window.buildStandardsSection = buildStandardsSection;
 })();
