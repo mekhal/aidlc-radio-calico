@@ -53,6 +53,11 @@
  * ("Production-grade Standards" — about/about.js's buildStandardsSection())
  * into the same <main>, below Section 1, off the same
  * window.__aboutPageContentReady await.
+ *
+ * Issue #151 (Ticket 4 of the About page story, final ticket): mounts
+ * Section 3 ("References & Acknowledgements" — about/about.js's
+ * buildReferencesSection()) into the same <main>, below Section 2, off the
+ * same window.__aboutPageContentReady await.
  */
 (function () {
   "use strict";
@@ -116,6 +121,7 @@
     window.__aboutPageContentReady = loadAboutContent().then((content) => {
       main.appendChild(buildProjectSection(state, content.colorPalette));
       main.appendChild(buildStandardsSection(state, content.productionStandards));
+      main.appendChild(buildReferencesSection(state, content.references));
     });
   }
 
