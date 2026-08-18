@@ -18,5 +18,6 @@
   "recentlyPlayedModalCloseLabel": "ปิดรายการเพลงล่าสุด",
   "nowPlayingUnavailable": "ไม่สามารถโหลดข้อมูลเพลงได้ในขณะนี้",
   "aboutProjectHeading": "โปรเจกต์ Radio Calico",
-  "aboutProjectDescription": "Radio Calico คือบริการสตรีมมิ่งวิทยุออนไลน์คุณภาพสูงแบบไม่มีโฆษณา ให้เสียง lossless ระดับ 24-bit / 48 kHz"
+  "aboutProjectDescription": "Radio Calico คือบริการสตรีมมิ่งวิทยุออนไลน์คุณภาพสูงแบบไม่มีโฆษณา ให้เสียง lossless ระดับ 24-bit / 48 kHz",
+  "aboutStandardsHeading": "มาตรฐานระดับโปรดักชัน"
 }

@@ -18,5 +18,6 @@
   "recentlyPlayedModalCloseLabel": "Close Recently Played",
   "nowPlayingUnavailable": "Unable to load track info right now.",
   "aboutProjectHeading": "The Radio Calico Project",
-  "aboutProjectDescription": "Radio Calico is a high-quality, ad-free internet radio streaming service delivering lossless audio at 24-bit / 48 kHz."
+  "aboutProjectDescription": "Radio Calico is a high-quality, ad-free internet radio streaming service delivering lossless audio at 24-bit / 48 kHz.",
+  "aboutStandardsHeading": "Production-grade Standards"
 }

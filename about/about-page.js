@@ -48,6 +48,11 @@
  * builders) before the section is built and appended.
  *
  * See tests/about/about-page.test.js and tests/about/about-content.test.js.
+ *
+ * Issue #151 (Ticket 3 of the About page story): mounts Section 2
+ * ("Production-grade Standards" — about/about.js's buildStandardsSection())
+ * into the same <main>, below Section 1, off the same
+ * window.__aboutPageContentReady await.
  */
 (function () {
   "use strict";
@@ -110,6 +115,7 @@
 
     window.__aboutPageContentReady = loadAboutContent().then((content) => {
       main.appendChild(buildProjectSection(state, content.colorPalette));
+      main.appendChild(buildStandardsSection(state, content.productionStandards));
     });
   }
 
