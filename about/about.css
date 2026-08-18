@@ -34,3 +34,18 @@
   font-size: 0.85rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
+
+/* Issue #151 (Ticket 3 of the About page story): Section 2, "Production-grade
+   Standards" — table content/colors come from Bootstrap's own table.table
+   styling; this only handles the section's heading/spacing, matching
+   Section 1's .chloe-about-project rules above. */
+
+.chloe-about-standards {
+  padding: 2rem;
+}
+
+.chloe-about-standards__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
