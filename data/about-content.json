@@ -27,5 +27,23 @@
       "tool": "Human decision gates",
       "description": "Every step of the AI-DLC loop has a human decision gate — a human reviews and approves the plan, the tests, and the code before anything merges."
     }
+  ],
+  "references": [
+    {
+      "name": "Claude GitHub Agent",
+      "description": "The @claude agent that drives each step of this loop directly from GitHub issue and PR comments."
+    },
+    {
+      "name": "AI-DLC Process",
+      "description": "The 7-step, human-gated development loop this site itself was built with — see README.md."
+    },
+    {
+      "name": "Open Source Libraries",
+      "description": "Bootstrap 5, Bootstrap Icons, and hls.js, loaded via CDN with no build step or bundler."
+    },
+    {
+      "name": "Style Guide",
+      "description": "The Radio Calico brand palette, typography, and component references in RadioCalicoStyle/."
+    }
   ]
 }

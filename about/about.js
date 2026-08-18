@@ -30,6 +30,14 @@
  * description sourced from README.md sections 11/12). Table content is fixed
  * English data (no state.lang branching); only buildStandardsSection()'s
  * heading is i18n'd. See tests/about/about-standards.test.js.
+ *
+ * Issue #151 (Ticket 4 of the About page story): Section 3, "References &
+ * Acknowledgements" — a Bootstrap list-group crediting the tools/concepts
+ * named by the issue body, data-driven from data/about-content.json's new
+ * `references` field (name fixed by the issue body, description drafted for
+ * this PR). Same fixed-English-data-driven-body / i18n-heading split as
+ * Section 2's buildProductionStandardsTable()/buildStandardsSection(). See
+ * tests/about/about-references.test.js.
  */
 (function () {
   "use strict";
@@ -158,9 +166,61 @@
     return section;
   }
 
+  // Fixed English content (name/description both sourced from
+  // data/about-content.json) — same "plain data, no state.lang branching"
+  // precedent as buildProductionStandardsTable() above. Only the section
+  // heading is i18n'd, via buildReferencesSection().
+  function buildReferencesList(references) {
+    const list = document.createElement("div");
+    list.className = "list-group chloe-about-references__list";
+
+    references.forEach((reference) => {
+      const item = document.createElement("div");
+      item.className = "list-group-item chloe-about-references__item";
+
+      const name = document.createElement("div");
+      name.className = "chloe-about-references__name";
+      name.textContent = reference.name;
+
+      const description = document.createElement("div");
+      description.className = "chloe-about-references__description";
+      description.textContent = reference.description;
+
+      item.appendChild(name);
+      item.appendChild(description);
+      list.appendChild(item);
+    });
+
+    return list;
+  }
+
+  function buildReferencesSection(state, references) {
+    const section = document.createElement("section");
+    section.className = "chloe-about-references";
+    section.dataset.testid = "about-references-section";
+
+    const heading = document.createElement("h2");
+    heading.className = "chloe-about-references__heading";
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].aboutReferencesHeading;
+    }
+
+    render();
+    state.onLanguageChange.push(render);
+
+    section.appendChild(heading);
+    section.appendChild(buildReferencesList(references));
+
+    return section;
+  }
+
   window.loadAboutContent = loadAboutContent;
   window.buildColorPalette = buildColorPalette;
   window.buildProjectSection = buildProjectSection;
   window.buildProductionStandardsTable = buildProductionStandardsTable;
   window.buildStandardsSection = buildStandardsSection;
+  window.buildReferencesList = buildReferencesList;
+  window.buildReferencesSection = buildReferencesSection;
 })();
