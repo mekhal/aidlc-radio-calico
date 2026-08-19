@@ -312,7 +312,7 @@ Autonomy นี้ **ถูกควบคุมด้วยความรู�
 
 ## 13. อ้างอิงและกิตติกรรมประกาศ (References & Acknowledgements)
 
-- แนวคิดและกระบวนการในโปรเจกต์นี้ได้แรงบันดาลใจจากคอร์ส **"Claude Code: Building Faster with AI, from Prototype to Prod"** บน Udemy ขอบคุณ **Frank Kane**
+- แนวคิดและกระบวนการในโปรเจกต์นี้ได้แรงบันดาลใจจากคอร์ส [**"Claude Code: Building Faster with AI, from Prototype to Prod"**](https://www.udemy.com/course/anthropic-claude-code/?srsltid=AfmBOoq1FmiJvG_rDMQgx4J-4xfD1qbJy9rJ2-c44YEslEFGdG1TC_wR&couponCode=CP260817G2) บน Udemy ขอบคุณ **Frank Kane**
 - ขอบคุณ **คุณ Kunaruk Osatapirat** (Speaker) สำหรับหัวข้อ **"AI-driven architecture: Designing distributed systems at scale"** ในงาน **AWS Summit Bangkok 2026**
 
 ---

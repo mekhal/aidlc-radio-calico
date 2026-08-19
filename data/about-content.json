@@ -42,8 +42,9 @@
       "description": "Bootstrap 5, Bootstrap Icons, and hls.js, loaded via CDN with no build step or bundler."
     },
     {
-      "name": "Style Guide",
-      "description": "The Radio Calico brand palette, typography, and component references in RadioCalicoStyle/."
+      "name": "Udemy Course – Claude Code: Building Faster with AI, from Prototype to Prod",
+      "description": "The ideas and process in this project were inspired by the Udemy course \"Claude Code: Building Faster with AI, from Prototype to Prod\" thanks to Frank Kane.",
+      "url": "https://www.udemy.com/course/anthropic-claude-code/?srsltid=AfmBOoq1FmiJvG_rDMQgx4J-4xfD1qbJy9rJ2-c44YEslEFGdG1TC_wR&couponCode=CP260817G2"
     }
   ]
 }
