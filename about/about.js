@@ -170,6 +170,10 @@
   // data/about-content.json) — same "plain data, no state.lang branching"
   // precedent as buildProductionStandardsTable() above. Only the section
   // heading is i18n'd, via buildReferencesSection().
+  //
+  // Issue #397: a reference may carry a `url` (currently only the Udemy
+  // course credit) — when present, its name renders as a link that opens in
+  // a new tab; entries without `url` keep rendering as plain text.
   function buildReferencesList(references) {
     const list = document.createElement("div");
     list.className = "list-group chloe-about-references__list";
@@ -180,7 +184,16 @@
 
       const name = document.createElement("div");
       name.className = "chloe-about-references__name";
-      name.textContent = reference.name;
+      if (reference.url) {
+        const link = document.createElement("a");
+        link.href = reference.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = reference.name;
+        name.appendChild(link);
+      } else {
+        name.textContent = reference.name;
+      }
 
       const description = document.createElement("div");
       description.className = "chloe-about-references__description";

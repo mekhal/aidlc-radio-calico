@@ -312,7 +312,7 @@ These are the concrete tools and workflows that back the four gates in [Section 
 
 ## 13. References & Acknowledgements
 
-- The ideas and process in this project were inspired by the Udemy course **"Claude Code: Building Faster with AI, from Prototype to Prod"** thanks to **Frank Kane**.
+- The ideas and process in this project were inspired by the [Udemy course **"Claude Code: Building Faster with AI, from Prototype to Prod"**](https://www.udemy.com/course/anthropic-claude-code/?srsltid=AfmBOoq1FmiJvG_rDMQgx4J-4xfD1qbJy9rJ2-c44YEslEFGdG1TC_wR&couponCode=CP260817G2) thanks to **Frank Kane**.
 - Thanks to **Kunaruk Osatapirat** (speaker) for the talk **"AI-driven architecture: Designing distributed systems at scale"** at **AWS Summit Bangkok 2026**.
 
 ---
