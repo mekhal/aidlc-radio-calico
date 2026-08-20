@@ -96,3 +96,55 @@
     padding: 1.25rem;
   }
 }
+
+/* Issue #405 (Ticket 4 of the "What's this" page story): Section 3, "Skill
+   Capture & Reuse" - two-column "First Time" / "Next Time" comparison
+   (AC1: Bootstrap col-md-6 grid, stacks to a single column below md - same
+   card look/theme-flipping tokens as Section 2's loop cards above, per
+   docs/knowledge-asset/published/theme-token-background-audit.md). The
+   "Next Time" card gets a border accent rather than a different background
+   to distinguish it, per that same skill's guidance to keep state cues out
+   of the background/text-contrast pairing. */
+
+.chloe-whats-this-skills {
+  padding: 2rem;
+}
+
+.chloe-whats-this-skills__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+}
+
+.whats-this-skill-card-col {
+  margin-bottom: 1.5rem;
+}
+
+.whats-this-skill-card {
+  height: 100%;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+}
+
+.whats-this-skill-card--next {
+  border-left: 4px solid var(--chloe-pink-deep);
+}
+
+.whats-this-skill-card__title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.whats-this-skill-card__body {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@media (max-width: 767.98px) {
+  .chloe-whats-this-skills {
+    padding: 1.25rem;
+  }
+}

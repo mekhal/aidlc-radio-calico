@@ -32,5 +32,16 @@
         "description": "Lessons learned along the way get written down and turned into reusable know-how for the next round."
       }
     ]
+  },
+  "skillCapture": {
+    "heading": "SKILL CAPTURE & REUSE",
+    "firstTime": {
+      "title": "First Time",
+      "body": "When a human makes a call - choosing an approach, setting a rule, giving feedback - the agent writes it down and saves it as a new skill in .claude/skills/."
+    },
+    "nextTime": {
+      "title": "Next Time",
+      "body": "In later loops, the agent automatically checks that stored skill and applies it, so its behavior stays consistent with what was decided before."
+    }
   }
 }
