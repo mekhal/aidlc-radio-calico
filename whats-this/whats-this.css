@@ -1,0 +1,42 @@
+/* Issue #403 (Ticket 2 of the "What's this" page story): Section 1, "What is
+   this?" - heading/body inherit the page's existing serif font-family and
+   --chloe-sage background from album-promo.css (already linked by
+   pages/whats-this.html), matching about/about.css's Section 1 precedent. */
+
+.chloe-whats-this-what {
+  padding: 2rem;
+}
+
+.chloe-whats-this-what__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.chloe-whats-this-what__body {
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Per docs/knowledge-asset/published/theme-token-background-audit.md:
+   --chloe-sage/--chloe-ink/--chloe-pink-deep all carry a
+   [data-chloe-theme="dark"] override in shared/tokens.css, so this pastel
+   badge stays readable in both themes rather than pairing a fixed-hue
+   background (--chloe-mint/--chloe-pink, neither of which flips) with a
+   theme-switching text color. */
+.chloe-whats-this-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chloe-whats-this-badge {
+  background-color: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border: 1px solid var(--chloe-pink-deep);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-family: var(--chloe-sans);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
