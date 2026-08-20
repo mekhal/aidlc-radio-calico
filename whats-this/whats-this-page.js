@@ -33,6 +33,7 @@
  * testable section builder) before the section is built and appended.
  *
  * See tests/whats-this/whats-this-content.test.js.
+<<<<<<< HEAD
  *
  * Issue #404 (Ticket 3 of the "What's this" page story): mounts Section 2
  * ("The AI-DLC Loop" - whats-this/whats-this.js's buildAiDlcLoopSection())
@@ -48,6 +49,8 @@
  * chain.
  *
  * See tests/whats-this/whats-this-skills.test.js.
+=======
+>>>>>>> ad2da9d (feat: What's this page Ticket 2 — Section 1 "What is this?" (issue #403))
  */
 (function () {
   "use strict";
