@@ -31,6 +31,15 @@
  * breakpoint and sit side by side at md and up.
  *
  * See tests/contact/contact-page.test.js.
+ *
+ * Issue #419 (Ticket 2 of the "Contact" page story): mounts the Contact Info
+ * column (contact/contact.js's buildContactInfoSection()) into
+ * #contact-info-root. Mirrors the already-shipped
+ * window.__aboutPageContentReady/window.__whatsThisPageContentReady pattern
+ * — loadContactContent() is awaited once here (not inside contact.js's
+ * synchronous, directly-testable buildContactInfoSection()) before the
+ * section is built and appended. #contact-form-root stays empty until
+ * Ticket 3.
  */
 (function () {
   "use strict";
@@ -106,6 +115,15 @@
     // of racing the fetch.
     window.__contactPageI18nReady = loadTranslations().then(() => {
       state.onLanguageChange.forEach((fn) => fn());
+    });
+
+    const infoRoot = page.querySelector("#contact-info-root");
+
+    // Mirrors about-page.js's window.__aboutPageContentReady — exposed as a
+    // named promise so a test suite can deterministically await it instead
+    // of racing the fetch.
+    window.__contactPageContentReady = loadContactContent().then((content) => {
+      infoRoot.appendChild(buildContactInfoSection(content));
     });
   }
 
