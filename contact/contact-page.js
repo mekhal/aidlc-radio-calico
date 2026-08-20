@@ -38,8 +38,13 @@
  * window.__aboutPageContentReady/window.__whatsThisPageContentReady pattern
  * — loadContactContent() is awaited once here (not inside contact.js's
  * synchronous, directly-testable buildContactInfoSection()) before the
- * section is built and appended. #contact-form-root stays empty until
- * Ticket 3.
+ * section is built and appended.
+ *
+ * Issue #420 (Ticket 3 of the "Contact" page story): mounts the Contact Form
+ * column (contact/contact.js's buildContactFormSection()) into
+ * #contact-form-root. Unlike the info column, buildContactFormSection() has
+ * no async content to await, so it mounts synchronously alongside the rest
+ * of the page — no window.__contactPage*Ready promise needed for it.
  */
 (function () {
   "use strict";
@@ -125,6 +130,9 @@
     window.__contactPageContentReady = loadContactContent().then((content) => {
       infoRoot.appendChild(buildContactInfoSection(content));
     });
+
+    const formRoot = page.querySelector("#contact-form-root");
+    formRoot.appendChild(buildContactFormSection());
   }
 
   window.buildHeader = buildHeader;
