@@ -24,6 +24,15 @@
  * exist yet.
  *
  * See tests/whats-this/whats-this-page.test.js.
+ *
+ * Issue #403 (Ticket 2 of the "What's this" page story): mounts Section 1
+ * ("What is this?" — whats-this/whats-this.js's buildWhatIsThisSection())
+ * into <main data-testid="whats-this-main">. Mirrors the already-shipped
+ * window.__aboutPageContentReady await pattern — loadWhatsThisContent() is
+ * awaited once here (not inside whats-this.js's synchronous, directly-
+ * testable section builder) before the section is built and appended.
+ *
+ * See tests/whats-this/whats-this-content.test.js.
  */
 (function () {
   "use strict";
@@ -74,7 +83,10 @@
     const page = document.createElement("div");
     page.className = "chloe-page";
     page.appendChild(buildHeader(state));
-    page.appendChild(buildWhatsThisMain());
+
+    const main = buildWhatsThisMain();
+    page.appendChild(main);
+
     page.appendChild(buildFooter(state));
     root.appendChild(page);
 
@@ -83,6 +95,11 @@
     // of racing the fetch.
     window.__whatsThisPageI18nReady = loadTranslations().then(() => {
       state.onLanguageChange.forEach((fn) => fn());
+    });
+
+    // Mirrors about-page.js's window.__aboutPageContentReady.
+    window.__whatsThisPageContentReady = loadWhatsThisContent().then((content) => {
+      main.appendChild(buildWhatIsThisSection(content.whatIsThis));
     });
   }
 
