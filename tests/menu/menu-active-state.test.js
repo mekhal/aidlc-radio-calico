@@ -53,6 +53,19 @@
  * convention of one dedicated file per nav item's special-cased behavior.
  * Written before menu/menu.js implements this, per TDD — fails until this
  * issue's Code PR (step 6) adds the path-based check for about.
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): whatsThis goes
+ * through the same rework — its href changes from "#whats-this" to the real
+ * page "pages/whats-this.html", and NAV_HREFS.whatsThis is updated to match.
+ * "whatsThis" was the last remaining hash-based representative example
+ * (chosen when About made this same move under issue #151), so the generic
+ * hash-driven cases below switch to "contact" — the only nav item still hash-
+ * based once Home/About/What's this/Case Study are all covered by either the
+ * empty-hash-defaults-to-home fallback or a real page. whatsThis's own
+ * path-based active-state check has its own dedicated coverage in the new
+ * tests/menu/menu-whats-this-link.test.js. Written before menu/menu.js
+ * implements this, per TDD — fails until this issue's Code PR (step 6) adds
+ * the path-based check for whatsThis.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -63,7 +76,7 @@
   const NAV_HREFS = {
     home: "#home",
     about: "pages/about.html",
-    whatsThis: "#whats-this",
+    whatsThis: "pages/whats-this.html",
     caseStudy: "case-study.html",
     contact: "#contact",
   };
@@ -109,9 +122,9 @@
   describe("menu/menu.js active nav state (issue #306)", () => {
     it("marks the nav item matching the current hash as active (aria-current=page)", async () => {
       await loadMenuModule();
-      await withHash("#whats-this", async () => {
+      await withHash("#contact", async () => {
         const nav = buildNav();
-        const active = linkFor(nav, "whatsThis");
+        const active = linkFor(nav, "contact");
         expect(active.getAttribute("aria-current")).toBe("page");
       });
     });
@@ -127,18 +140,18 @@
 
     it("does not navigate when the active nav item is clicked", async () => {
       await loadMenuModule();
-      await withHash("#whats-this", async () => {
+      await withHash("#contact", async () => {
         const nav = buildNav();
-        const active = linkFor(nav, "whatsThis");
+        const active = linkFor(nav, "contact");
         expect(clickAndCheckPrevented(active)).toBe(true);
       });
     });
 
     it("leaves every non-active nav item clickable and without aria-current", async () => {
       await loadMenuModule();
-      await withHash("#whats-this", async () => {
+      await withHash("#contact", async () => {
         const nav = buildNav();
-        NAV_KEYS.filter((key) => key !== "whatsThis").forEach((key) => {
+        NAV_KEYS.filter((key) => key !== "contact").forEach((key) => {
           const link = linkFor(nav, key);
           expect(link.getAttribute("aria-current")).toBe(null);
           expect(clickAndCheckPrevented(link)).toBe(false);
@@ -148,7 +161,7 @@
 
     it("all nav items keep their href regardless of active state (AC unchanged from issue #255)", async () => {
       await loadMenuModule();
-      await withHash("#whats-this", async () => {
+      await withHash("#contact", async () => {
         const nav = buildNav();
         NAV_KEYS.forEach((key) => {
           expect(linkFor(nav, key).getAttribute("href")).toBe(NAV_HREFS[key]);

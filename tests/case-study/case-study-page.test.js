@@ -33,6 +33,12 @@
  * root, this non-hash href needs no further rewrite here — the buildHeader()
  * rule below only rewrites "#"-prefixed hrefs, so "pages/about.html" already
  * resolves correctly as-is from the repo root.
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): What's this's href
+ * changes the same way, from the hash anchor "#whats-this" to the real page
+ * "pages/whats-this.html" (also one directory down under pages/ — see
+ * tests/whats-this/whats-this-page.test.js). Same reasoning as About above —
+ * "pages/whats-this.html" needs no further rewrite from the repo root.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -80,7 +86,7 @@
       const header = window.buildHeader(state);
       const hrefs = Array.from(header.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
 
-      expect(hrefs).toEqual(["index.html#home", "pages/about.html", "index.html#whats-this", "case-study.html", "index.html#contact"]);
+      expect(hrefs).toEqual(["index.html#home", "pages/about.html", "pages/whats-this.html", "case-study.html", "index.html#contact"]);
     });
 
     it("buildHeader(state) does not rewrite the logo's image path (case-study.html sits at the repo root, same as index.html)", async () => {
