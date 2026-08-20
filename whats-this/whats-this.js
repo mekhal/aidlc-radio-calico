@@ -30,6 +30,9 @@
  * re-injects this file as a fresh <script> tag), with globals attached to
  * `window` explicitly. See tests/whats-this/whats-this-content.test.js.
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3cb48ec (feat: What's this page Ticket 3 — Section 2 "The AI-DLC Loop" (issue #404))
  *
  * Issue #404 (Ticket 3 of the "What's this" page story, part of #152), step 3
  * waiver approved (2026-08-20): Section 2, "The AI-DLC Loop" - a "THE AI-DLC
@@ -45,6 +48,7 @@
  * plain argument, same synchronous/directly-testable convention as
  * buildWhatIsThisSection() above - whats-this-page.js awaits
  * loadWhatsThisContent() once and passes both resolved sub-objects in.
+<<<<<<< HEAD
  *
  * Issue #405 (Ticket 4 of the "What's this" page story, part of #152), step 3
  * waiver approved (2026-08-20): Section 3, "Skill Capture & Reuse" - a
@@ -62,6 +66,8 @@
  * above.
 =======
 >>>>>>> ad2da9d (feat: What's this page Ticket 2 — Section 1 "What is this?" (issue #403))
+=======
+>>>>>>> 3cb48ec (feat: What's this page Ticket 3 — Section 2 "The AI-DLC Loop" (issue #404))
  */
 (function () {
   "use strict";
@@ -109,6 +115,9 @@
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3cb48ec (feat: What's this page Ticket 3 — Section 2 "The AI-DLC Loop" (issue #404))
   function buildAiDlcLoopCard(step, index) {
     const col = document.createElement("div");
     col.className = "col-md-4 whats-this-loop-card-col";
@@ -163,6 +172,7 @@
     return section;
   }
 
+<<<<<<< HEAD
   function buildSkillCaptureCard(card, modifierClass) {
     const col = document.createElement("div");
     col.className = "col-md-6 whats-this-skill-card-col";
@@ -213,12 +223,15 @@
     return section;
   }
 
+=======
+>>>>>>> 3cb48ec (feat: What's this page Ticket 3 — Section 2 "The AI-DLC Loop" (issue #404))
   window.loadWhatsThisContent = loadWhatsThisContent;
   window.buildBadgeRow = buildBadgeRow;
   window.buildWhatIsThisSection = buildWhatIsThisSection;
   window.buildAiDlcLoopCard = buildAiDlcLoopCard;
   window.buildAiDlcLoopGrid = buildAiDlcLoopGrid;
   window.buildAiDlcLoopSection = buildAiDlcLoopSection;
+<<<<<<< HEAD
   window.buildSkillCaptureCard = buildSkillCaptureCard;
   window.buildSkillCaptureGrid = buildSkillCaptureGrid;
   window.buildSkillCaptureSection = buildSkillCaptureSection;
@@ -227,4 +240,6 @@
   window.buildBadgeRow = buildBadgeRow;
   window.buildWhatIsThisSection = buildWhatIsThisSection;
 >>>>>>> ad2da9d (feat: What's this page Ticket 2 — Section 1 "What is this?" (issue #403))
+=======
+>>>>>>> 3cb48ec (feat: What's this page Ticket 3 — Section 2 "The AI-DLC Loop" (issue #404))
 })();
