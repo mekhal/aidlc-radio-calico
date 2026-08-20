@@ -1,0 +1,7 @@
+{
+  "whatIsThis": {
+    "heading": "WHAT IS THIS?",
+    "body": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
+    "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"]
+  }
+}
