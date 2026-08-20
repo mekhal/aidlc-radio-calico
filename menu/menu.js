@@ -75,6 +75,16 @@
  * isCaseStudyActive()/isAboutActive(). The empty-hash-means-home fallback
  * gate is extended to include this third standalone page. See
  * tests/menu/menu-whats-this-link.test.js.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story, part of #153): Contact
+ * goes through the same rework — it moves off index.html onto its own
+ * standalone page (pages/contact.html), so its href becomes that real page
+ * (was the hash anchor "#contact", the last nav item still hash-based besides
+ * home) and its active state is judged by page path, not hash, via the same
+ * window.__MENU_CURRENT_PATH__ || window.location.pathname seam as
+ * isCaseStudyActive()/isAboutActive()/isWhatsThisActive(). The empty-hash-
+ * means-home fallback gate is extended to include this fourth standalone
+ * page. See tests/menu/menu-contact-link.test.js.
  */
 (function () {
   "use strict";
@@ -85,7 +95,7 @@
     about: "pages/about.html",
     whatsThis: "pages/whats-this.html",
     caseStudy: "case-study.html",
-    contact: "#contact",
+    contact: "pages/contact.html",
   };
 
   function isCaseStudyActive() {
@@ -103,19 +113,26 @@
     return path.endsWith("whats-this.html");
   }
 
+  function isContactActive() {
+    const path = window.__MENU_CURRENT_PATH__ || window.location.pathname;
+    return path.endsWith("contact.html");
+  }
+
   function isKeyActive(key, hash) {
     if (key === "caseStudy") return isCaseStudyActive();
     if (key === "about") return isAboutActive();
     if (key === "whatsThis") return isWhatsThisActive();
+    if (key === "contact") return isContactActive();
     return NAV_HREFS[key] === hash;
   }
 
   function getActiveNavKeys() {
-    // Issue #375 (extended by issue #151, #402): the empty-hash-means-home
-    // fallback only holds on index.html. On a standalone page like
-    // case-study.html, pages/about.html, or pages/whats-this.html, an empty
-    // hash is just "no anchor set" and must not also light up Home.
-    const isStandalonePageActive = isCaseStudyActive() || isAboutActive() || isWhatsThisActive();
+    // Issue #375 (extended by issue #151, #402, #418): the empty-hash-means-
+    // home fallback only holds on index.html. On a standalone page like
+    // case-study.html, pages/about.html, pages/whats-this.html, or
+    // pages/contact.html, an empty hash is just "no anchor set" and must not
+    // also light up Home.
+    const isStandalonePageActive = isCaseStudyActive() || isAboutActive() || isWhatsThisActive() || isContactActive();
     const hash = isStandalonePageActive ? window.location.hash : window.location.hash || "#home";
     return new Set(NAV_KEYS.filter((key) => isKeyActive(key, hash)));
   }
