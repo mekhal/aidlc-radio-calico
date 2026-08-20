@@ -174,6 +174,13 @@
          same reason. -->
     <script src="menu/menu-whats-this-link.test.js"></script>
 
+    <!-- issue #418 (Ticket 1 of the "Contact" page story): contact's nav
+         item switches from a same-page hash anchor to a real page href
+         (pages/contact.html) — same standalone-loader pattern as the
+         menu-whats-this-link.test.js block above, own dedicated file for the
+         same reason. -->
+    <script src="menu/menu-contact-link.test.js"></script>
+
     <!-- issue #354 (root cause #1): dedicated coverage for the shared
          click-and-check-prevented.js helper above. -->
     <script src="menu/click-and-check-prevented.test.js"></script>
@@ -273,6 +280,33 @@
          category as tests/skills-storage-in-repo.test.js, so wired directly
          here rather than into test-report-suite-files.js. -->
     <script src="whats-this/whats-this-cdn-sources.test.js"></script>
+
+    <!-- issue #418 (Ticket 1 of the "Contact" page story): contact/
+         contact-page.js, the new standalone pages/contact.html page's thin
+         init script — same standalone-loader pattern as the about/
+         whats-this/ blocks above. -->
+    <script src="contact/contact-page.test.js"></script>
+
+    <!-- issue #418 (Ticket 1 of the "Contact" page story): config/cdn-sources.json's
+         bootstrap/bootstrap-icons usedIn lists must include pages/contact.html
+         — a plain JSON-content check, same category as
+         whats-this/whats-this-cdn-sources.test.js above, so wired directly
+         here rather than into test-report-suite-files.js. -->
+    <script src="contact/contact-cdn-sources.test.js"></script>
+
+    <!-- issue #419 (Ticket 2 of the "Contact" page story): contact/contact.js's
+         Contact Info column content builders — the bilingual (Thai + English,
+         both always rendered) inspiration paragraph, name, and email, all
+         fetched from data/contact-content.json — same standalone-loader
+         pattern as the about/whats-this/ blocks above. -->
+    <script src="contact/contact-content.test.js"></script>
+
+    <!-- issue #420 (Ticket 3 of the "Contact" page story): contact/contact.js's
+         Contact Form column content builders — Name/Email/Message/Submit +
+         the mailto: submit contract, addressed to mekha.l@outlook.com — same
+         standalone-loader pattern as the contact-content.test.js block
+         above. -->
+    <script src="contact/contact-form.test.js"></script>
 
     <!-- issue #54: the list of "real" test files is shared with app.js's
          footer modal via test-report-suite-files.js (single source of

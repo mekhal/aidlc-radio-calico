@@ -39,6 +39,13 @@
  * "pages/whats-this.html" (also one directory down under pages/ — see
  * tests/whats-this/whats-this-page.test.js). Same reasoning as About above —
  * "pages/whats-this.html" needs no further rewrite from the repo root.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): Contact's href changes
+ * the same way, from the hash anchor "#contact" to the real page
+ * "pages/contact.html" (also one directory down under pages/ — see
+ * tests/contact/contact-page.test.js). Same reasoning as About/What's this
+ * above — "pages/contact.html" needs no further rewrite from the repo root;
+ * no code change needed in case-study-page.js itself.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -86,7 +93,7 @@
       const header = window.buildHeader(state);
       const hrefs = Array.from(header.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
 
-      expect(hrefs).toEqual(["index.html#home", "pages/about.html", "pages/whats-this.html", "case-study.html", "index.html#contact"]);
+      expect(hrefs).toEqual(["index.html#home", "pages/about.html", "pages/whats-this.html", "case-study.html", "pages/contact.html"]);
     });
 
     it("buildHeader(state) does not rewrite the logo's image path (case-study.html sits at the repo root, same as index.html)", async () => {
