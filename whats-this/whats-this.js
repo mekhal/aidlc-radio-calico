@@ -44,6 +44,21 @@
  * plain argument, same synchronous/directly-testable convention as
  * buildWhatIsThisSection() above - whats-this-page.js awaits
  * loadWhatsThisContent() once and passes both resolved sub-objects in.
+ *
+ * Issue #405 (Ticket 4 of the "What's this" page story, part of #152), step 3
+ * waiver approved (2026-08-20): Section 3, "Skill Capture & Reuse" - a
+ * two-column "First Time" / "Next Time" comparison (AC1: stacks to a single
+ * column below md, same Bootstrap row/col precedent as
+ * buildAiDlcLoopSection() above, but col-md-6 for a 2-up rather than 3-up
+ * grid). "First Time" paraphrases how a new skill gets captured from a human
+ * decision/feedback into .claude/skills/ (AC2); "Next Time" paraphrases how
+ * the agent automatically reuses that stored skill in later loops for more
+ * consistent behavior (AC3) - both a general-audience paraphrase of README
+ * section 7, not verbatim (AC4). Sourced from data/whats-this-content.json's
+ * new skillCapture field. buildSkillCaptureSection(content) takes the
+ * resolved skillCapture object as a plain argument, same
+ * synchronous/directly-testable convention as the two section builders
+ * above.
  */
 (function () {
   "use strict";
@@ -144,10 +159,63 @@
     return section;
   }
 
+  function buildSkillCaptureCard(card, modifierClass) {
+    const col = document.createElement("div");
+    col.className = "col-md-6 whats-this-skill-card-col";
+    col.dataset.testid = "whats-this-skill-card-col";
+
+    const box = document.createElement("div");
+    box.className = `whats-this-skill-card ${modifierClass}`;
+    box.dataset.testid = "whats-this-skill-card";
+
+    const title = document.createElement("h3");
+    title.className = "whats-this-skill-card__title";
+    title.textContent = card.title;
+
+    const body = document.createElement("p");
+    body.className = "whats-this-skill-card__body";
+    body.textContent = card.body;
+
+    box.appendChild(title);
+    box.appendChild(body);
+    col.appendChild(box);
+
+    return col;
+  }
+
+  function buildSkillCaptureGrid(content) {
+    const grid = document.createElement("div");
+    grid.className = "row whats-this-skill-grid";
+    grid.dataset.testid = "whats-this-skill-grid";
+
+    grid.appendChild(buildSkillCaptureCard(content.firstTime, "whats-this-skill-card--first"));
+    grid.appendChild(buildSkillCaptureCard(content.nextTime, "whats-this-skill-card--next"));
+
+    return grid;
+  }
+
+  function buildSkillCaptureSection(content) {
+    const section = document.createElement("section");
+    section.className = "chloe-whats-this-skills";
+    section.dataset.testid = "whats-this-skills-section";
+
+    const heading = document.createElement("h2");
+    heading.className = "chloe-whats-this-skills__heading";
+    heading.textContent = content.heading;
+
+    section.appendChild(heading);
+    section.appendChild(buildSkillCaptureGrid(content));
+
+    return section;
+  }
+
   window.loadWhatsThisContent = loadWhatsThisContent;
   window.buildBadgeRow = buildBadgeRow;
   window.buildWhatIsThisSection = buildWhatIsThisSection;
   window.buildAiDlcLoopCard = buildAiDlcLoopCard;
   window.buildAiDlcLoopGrid = buildAiDlcLoopGrid;
   window.buildAiDlcLoopSection = buildAiDlcLoopSection;
+  window.buildSkillCaptureCard = buildSkillCaptureCard;
+  window.buildSkillCaptureGrid = buildSkillCaptureGrid;
+  window.buildSkillCaptureSection = buildSkillCaptureSection;
 })();

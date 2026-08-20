@@ -40,6 +40,14 @@
  * the same loadWhatsThisContent() await chain.
  *
  * See tests/whats-this/whats-this-loop.test.js.
+ *
+ * Issue #405 (Ticket 4 of the "What's this" page story): mounts Section 3
+ * ("Skill Capture & Reuse" - whats-this/whats-this.js's
+ * buildSkillCaptureSection()) into <main data-testid="whats-this-main">,
+ * appended after Section 2 within the same loadWhatsThisContent() await
+ * chain.
+ *
+ * See tests/whats-this/whats-this-skills.test.js.
  */
 (function () {
   "use strict";
@@ -108,6 +116,7 @@
     window.__whatsThisPageContentReady = loadWhatsThisContent().then((content) => {
       main.appendChild(buildWhatIsThisSection(content.whatIsThis));
       main.appendChild(buildAiDlcLoopSection(content.aidlcLoop));
+      main.appendChild(buildSkillCaptureSection(content.skillCapture));
     });
   }
 
