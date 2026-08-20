@@ -33,6 +33,13 @@
  * testable section builder) before the section is built and appended.
  *
  * See tests/whats-this/whats-this-content.test.js.
+ *
+ * Issue #404 (Ticket 3 of the "What's this" page story): mounts Section 2
+ * ("The AI-DLC Loop" - whats-this/whats-this.js's buildAiDlcLoopSection())
+ * into <main data-testid="whats-this-main">, appended after Section 1 within
+ * the same loadWhatsThisContent() await chain.
+ *
+ * See tests/whats-this/whats-this-loop.test.js.
  */
 (function () {
   "use strict";
@@ -100,6 +107,7 @@
     // Mirrors about-page.js's window.__aboutPageContentReady.
     window.__whatsThisPageContentReady = loadWhatsThisContent().then((content) => {
       main.appendChild(buildWhatIsThisSection(content.whatIsThis));
+      main.appendChild(buildAiDlcLoopSection(content.aidlcLoop));
     });
   }
 

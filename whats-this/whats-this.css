@@ -40,3 +40,59 @@
   font-weight: 600;
   font-size: 0.8rem;
 }
+
+/* Issue #404 (Ticket 3 of the "What's this" page story): Section 2, "The
+   AI-DLC Loop" - reuses case-study/case-study.css's card look (same
+   --chloe-sage/--chloe-ink/--chloe-pink-deep theme-flipping tokens, per
+   docs/knowledge-asset/published/theme-token-background-audit.md) and its
+   Bootstrap col-md-4 grid (AC3: stacks vertically below md, 3-per-row grid
+   at md and up). */
+
+.chloe-whats-this-loop {
+  padding: 2rem;
+}
+
+.chloe-whats-this-loop__heading {
+  font-style: italic;
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+}
+
+.whats-this-loop-card-col {
+  margin-bottom: 1.5rem;
+}
+
+.whats-this-loop-card {
+  height: 100%;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.whats-this-loop-card__number {
+  font-family: var(--chloe-sans);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--chloe-pink-deep);
+  margin: 0 0 0.5rem;
+}
+
+.whats-this-loop-card__title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.whats-this-loop-card__description {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@media (max-width: 767.98px) {
+  .chloe-whats-this-loop {
+    padding: 1.25rem;
+  }
+}

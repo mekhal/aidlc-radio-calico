@@ -3,5 +3,34 @@
     "heading": "WHAT IS THIS?",
     "body": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
     "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"]
+  },
+  "aidlcLoop": {
+    "heading": "THE AI-DLC LOOP",
+    "steps": [
+      {
+        "title": "Issue Trigger",
+        "description": "A human kicks things off by opening a GitHub issue describing what's needed."
+      },
+      {
+        "title": "Plan & AC Gate",
+        "description": "The AI proposes a plan with clear success criteria, and a human must approve it before anything else happens."
+      },
+      {
+        "title": "TDD Gate",
+        "description": "The AI writes tests that describe the desired outcome before any feature code exists, and a human signs off on them first."
+      },
+      {
+        "title": "Implementation Gate",
+        "description": "Only after the tests are approved does the AI write the actual feature code to make them pass."
+      },
+      {
+        "title": "Review & Merge Gate",
+        "description": "A human reviews the finished work against quality and security checks, then merges it in to close the loop."
+      },
+      {
+        "title": "Close & Capture Gate",
+        "description": "Lessons learned along the way get written down and turned into reusable know-how for the next round."
+      }
+    ]
   }
 }
