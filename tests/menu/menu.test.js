@@ -39,6 +39,12 @@
  * below are otherwise unchanged (they only compare against NAV_HREFS[key],
  * not against a hash literal). About's own path-based active-state behavior
  * is covered separately in tests/menu/menu-about-link.test.js.
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): whatsThis goes
+ * through the same rework — NAV_HREFS.whatsThis becomes the real page
+ * "pages/whats-this.html" (was the hash anchor "#whats-this"). Same reasoning
+ * as About above; whatsThis's own path-based active-state behavior is covered
+ * separately in tests/menu/menu-whats-this-link.test.js.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -48,7 +54,7 @@
   const NAV_HREFS = {
     home: "#home",
     about: "pages/about.html",
-    whatsThis: "#whats-this",
+    whatsThis: "pages/whats-this.html",
     caseStudy: "case-study.html",
     contact: "#contact",
   };

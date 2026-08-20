@@ -29,6 +29,11 @@
  * real page "pages/about.html" (was the hash anchor "#about") — this page's
  * generic non-hash rewrite rule (`../${href}`), already exercised by
  * caseStudy above, applies unchanged and produces "../pages/about.html".
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): whatsThis's href is
+ * now the real page "pages/whats-this.html" (was the hash anchor
+ * "#whats-this") — the same generic non-hash rewrite rule applies unchanged
+ * and produces "../pages/whats-this.html".
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -74,7 +79,7 @@
       expect(hrefs).toEqual([
         "../index.html#home",
         "../pages/about.html",
-        "../index.html#whats-this",
+        "../pages/whats-this.html",
         "../case-study.html",
         "../index.html#contact",
       ]);

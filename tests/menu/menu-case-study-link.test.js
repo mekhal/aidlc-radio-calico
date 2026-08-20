@@ -53,6 +53,13 @@
  * hash-based — swapped to "whatsThis" (#whats-this), which stays a hash
  * placeholder, mirroring the same swap menu-active-state.test.js's generic
  * cases made.
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): whatsThis goes
+ * through the same move to its own standalone page (pages/whats-this.html),
+ * so it's no longer hash-based either — the case below swaps again, to
+ * "contact" (#contact), the only nav item still hash-based once Home/About/
+ * What's this/Case Study are all covered by either the empty-hash-defaults-
+ * to-home fallback or a real page.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -133,11 +140,11 @@
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
-        window.location.hash = "#whats-this";
+        window.location.hash = "#contact";
         await withCurrentPath("/case-study.html", async () => {
           const nav = buildNav();
-          const whatsThis = nav.querySelector('a[href="#whats-this"]');
-          expect(whatsThis.getAttribute("aria-current")).toBe("page");
+          const contact = nav.querySelector('a[href="#contact"]');
+          expect(contact.getAttribute("aria-current")).toBe("page");
           expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {
