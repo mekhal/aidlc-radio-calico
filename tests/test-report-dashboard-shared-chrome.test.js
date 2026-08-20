@@ -34,6 +34,11 @@
  * now the real page "pages/whats-this.html" (was the hash anchor
  * "#whats-this") — the same generic non-hash rewrite rule applies unchanged
  * and produces "../pages/whats-this.html".
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): contact's href is now
+ * the real page "pages/contact.html" (was the hash anchor "#contact") — the
+ * same generic non-hash rewrite rule applies unchanged and produces
+ * "../pages/contact.html". #home is now the only hash-anchor item left.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -81,7 +86,7 @@
         "../pages/about.html",
         "../pages/whats-this.html",
         "../case-study.html",
-        "../index.html#contact",
+        "../pages/contact.html",
       ]);
 
       unloadTestReportDashboard(root);

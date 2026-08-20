@@ -60,6 +60,11 @@
  * "contact" (#contact), the only nav item still hash-based once Home/About/
  * What's this/Case Study are all covered by either the empty-hash-defaults-
  * to-home fallback or a real page.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): contact goes through the
+ * same move to its own standalone page (pages/contact.html), so it's no
+ * longer hash-based either — the case below swaps one final time, to "home"
+ * (#home), the only nav item left that's hash-based.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -140,11 +145,11 @@
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
-        window.location.hash = "#contact";
+        window.location.hash = "#home";
         await withCurrentPath("/case-study.html", async () => {
           const nav = buildNav();
-          const contact = nav.querySelector('a[href="#contact"]');
-          expect(contact.getAttribute("aria-current")).toBe("page");
+          const home = nav.querySelector('a[href="#home"]');
+          expect(home.getAttribute("aria-current")).toBe("page");
           expect(caseStudyLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {

@@ -40,6 +40,14 @@
  *
  * Written before whats-this/whats-this-page.js exists, per TDD — fails until
  * this issue's Code PR (step 6) creates it.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): the contact item's href
+ * in the expected hrefs array below changes from the hash anchor
+ * "../index.html#contact" to the real page "../pages/contact.html" (Contact
+ * moves to its own standalone page, one directory down under pages/, same as
+ * About/What's this) — this page's generic non-hash rewrite rule
+ * (`../${href}`) applies unchanged; no code change needed in
+ * whats-this-page.js itself. #home is now the only hash-anchor item left.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -79,7 +87,7 @@
         "../pages/about.html",
         "whats-this.html",
         "../case-study.html",
-        "../index.html#contact",
+        "../pages/contact.html",
       ]);
     });
 
