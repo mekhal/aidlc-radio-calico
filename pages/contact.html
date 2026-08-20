@@ -70,6 +70,10 @@
          contact-page.js, which calls buildFooter() when mounting the page. -->
     <script src="../footer/footer.js"></script>
 
+    <!-- Issue #419 (Ticket 2 of the "Contact" page story): contact.js's
+         loadContactContent()/buildContactInfoSection() — must load before
+         contact-page.js, which calls them to mount the Contact Info column. -->
+    <script src="../contact/contact.js"></script>
     <script src="../contact/contact-page.js"></script>
   </body>
 </html>
