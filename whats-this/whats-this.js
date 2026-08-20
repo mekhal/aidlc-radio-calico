@@ -29,6 +29,7 @@
  * IIFE per issue #330's IIFE-redeclaration lesson (the test harness
  * re-injects this file as a fresh <script> tag), with globals attached to
  * `window` explicitly. See tests/whats-this/whats-this-content.test.js.
+<<<<<<< HEAD
  *
  * Issue #404 (Ticket 3 of the "What's this" page story, part of #152), step 3
  * waiver approved (2026-08-20): Section 2, "The AI-DLC Loop" - a "THE AI-DLC
@@ -59,6 +60,8 @@
  * resolved skillCapture object as a plain argument, same
  * synchronous/directly-testable convention as the two section builders
  * above.
+=======
+>>>>>>> ad2da9d (feat: What's this page Ticket 2 — Section 1 "What is this?" (issue #403))
  */
 (function () {
   "use strict";
@@ -105,6 +108,7 @@
     return section;
   }
 
+<<<<<<< HEAD
   function buildAiDlcLoopCard(step, index) {
     const col = document.createElement("div");
     col.className = "col-md-4 whats-this-loop-card-col";
@@ -218,4 +222,9 @@
   window.buildSkillCaptureCard = buildSkillCaptureCard;
   window.buildSkillCaptureGrid = buildSkillCaptureGrid;
   window.buildSkillCaptureSection = buildSkillCaptureSection;
+=======
+  window.loadWhatsThisContent = loadWhatsThisContent;
+  window.buildBadgeRow = buildBadgeRow;
+  window.buildWhatIsThisSection = buildWhatIsThisSection;
+>>>>>>> ad2da9d (feat: What's this page Ticket 2 — Section 1 "What is this?" (issue #403))
 })();
