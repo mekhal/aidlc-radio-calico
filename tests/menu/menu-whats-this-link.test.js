@@ -1,19 +1,20 @@
 /**
- * Issue #151 (Ticket 1 of the About page story, plan confirmed 2026-08-15):
- * About moves off index.html onto its own standalone page, pages/about.html,
- * instead of an in-page "#about" section — the same rework caseStudy went
- * through under issue #323. menu/menu.js's `about` nav item switches from a
- * same-page hash anchor to a real page href, so:
+ * Issue #402 (Ticket 1 of the "What's this" page story, part of #152): "What's
+ * this" moves off index.html onto its own standalone page,
+ * pages/whats-this.html, instead of an in-page "#whats-this" section — the
+ * same rework About went through under issue #151. menu/menu.js's `whatsThis`
+ * nav item switches from a same-page hash anchor to a real page href, so:
  *
- * - NAV_HREFS.about becomes "pages/about.html" (was "#about") — see
- *   tests/menu/menu-active-state.test.js, whose local NAV_HREFS constant is
- *   updated in this same Test PR to match, and whose generic hash-driven
- *   cases now drive off "whatsThis" instead of "about".
- * - getActiveNavKeys() can no longer detect the about item via
+ * - NAV_HREFS.whatsThis becomes "pages/whats-this.html" (was "#whats-this") —
+ *   see tests/menu/menu-active-state.test.js, whose local NAV_HREFS constant
+ *   is updated in this same Test PR to match, and whose generic hash-driven
+ *   cases now drive off "contact" instead of "whatsThis" (the only nav item
+ *   still hash-based once About/What's this/Case Study are all real pages).
+ * - getActiveNavKeys() can no longer detect the whatsThis item via
  *   window.location.hash (a real page has no hash to compare). Every other
  *   item keeps the existing hash-based check unchanged — this file covers
- *   only the about item's own detection, mirroring
- *   tests/menu/menu-case-study-link.test.js's structure and its issue #375
+ *   only the whatsThis item's own detection, mirroring
+ *   tests/menu/menu-about-link.test.js's structure and its issue #375
  *   double-active fix (applied here pre-emptively rather than as a
  *   follow-up bug, since the failure mode is identical for any standalone
  *   page reached with an empty hash).
@@ -21,12 +22,12 @@
  * Per docs/knowledge-asset/published/test-pr-native-api-and-self-ref-checklist.md:
  * a test must not stub/override real navigation or window.location.pathname
  * directly. Instead this is the implementation contract for the Code PR:
- * menu.js reads the same application-level seam already used for caseStudy,
- * `window.__MENU_CURRENT_PATH__ || window.location.pathname`, when deciding
- * whether the about item is active.
+ * menu.js reads the same application-level seam already used for about/
+ * caseStudy, `window.__MENU_CURRENT_PATH__ || window.location.pathname`, when
+ * deciding whether the whatsThis item is active.
  *
  * Written before menu/menu.js implements this, per TDD — fails until this
- * issue's Code PR (step 6) adds the path-based check for about.
+ * issue's Code PR (step 6) adds the path-based check for whatsThis.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -52,8 +53,8 @@
     return window.buildMenu(state);
   }
 
-  function aboutLink(nav) {
-    return nav.querySelector('a[href="pages/about.html"]');
+  function whatsThisLink(nav) {
+    return nav.querySelector('a[href="pages/whats-this.html"]');
   }
 
   async function withCurrentPath(value, fn) {
@@ -67,79 +68,83 @@
     }
   }
 
-  describe("menu/menu.js About nav item points to its own page, not a hash anchor (issue #151, Ticket 1)", () => {
-    it('renders the about nav item\'s href as the real page "pages/about.html", not "#about"', async () => {
+  describe("menu/menu.js What's this nav item points to its own page, not a hash anchor (issue #402, Ticket 1)", () => {
+    it('renders the whatsThis nav item\'s href as the real page "pages/whats-this.html", not "#whats-this"', async () => {
       await loadMenuModule();
       await withCurrentPath("/index.html", async () => {
         const nav = buildNav();
-        expect(aboutLink(nav)).toBeTruthy();
-        expect(nav.querySelector('a[href="#about"]')).toBeFalsy();
+        expect(whatsThisLink(nav)).toBeTruthy();
+        expect(nav.querySelector('a[href="#whats-this"]')).toBeFalsy();
       });
     });
 
-    it("marks about active (aria-current=page) when the current page path ends with about.html", async () => {
+    it("marks whatsThis active (aria-current=page) when the current page path ends with whats-this.html", async () => {
       await loadMenuModule();
-      await withCurrentPath("/pages/about.html", async () => {
+      await withCurrentPath("/pages/whats-this.html", async () => {
         const nav = buildNav();
-        expect(aboutLink(nav).getAttribute("aria-current")).toBe("page");
+        expect(whatsThisLink(nav).getAttribute("aria-current")).toBe("page");
       });
     });
 
-    it("does not navigate when the active about link is clicked", async () => {
+    it("does not navigate when the active whatsThis link is clicked", async () => {
       await loadMenuModule();
-      await withCurrentPath("/pages/about.html", async () => {
+      await withCurrentPath("/pages/whats-this.html", async () => {
         const nav = buildNav();
-        expect(clickAndCheckPrevented(aboutLink(nav))).toBe(true);
+        expect(clickAndCheckPrevented(whatsThisLink(nav))).toBe(true);
       });
     });
 
-    it("leaves about inactive (clickable, no aria-current) when the current page is not about.html", async () => {
+    it("leaves whatsThis inactive (clickable, no aria-current) when the current page is not whats-this.html", async () => {
       await loadMenuModule();
       await withCurrentPath("/index.html", async () => {
         const nav = buildNav();
-        const link = aboutLink(nav);
+        const link = whatsThisLink(nav);
         expect(link.getAttribute("aria-current")).toBe(null);
         expect(clickAndCheckPrevented(link)).toBe(false);
       });
     });
 
-    it("about's page-path check is independent of the other items' existing hash-based active state", async () => {
+    it("whatsThis's page-path check is independent of the other items' existing hash-based active state", async () => {
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
         window.location.hash = "#contact";
-        await withCurrentPath("/pages/about.html", async () => {
+        await withCurrentPath("/pages/whats-this.html", async () => {
           const nav = buildNav();
           const contact = nav.querySelector('a[href="#contact"]');
           expect(contact.getAttribute("aria-current")).toBe("page");
-          expect(aboutLink(nav).getAttribute("aria-current")).toBe("page");
+          expect(whatsThisLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {
         window.location.hash = originalHash;
       }
     });
 
-    it("leaves Home inactive when the hash is empty on about.html, so only About is active (mirrors issue #375's case-study fix)", async () => {
+    it("leaves Home inactive when the hash is empty on whats-this.html, so only What's this is active (mirrors issue #375's case-study fix)", async () => {
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
         window.location.hash = "";
-        await withCurrentPath("/pages/about.html", async () => {
+        await withCurrentPath("/pages/whats-this.html", async () => {
           const nav = buildNav();
           const home = nav.querySelector('a[href="#home"]');
           expect(home.getAttribute("aria-current")).toBe(null);
-          expect(aboutLink(nav).getAttribute("aria-current")).toBe("page");
+          expect(whatsThisLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {
         window.location.hash = originalHash;
       }
     });
 
-    it("about and caseStudy can each be active independently on their own pages (no cross-contamination)", async () => {
+    it("whatsThis and about/caseStudy can each be active independently on their own pages (no cross-contamination)", async () => {
       await loadMenuModule();
+      await withCurrentPath("/pages/about.html", async () => {
+        const nav = buildNav();
+        expect(whatsThisLink(nav).getAttribute("aria-current")).toBe(null);
+      });
       await withCurrentPath("/case-study.html", async () => {
         const nav = buildNav();
-        expect(aboutLink(nav).getAttribute("aria-current")).toBe(null);
+        expect(whatsThisLink(nav).getAttribute("aria-current")).toBe(null);
       });
     });
   });

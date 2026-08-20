@@ -45,6 +45,13 @@
  *
  * Written before about/about-page.js exists, per TDD — fails until this
  * issue's Code PR (step 6) creates it.
+ *
+ * Issue #402 (Ticket 1 of the "What's this" page story): the whatsThis item's
+ * href in the expected hrefs array below changes from the hash anchor
+ * "../index.html#whats-this" to the real page "../pages/whats-this.html"
+ * (What's this moves to its own standalone page, one directory down under
+ * pages/, same as About) — this page's generic non-hash rewrite rule
+ * (`../${href}`), already exercised by caseStudy, applies unchanged.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -79,7 +86,7 @@
       const header = window.buildHeader(state);
       const hrefs = Array.from(header.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
 
-      expect(hrefs).toEqual(["../index.html#home", "about.html", "../index.html#whats-this", "../case-study.html", "../index.html#contact"]);
+      expect(hrefs).toEqual(["../index.html#home", "about.html", "../pages/whats-this.html", "../case-study.html", "../index.html#contact"]);
     });
 
     it("buildHeader(state) resolves the about item's own href to the self-referencing about.html, not ../pages/about.html", async () => {
