@@ -52,6 +52,14 @@
  * (What's this moves to its own standalone page, one directory down under
  * pages/, same as About) — this page's generic non-hash rewrite rule
  * (`../${href}`), already exercised by caseStudy, applies unchanged.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): the contact item's href
+ * in the expected hrefs array below changes the same way, from the hash
+ * anchor "../index.html#contact" to the real page "../pages/contact.html"
+ * (Contact moves to its own standalone page, one directory down under
+ * pages/, same as About/What's this) — this page's generic non-hash rewrite
+ * rule (`../${href}`) applies unchanged; no code change needed in
+ * about-page.js itself.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -86,7 +94,7 @@
       const header = window.buildHeader(state);
       const hrefs = Array.from(header.querySelectorAll(".chloe-nav a")).map((a) => a.getAttribute("href"));
 
-      expect(hrefs).toEqual(["../index.html#home", "about.html", "../pages/whats-this.html", "../case-study.html", "../index.html#contact"]);
+      expect(hrefs).toEqual(["../index.html#home", "about.html", "../pages/whats-this.html", "../case-study.html", "../pages/contact.html"]);
     });
 
     it("buildHeader(state) resolves the about item's own href to the self-referencing about.html, not ../pages/about.html", async () => {

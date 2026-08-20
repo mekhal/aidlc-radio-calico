@@ -66,6 +66,19 @@
  * tests/menu/menu-whats-this-link.test.js. Written before menu/menu.js
  * implements this, per TDD — fails until this issue's Code PR (step 6) adds
  * the path-based check for whatsThis.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): contact goes through the
+ * same rework — its href changes from "#contact" to the real page
+ * "pages/contact.html", and NAV_HREFS.contact is updated to match. "contact"
+ * was the last remaining hash-based representative example, so the generic
+ * hash-driven cases below switch to "home" (an explicit "#home" hash, not
+ * just the empty-hash default already covered by its own dedicated test) —
+ * the only nav item left that's hash-based once Home/About/What's this/Case
+ * Study/Contact are all covered by either the empty-hash-defaults-to-home
+ * fallback or a real page. Contact's own path-based active-state check has
+ * its own dedicated coverage in the new tests/menu/menu-contact-link.test.js.
+ * Written before menu/menu.js implements this, per TDD — fails until this
+ * issue's Code PR (step 6) adds the path-based check for contact.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -78,7 +91,7 @@
     about: "pages/about.html",
     whatsThis: "pages/whats-this.html",
     caseStudy: "case-study.html",
-    contact: "#contact",
+    contact: "pages/contact.html",
   };
 
   const SAMPLE_TRANSLATIONS = {
@@ -122,9 +135,9 @@
   describe("menu/menu.js active nav state (issue #306)", () => {
     it("marks the nav item matching the current hash as active (aria-current=page)", async () => {
       await loadMenuModule();
-      await withHash("#contact", async () => {
+      await withHash("#home", async () => {
         const nav = buildNav();
-        const active = linkFor(nav, "contact");
+        const active = linkFor(nav, "home");
         expect(active.getAttribute("aria-current")).toBe("page");
       });
     });
@@ -140,18 +153,18 @@
 
     it("does not navigate when the active nav item is clicked", async () => {
       await loadMenuModule();
-      await withHash("#contact", async () => {
+      await withHash("#home", async () => {
         const nav = buildNav();
-        const active = linkFor(nav, "contact");
+        const active = linkFor(nav, "home");
         expect(clickAndCheckPrevented(active)).toBe(true);
       });
     });
 
     it("leaves every non-active nav item clickable and without aria-current", async () => {
       await loadMenuModule();
-      await withHash("#contact", async () => {
+      await withHash("#home", async () => {
         const nav = buildNav();
-        NAV_KEYS.filter((key) => key !== "contact").forEach((key) => {
+        NAV_KEYS.filter((key) => key !== "home").forEach((key) => {
           const link = linkFor(nav, key);
           expect(link.getAttribute("aria-current")).toBe(null);
           expect(clickAndCheckPrevented(link)).toBe(false);
@@ -161,7 +174,7 @@
 
     it("all nav items keep their href regardless of active state (AC unchanged from issue #255)", async () => {
       await loadMenuModule();
-      await withHash("#contact", async () => {
+      await withHash("#home", async () => {
         const nav = buildNav();
         NAV_KEYS.forEach((key) => {
           expect(linkFor(nav, key).getAttribute("href")).toBe(NAV_HREFS[key]);
@@ -175,11 +188,15 @@
         const nav = buildNav();
         expect(linkFor(nav, "home").getAttribute("aria-current")).toBe("page");
 
-        window.location.hash = "#contact";
+        window.location.hash = "#does-not-match-any-item";
         window.dispatchEvent(new HashChangeEvent("hashchange"));
 
         expect(linkFor(nav, "home").getAttribute("aria-current")).toBe(null);
-        expect(linkFor(nav, "contact").getAttribute("aria-current")).toBe("page");
+
+        window.location.hash = "#home";
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+
+        expect(linkFor(nav, "home").getAttribute("aria-current")).toBe("page");
       });
     });
   });

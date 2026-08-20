@@ -28,6 +28,14 @@
  *
  * Written before menu/menu.js implements this, per TDD — fails until this
  * issue's Code PR (step 6) adds the path-based check for whatsThis.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): the "independent of the
+ * other items' existing hash-based active state" case below used "contact"
+ * as its example of an unrelated hash-based nav item. Contact moves to its
+ * own standalone page (pages/contact.html) under this issue, so it's no
+ * longer hash-based — swapped to "home" (#home), the only nav item left
+ * that's hash-based, mirroring the same swap menu-active-state.test.js's
+ * generic cases made.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -108,11 +116,11 @@
       await loadMenuModule();
       const originalHash = window.location.hash;
       try {
-        window.location.hash = "#contact";
+        window.location.hash = "#home";
         await withCurrentPath("/pages/whats-this.html", async () => {
           const nav = buildNav();
-          const contact = nav.querySelector('a[href="#contact"]');
-          expect(contact.getAttribute("aria-current")).toBe("page");
+          const home = nav.querySelector('a[href="#home"]');
+          expect(home.getAttribute("aria-current")).toBe("page");
           expect(whatsThisLink(nav).getAttribute("aria-current")).toBe("page");
         });
       } finally {

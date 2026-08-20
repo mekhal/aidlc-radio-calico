@@ -45,6 +45,12 @@
  * "pages/whats-this.html" (was the hash anchor "#whats-this"). Same reasoning
  * as About above; whatsThis's own path-based active-state behavior is covered
  * separately in tests/menu/menu-whats-this-link.test.js.
+ *
+ * Issue #418 (Ticket 1 of the "Contact" page story): contact goes through the
+ * same rework — NAV_HREFS.contact becomes the real page "pages/contact.html"
+ * (was the hash anchor "#contact"). Same reasoning as About/whatsThis above;
+ * contact's own path-based active-state behavior is covered separately in
+ * tests/menu/menu-contact-link.test.js.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -56,7 +62,7 @@
     about: "pages/about.html",
     whatsThis: "pages/whats-this.html",
     caseStudy: "case-study.html",
-    contact: "#contact",
+    contact: "pages/contact.html",
   };
 
   const SAMPLE_TRANSLATIONS = {
