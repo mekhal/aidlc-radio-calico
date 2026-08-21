@@ -1,4 +1,11 @@
 <!--
+DEPRECATED 2026-08-21 (issue #432 close, per @mekhal's "ย้าย Knowledge ที่ทับซ้อนเข้า Deprecated"):
+this content is now fully duplicated verbatim as a Hard rule directly in CLAUDE.md ("Follow-up
+changes to an already-open PR must be commented on that PR itself, not on the parent issue."),
+which is always loaded every turn — keeping this as a separate published/ file was redundant
+upkeep with no added coverage. See docs/decisions/2026-08-21-issue-432-close-scores-and-followups.md.
+
+Original scratch-draft note, kept for history:
 Scratch draft per CLAUDE.md's write-guard workaround: agent writes cannot land inside .claude/.
 A human copies the content between the markers below verbatim into:
   .claude/skills/pr-followup-on-pr-not-issue/SKILL.md
