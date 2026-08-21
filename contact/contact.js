@@ -1,20 +1,23 @@
 /**
  * Issue #419 (Ticket 2 of the "Contact" page story, part of #153): the
- * Contact Info column (#contact-info-root) — a bilingual inspiration
- * paragraph (Thai, then English, both always rendered — no language toggle,
- * confirmed with @mekhal in #153's review) followed by "Mekha Lomlao" and
- * "mekha.l@outlook.com", all data-driven from data/contact-content.json
- * (AC3) rather than hardcoded in JS — same fetch-a-JSON-file pattern as
- * about/about.js's loadAboutContent() and whats-this/whats-this.js's
- * loadWhatsThisContent().
+ * Contact Info column (#contact-info-root) — an inspiration paragraph
+ * followed by "Mekha Lomlao" and "mekha.l@outlook.com", all data-driven from
+ * data/contact-content.json (AC3) rather than hardcoded in JS — same
+ * fetch-a-JSON-file pattern as about/about.js's loadAboutContent() and
+ * whats-this/whats-this.js's loadWhatsThisContent().
  *
- * Unlike about.js's i18n'd sections (ALBUM_PROMO_TRANSLATIONS/state.lang, one
- * language visible at a time), this content is bilingual by design: both the
- * Thai and English paragraphs render together, always, with no state.lang
- * branching at all — see the correction posted in #153's plan comment.
- * buildContactInfoSection(content) takes the resolved content object as a
- * plain argument rather than calling loadContactContent() itself, so it
- * stays synchronous/directly testable — contact-page.js is responsible for
+ * Issue #432: the inspiration paragraph now follows the site-wide language
+ * toggle (one language visible at a time) instead of always rendering both
+ * Thai and English together — reversing #419's original "bilingual by
+ * design, no state.lang branching" decision, per @mekhal's feedback after
+ * seeing it shipped live. buildContactInfoSection(content, state) takes the
+ * resolved content object plus `state` (mirroring about.js's
+ * buildStandardsSection(state, standards)), renders a single inspiration <p>
+ * reflecting state.lang, and pushes a render() callback onto
+ * state.onLanguageChange so it swaps live on toggle — same pattern as
+ * about.js's buildStandardsSection(). It still takes `content` as a plain
+ * argument rather than calling loadContactContent() itself, so it stays
+ * synchronous/directly testable — contact-page.js is responsible for
  * awaiting loadContactContent() once (mirrors the already-shipped
  * window.__aboutPageContentReady/window.__whatsThisPageContentReady pattern)
  * and mounting the result into #contact-info-root.
@@ -29,6 +32,13 @@
  * buildContactFormSection() mirrors buildContactInfoSection() above: a
  * synchronous, directly-testable builder living here rather than in
  * contact-page.js (reuse-first, same split Ticket 2 established).
+ *
+ * Issue #432 follow-up: the Name/Email/Message labels and the Send button,
+ * previously hardcoded English literals with zero language support, now also
+ * follow the toggle. buildContactFormSection(state) reads new i18n keys —
+ * contactFormNameLabel/contactFormEmailLabel/contactFormMessageLabel/
+ * contactFormSendLabel — from ALBUM_PROMO_TRANSLATIONS[state.lang], pushing
+ * a render() callback onto state.onLanguageChange, same pattern as above.
  *
  * The submit handler never lets the browser follow the form's own
  * navigation — it calls buildMailtoUrl() (a pure function, easy to unit
@@ -53,20 +63,21 @@
     return response.json();
   }
 
-  function buildContactInfoSection(content) {
+  function buildContactInfoSection(content, state) {
     const section = document.createElement("div");
     section.className = "chloe-contact-info";
     section.dataset.testid = "contact-info-section";
 
-    const inspirationTh = document.createElement("p");
-    inspirationTh.className = "chloe-contact-info__inspiration chloe-contact-info__inspiration--th";
-    inspirationTh.lang = "th";
-    inspirationTh.textContent = content.inspiration.th;
+    const inspiration = document.createElement("p");
+    inspiration.className = "chloe-contact-info__inspiration";
 
-    const inspirationEn = document.createElement("p");
-    inspirationEn.className = "chloe-contact-info__inspiration chloe-contact-info__inspiration--en";
-    inspirationEn.lang = "en";
-    inspirationEn.textContent = content.inspiration.en;
+    function render() {
+      inspiration.lang = state.lang;
+      inspiration.textContent = content.inspiration[state.lang];
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     const name = document.createElement("p");
     name.className = "chloe-contact-info__name";
@@ -79,8 +90,7 @@
     emailLink.textContent = content.email;
     email.appendChild(emailLink);
 
-    section.appendChild(inspirationTh);
-    section.appendChild(inspirationEn);
+    section.appendChild(inspiration);
     section.appendChild(name);
     section.appendChild(email);
 
@@ -93,14 +103,13 @@
     return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   }
 
-  function buildFormField({ id, label, tag, type, name }) {
+  function buildFormField({ id, tag, type, name }) {
     const group = document.createElement("div");
     group.className = "mb-3";
 
     const fieldLabel = document.createElement("label");
     fieldLabel.setAttribute("for", id);
     fieldLabel.className = "form-label";
-    fieldLabel.textContent = label;
 
     const field = document.createElement(tag);
     field.id = id;
@@ -112,25 +121,36 @@
     group.appendChild(fieldLabel);
     group.appendChild(field);
 
-    return { group, field };
+    return { group, field, label: fieldLabel };
   }
 
-  function buildContactFormSection() {
+  function buildContactFormSection(state) {
     const section = document.createElement("div");
     section.className = "chloe-contact-form";
     section.dataset.testid = "contact-form-section";
 
     const form = document.createElement("form");
 
-    const nameField = buildFormField({ id: "contact-form-name", label: "Name", tag: "input", type: "text", name: "name" });
-    const emailField = buildFormField({ id: "contact-form-email", label: "Email", tag: "input", type: "email", name: "email" });
-    const messageField = buildFormField({ id: "contact-form-message", label: "Message", tag: "textarea", name: "message" });
+    const nameField = buildFormField({ id: "contact-form-name", tag: "input", type: "text", name: "name" });
+    const emailField = buildFormField({ id: "contact-form-email", tag: "input", type: "email", name: "email" });
+    const messageField = buildFormField({ id: "contact-form-message", tag: "textarea", name: "message" });
     messageField.field.rows = 5;
 
     const submitButton = document.createElement("button");
     submitButton.type = "submit";
     submitButton.className = "btn chloe-contact-form__submit";
-    submitButton.textContent = "Send";
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const translations = ALBUM_PROMO_TRANSLATIONS[state.lang];
+      nameField.label.textContent = translations.contactFormNameLabel;
+      emailField.label.textContent = translations.contactFormEmailLabel;
+      messageField.label.textContent = translations.contactFormMessageLabel;
+      submitButton.textContent = translations.contactFormSendLabel;
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();

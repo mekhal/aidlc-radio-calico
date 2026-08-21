@@ -45,6 +45,10 @@
  * #contact-form-root. Unlike the info column, buildContactFormSection() has
  * no async content to await, so it mounts synchronously alongside the rest
  * of the page — no window.__contactPage*Ready promise needed for it.
+ *
+ * Issue #432: both buildContactInfoSection() and buildContactFormSection()
+ * now take `state` as well, so their toggle-following render() callbacks can
+ * register on state.onLanguageChange — both call sites below pass it through.
  */
 (function () {
   "use strict";
@@ -128,11 +132,11 @@
     // named promise so a test suite can deterministically await it instead
     // of racing the fetch.
     window.__contactPageContentReady = loadContactContent().then((content) => {
-      infoRoot.appendChild(buildContactInfoSection(content));
+      infoRoot.appendChild(buildContactInfoSection(content, state));
     });
 
     const formRoot = page.querySelector("#contact-form-root");
-    formRoot.appendChild(buildContactFormSection());
+    formRoot.appendChild(buildContactFormSection(state));
   }
 
   window.buildHeader = buildHeader;

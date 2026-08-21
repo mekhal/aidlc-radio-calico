@@ -20,5 +20,9 @@
   "aboutProjectHeading": "โปรเจกต์ Radio Calico",
   "aboutProjectDescription": "Radio Calico คือบริการสตรีมมิ่งวิทยุออนไลน์คุณภาพสูงแบบไม่มีโฆษณา ให้เสียง lossless ระดับ 24-bit / 48 kHz",
   "aboutStandardsHeading": "มาตรฐานระดับโปรดักชัน",
-  "aboutReferencesHeading": "การอ้างอิงและคำขอบคุณ"
+  "aboutReferencesHeading": "การอ้างอิงและคำขอบคุณ",
+  "contactFormNameLabel": "ชื่อ",
+  "contactFormEmailLabel": "อีเมล",
+  "contactFormMessageLabel": "ข้อความ",
+  "contactFormSendLabel": "ส่ง"
 }
