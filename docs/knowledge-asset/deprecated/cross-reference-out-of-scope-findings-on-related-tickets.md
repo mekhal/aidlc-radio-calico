@@ -1,4 +1,12 @@
 <!--
+DEPRECATED 2026-08-21 (issue #432 close, per @mekhal's "ย้าย Knowledge ที่ทับซ้อนเข้า Deprecated"):
+this content is now fully duplicated verbatim as a Hard rule directly in CLAUDE.md (the "missed
+functionality becomes a NEW issue" bullet's exception clause for a related, already-sequenced
+sibling ticket), which is always loaded every turn — keeping this as a separate published/ file
+was redundant upkeep with no added coverage. See
+docs/decisions/2026-08-21-issue-432-close-scores-and-followups.md.
+
+Original scratch-draft note, kept for history:
 Scratch draft per CLAUDE.md's write-guard workaround: agent writes cannot land inside .claude/.
 A human copies the content between the markers below verbatim into:
   .claude/skills/cross-reference-out-of-scope-findings-on-related-tickets/SKILL.md
