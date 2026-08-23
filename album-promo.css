@@ -345,6 +345,7 @@ body {
    rendered by the React island (mountPlayerControls() in album-promo.js) —
    these rules only style the classes/data-testids that component renders. */
 .chloe-player-controls {
+  position: relative; /* anchors the More Options dropdown (issue #446) */
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -412,6 +413,103 @@ body {
   min-width: 48px;
   max-width: 100%;
   accent-color: var(--chloe-pink-deep);
+}
+
+/* --- Issue #446 (Ticket 0, parent #421): More Options button + sub-menu
+   shell (Sleep Timer / Audio Quality / Share). The active-option highlight
+   (AC3) uses a border + text-color accent rather than a full background —
+   per the theme-token-background-audit skill, --chloe-pink-deep is the only
+   accent token with a confirmed [data-chloe-theme="dark"] override, and a
+   full-background swap risks contrast issues that a fixed-hue border avoids.
+   No specific highlight color was locked in #421's review beyond "ไฮไลท์สี"
+   (color highlight, replacing the earlier ✓ checkmark), so this reuses the
+   same accent already used elsewhere in this card (play button, slider). */
+.chloe-player-controls__more-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.chloe-player-controls__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.chloe-player-controls__more:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.chloe-player-controls__menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  z-index: 20;
+  font-family: var(--chloe-sans);
+}
+
+.chloe-player-controls__menu-section + .chloe-player-controls__menu-section {
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+.chloe-player-controls__menu-heading {
+  padding: 0.3rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.chloe-player-controls__menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem 0.4rem calc(1rem - 3px);
+  cursor: pointer;
+}
+
+.chloe-player-controls__menu-item:hover {
+  background: rgb(0 0 0 / 0.05);
+}
+
+.chloe-player-controls__menu-item.is-active {
+  border-left-color: var(--chloe-pink-deep);
+  color: var(--chloe-pink-deep);
+  font-weight: 700;
+}
+
+.chloe-player-controls__menu-item--share {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chloe-player-controls__menu-divider {
+  height: 1px;
+  margin: 0.35rem 0;
+  background: rgb(0 0 0 / 0.08);
 }
 
 /* --- Ticket A: mobile — page-shell adjustments for the sidebar's bottom-bar
