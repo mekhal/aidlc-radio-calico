@@ -305,13 +305,63 @@
     return `${mins}:${String(secs).padStart(2, "0")}`;
   }
 
+  // Issue #446 (Ticket 0, parent #421): shell option lists for the ⋮ More
+  // Options sub-menu. Selecting an option here only updates which item is
+  // highlighted (AC3) — wiring the actual countdown/HLS-level-switch
+  // behavior behind each option is Ticket 1 (#447)/Ticket 2 (#448).
+  const SLEEP_TIMER_OPTIONS = [
+    { value: "off", label: "Off" },
+    { value: "15", label: "15 minutes" },
+    { value: "30", label: "30 minutes" },
+    { value: "45", label: "45 minutes" },
+    { value: "60", label: "1 hour" },
+  ];
+
+  const AUDIO_QUALITY_OPTIONS = [
+    { value: "auto", label: "Auto (Recommended)" },
+    { value: "high", label: "High" },
+    { value: "medium", label: "Medium" },
+    { value: "low", label: "Low" },
+  ];
+
+  // Reused by both Sleep Timer and Audio Quality sections — same
+  // menuitemradio + active-highlight rendering (AC3), only the option list
+  // and testid prefix differ.
+  function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect) {
+    return React.createElement(
+      "div",
+      { className: "chloe-player-controls__menu-section", role: "group", "aria-label": heading },
+      React.createElement("div", { className: "chloe-player-controls__menu-heading" }, heading),
+      options.map((option) =>
+        React.createElement(
+          "button",
+          {
+            key: option.value,
+            type: "button",
+            role: "menuitemradio",
+            "aria-checked": option.value === activeValue,
+            className:
+              "chloe-player-controls__menu-item" + (option.value === activeValue ? " is-active" : ""),
+            "data-testid": `player-${testidPrefix}-option-${option.value}`,
+            onClick: () => onSelect(option.value),
+          },
+          option.label
+        )
+      )
+    );
+  }
+
   function PlayerControls() {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
     const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
+    const [isMoreMenuOpen, setIsMoreMenuOpen] = React.useState(false);
+    const [sleepTimerOption, setSleepTimerOption] = React.useState(SLEEP_TIMER_OPTIONS[0].value);
+    const [audioQualityOption, setAudioQualityOption] = React.useState(AUDIO_QUALITY_OPTIONS[0].value);
     const audioRef = React.useRef(null);
     const hlsRef = React.useRef(null);
     const timerIntervalRef = React.useRef(null);
+    const moreMenuRef = React.useRef(null);
 
     function stopTimer() {
       if (timerIntervalRef.current !== null) {
@@ -375,6 +425,31 @@
       if (audioRef.current) audioRef.current.volume = volume / 100;
     }, [volume]);
 
+    // Baseline dropdown affordance (click-outside / Escape to close) — the
+    // richer keyboard-menu-navigation and aria-live questions raised in
+    // #421's review were never answered, so this stays minimal rather than
+    // guessing a fuller spec.
+    React.useEffect(() => {
+      if (!isMoreMenuOpen) return;
+
+      function handleOutsideClick(event) {
+        if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
+          setIsMoreMenuOpen(false);
+        }
+      }
+
+      function handleKeyDown(event) {
+        if (event.key === "Escape") setIsMoreMenuOpen(false);
+      }
+
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("mousedown", handleOutsideClick);
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [isMoreMenuOpen]);
+
     function togglePlayback() {
       const audio = audioRef.current;
       if (isPlaying) {
@@ -429,6 +504,56 @@
           "aria-label": "Volume",
           onChange: (event) => setVolume(Number(event.target.value)),
         })
+      ),
+      // Issue #446 (Ticket 0, parent #421): More Options button + sub-menu
+      // shell, placed after the volume slider per AC1.
+      React.createElement(
+        "div",
+        { className: "chloe-player-controls__more-wrap", ref: moreMenuRef },
+        React.createElement(
+          "button",
+          {
+            type: "button",
+            className: "chloe-player-controls__more",
+            "data-testid": "player-more-options",
+            "aria-haspopup": "true",
+            "aria-expanded": isMoreMenuOpen,
+            "aria-label": "More options",
+            onClick: () => setIsMoreMenuOpen((open) => !open),
+          },
+          React.createElement("i", { className: "bi bi-three-dots-vertical", "aria-hidden": "true" })
+        ),
+        isMoreMenuOpen &&
+          React.createElement(
+            "div",
+            {
+              className: "chloe-player-controls__menu",
+              role: "menu",
+              "data-testid": "player-more-menu",
+              "aria-label": "More options",
+            },
+            renderMenuSection("Sleep Timer", "sleep-timer", SLEEP_TIMER_OPTIONS, sleepTimerOption, setSleepTimerOption),
+            renderMenuSection(
+              "Audio Quality",
+              "audio-quality",
+              AUDIO_QUALITY_OPTIONS,
+              audioQualityOption,
+              setAudioQualityOption
+            ),
+            React.createElement("div", { className: "chloe-player-controls__menu-divider", "aria-hidden": "true" }),
+            React.createElement(
+              "button",
+              {
+                type: "button",
+                role: "menuitem",
+                className: "chloe-player-controls__menu-item chloe-player-controls__menu-item--share",
+                "data-testid": "player-share",
+                onClick: () => setIsMoreMenuOpen(false),
+              },
+              React.createElement("i", { className: "bi bi-share", "aria-hidden": "true" }),
+              "Share"
+            )
+          )
       )
     );
   }
