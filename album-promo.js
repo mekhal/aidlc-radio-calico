@@ -463,6 +463,13 @@
     const hlsRef = React.useRef(null);
     const timerIntervalRef = React.useRef(null);
     const sleepTimerIntervalRef = React.useRef(null);
+    // Wall-clock deadline (Date.now() + remaining ms), not a tick counter —
+    // 2026-08-24 fix (#447 review): some browsers throttle a paused/backgrounded
+    // tab's setInterval (they exempt only audible tabs), which made a
+    // tick-decrement countdown appear frozen while playback was paused. Each
+    // tick recomputes seconds-remaining from this deadline, so it always
+    // reflects real elapsed time regardless of how many ticks actually fired.
+    const sleepTimerDeadlineRef = React.useRef(null);
     const moreMenuRef = React.useRef(null);
 
     // Follow-up to #446: the ⋮ menu's labels weren't hooked into the page's
@@ -522,13 +529,18 @@
       clearSleepTimerInterval();
 
       if (value === "off") {
+        sleepTimerDeadlineRef.current = null;
         setSleepTimerSecondsRemaining(null);
         return;
       }
 
-      setSleepTimerSecondsRemaining(getSleepTimerTotalSeconds(value));
+      const totalSeconds = getSleepTimerTotalSeconds(value);
+      sleepTimerDeadlineRef.current = Date.now() + totalSeconds * 1000;
+      setSleepTimerSecondsRemaining(totalSeconds);
       sleepTimerIntervalRef.current = setInterval(() => {
-        setSleepTimerSecondsRemaining((seconds) => (seconds === null || seconds <= 0 ? seconds : seconds - 1));
+        const deadline = sleepTimerDeadlineRef.current;
+        if (deadline === null) return;
+        setSleepTimerSecondsRemaining(Math.max(0, Math.round((deadline - Date.now()) / 1000)));
       }, getSleepTimerTickMs());
     }
 
@@ -539,6 +551,7 @@
     React.useEffect(() => {
       if (sleepTimerSecondsRemaining !== 0) return;
       clearSleepTimerInterval();
+      sleepTimerDeadlineRef.current = null;
       setSleepTimerSecondsRemaining(null);
       setSleepTimerOption("off");
       stopTimer();
