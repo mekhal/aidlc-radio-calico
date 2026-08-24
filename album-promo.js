@@ -519,11 +519,30 @@
       }
     }
 
+    // Starts (or restarts) the wall-clock-deadline interval for a given
+    // remaining-seconds value. Shared by selectSleepTimer() (starting a
+    // fresh countdown while already playing) and togglePlayback()'s resume
+    // branch (continuing a frozen countdown from where it left off) —
+    // 2026-08-24 AC3 revision (#447 review): the countdown now only ticks
+    // while playback is playing, so both start points need the same
+    // deadline math (see sleepTimerDeadlineRef's comment above for why a
+    // deadline, not a tick-decrement, is used).
+    function startSleepTimerInterval(totalSeconds) {
+      sleepTimerDeadlineRef.current = Date.now() + totalSeconds * 1000;
+      sleepTimerIntervalRef.current = setInterval(() => {
+        const deadline = sleepTimerDeadlineRef.current;
+        if (deadline === null) return;
+        setSleepTimerSecondsRemaining(Math.max(0, Math.round((deadline - Date.now()) / 1000)));
+      }, getSleepTimerTickMs());
+    }
+
     // AC5: Cancel and reselecting Off both route through here (value ===
-    // "off" just clears/hides). AC3: this interval is entirely independent
-    // of timerIntervalRef (elapsed-time counter) and isPlaying — play/pause
-    // and Audio Quality changes never touch it, so it keeps counting
-    // regardless. AC6: session-only — nothing here touches localStorage.
+    // "off" just clears/hides). AC3 (revised 2026-08-24 on #447's review):
+    // the countdown only ticks while playback is playing — selecting a
+    // duration while paused shows the panel at the full duration but frozen
+    // until togglePlayback()'s resume branch starts the interval. The
+    // countdown remains independent of Audio Quality changes. AC6:
+    // session-only — nothing here touches localStorage.
     function selectSleepTimer(value) {
       setSleepTimerOption(value);
       clearSleepTimerInterval();
@@ -535,13 +554,12 @@
       }
 
       const totalSeconds = getSleepTimerTotalSeconds(value);
-      sleepTimerDeadlineRef.current = Date.now() + totalSeconds * 1000;
       setSleepTimerSecondsRemaining(totalSeconds);
-      sleepTimerIntervalRef.current = setInterval(() => {
-        const deadline = sleepTimerDeadlineRef.current;
-        if (deadline === null) return;
-        setSleepTimerSecondsRemaining(Math.max(0, Math.round((deadline - Date.now()) / 1000)));
-      }, getSleepTimerTickMs());
+      sleepTimerDeadlineRef.current = null;
+
+      if (isPlaying) {
+        startSleepTimerInterval(totalSeconds);
+      }
     }
 
     // AC4: once the countdown reaches zero, pause playback and hide the
@@ -638,10 +656,19 @@
       const audio = audioRef.current;
       if (isPlaying) {
         stopTimer();
+        // AC3 (revised 2026-08-24 on #447's review): freeze the Sleep Timer
+        // countdown at its current remaining time while paused — the panel
+        // stays visible, sleepTimerSecondsRemaining just stops updating.
+        clearSleepTimerInterval();
         audio.pause();
       } else {
         audio.play();
         startTimer();
+        // Resume a frozen countdown (if one is active) from the remaining
+        // time — no skip, no reset.
+        if (sleepTimerSecondsRemaining !== null) {
+          startSleepTimerInterval(sleepTimerSecondsRemaining);
+        }
       }
       setIsPlaying((playing) => !playing);
     }
