@@ -22,6 +22,8 @@
   "playerMenuSleepTimerLabel": "ตั้งเวลาปิด",
   "playerMenuAudioQualityLabel": "คุณภาพเสียง",
   "playerMenuShareLabel": "แชร์",
+  "playerShareModalCloseLabel": "ปิดหน้าต่างแชร์",
+  "playerShareCopyLinkLabel": "คัดลอกลิงก์",
   "playerSleepTimerOff": "ปิด",
   "playerSleepTimerMin15": "15 นาที",
   "playerSleepTimerMin30": "30 นาที",
