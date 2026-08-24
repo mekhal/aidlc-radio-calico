@@ -27,6 +27,7 @@
   "playerSleepTimerMin30": "30 minutes",
   "playerSleepTimerMin45": "45 minutes",
   "playerSleepTimerHour1": "1 hour",
+  "playerSleepTimerCancelLabel": "Cancel",
   "playerAudioQualityAuto": "Auto (Recommended)",
   "playerAudioQualityHigh": "High",
   "playerAudioQualityMedium": "Medium",
