@@ -335,6 +335,21 @@
     return match ? t[match.labelKey] : "";
   }
 
+  // Issue #448 (Ticket 2, #421): matches a High/Medium/Low quality option to
+  // hls.js's real hls.levels[] by each level's actual bitrate (highest ->
+  // High, middle -> Medium, lowest -> Low) rather than by array index, since
+  // a master playlist's level order isn't guaranteed to be bitrate-sorted
+  // (2026-08-24 review, #448).
+  function findLevelIndexForQuality(levels, value) {
+    if (!Array.isArray(levels) || levels.length === 0) return -1;
+    const sortedByBitrateDesc = levels
+      .map((level, index) => ({ index, bitrate: level.bitrate }))
+      .sort((a, b) => b.bitrate - a.bitrate);
+    const qualityRank = AUDIO_QUALITY_OPTIONS.findIndex((option) => option.value === value) - 1;
+    const match = sortedByBitrateDesc[qualityRank];
+    return match ? match.index : -1;
+  }
+
   // Issue #447 (Ticket 1, parent #421): Sleep Timer countdown. Tick cadence
   // is overridable for tests, mirroring the existing
   // window.__ALBUM_PROMO_TIMER_TICK_MS__ convention (getPlayerTimerTickMs
@@ -562,6 +577,25 @@
       }
     }
 
+    // AC3 (#448): drives the real hls.js instance's currentLevel, matched by
+    // bitrate (see findLevelIndexForQuality). Native HLS fallback (no
+    // hlsRef.current) has no currentLevel to control, so selecting an option
+    // there just updates the highlighted state (2026-08-24 review Q&A,
+    // #448). AC4: session-only, nothing here touches localStorage. AC5: this
+    // never touches sleepTimerIntervalRef/sleepTimerDeadlineRef, so a
+    // running Sleep Timer countdown is unaffected.
+    function selectAudioQuality(value) {
+      setAudioQualityOption(value);
+      const hls = hlsRef.current;
+      if (!hls) return;
+      if (value === "auto") {
+        hls.currentLevel = -1;
+        return;
+      }
+      const levelIndex = findLevelIndexForQuality(hls.levels, value);
+      if (levelIndex !== -1) hls.currentLevel = levelIndex;
+    }
+
     // AC4: once the countdown reaches zero, pause playback and hide the
     // panel. Reuses stopTimer()/setIsPlaying(false) — the same cleanup
     // togglePlayback's pause branch performs below — rather than a second
@@ -770,7 +804,7 @@
                 "audio-quality",
                 AUDIO_QUALITY_OPTIONS,
                 audioQualityOption,
-                setAudioQualityOption,
+                selectAudioQuality,
                 () => setOpenSubmenu(null),
                 t
               ),
