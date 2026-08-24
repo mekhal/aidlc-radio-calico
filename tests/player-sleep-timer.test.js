@@ -13,9 +13,15 @@
  *        sentence with NO leading icon (a prior ⏱️ prefix was cut per the
  *        latest #421 decision — regression-guarded explicitly below), plus
  *        a Cancel button.
- *   AC3: the countdown always keeps ticking — independent of play/pause and
- *        of Audio Quality changes mid-countdown (per mekhal's decisive
- *        answer on #421, referenced in this issue's body).
+ *   AC3: the countdown only ticks while playback is playing. Pausing
+ *        freezes it at the remaining time (panel stays visible, value
+ *        unchanged); resuming continues from that same remaining time with
+ *        no skip. Selecting a duration while already paused shows the panel
+ *        immediately at the full duration, frozen, until Play is pressed.
+ *        The countdown remains independent of Audio Quality changes
+ *        mid-countdown. (Revised 2026-08-24 on #447's review — reverses the
+ *        original "always counts regardless of play/pause" decision from
+ *        #421; the Audio Quality independence is unchanged.)
  *   AC4: on reaching zero, playback is paused and the panel is hidden.
  *   AC5: Cancel, or reselecting Off, stops the countdown and hides the panel
  *        immediately.
@@ -219,7 +225,7 @@
       }
     });
 
-    it("AC3: keeps counting down while playback is paused, and resumes with no interruption to the countdown", async () => {
+    it("AC3: freezes the countdown while playback is paused, then resumes from the same remaining time after Play", async () => {
       window.installMockHls();
       window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ = 20;
       window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__ = 8;
@@ -229,14 +235,63 @@
       try {
         selectSleepTimerOption(root, "15");
         await nextTick();
-        const beforePause = sleepTimerCountdownText(root);
+        await waitFor(() => sleepTimerCountdownText(root) !== null);
 
         playPauseButton(root).click(); // pause playback
         await nextTick();
         expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
 
-        await waitFor(() => sleepTimerCountdownText(root) !== beforePause);
-        expect(sleepTimerCountdownText(root) === beforePause).toBeFalsy();
+        const atPause = sleepTimerCountdownText(root);
+        // Several tick intervals' worth of real time: if the countdown were
+        // still (wrongly) ticking while paused, this would be enough for the
+        // text to change.
+        await wait(150);
+        expect(sleepTimerCountdownText(root)).toBe(atPause);
+        expect(sleepTimerPanel(root)).toBeTruthy();
+
+        playPauseButton(root).click(); // resume playback
+        await nextTick();
+        expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("true");
+
+        await waitFor(() => sleepTimerCountdownText(root) !== atPause);
+        expect(sleepTimerCountdownText(root) === atPause).toBeFalsy();
+      } finally {
+        spy.restore();
+        unloadAlbumPromo(root);
+        delete window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__;
+        delete window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__;
+      }
+    });
+
+    it("AC3: selecting a duration while playback is already paused shows the panel frozen at the full duration until Play starts it", async () => {
+      window.installMockHls();
+      window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ = 20;
+      window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__ = 8;
+      const spy = spyOnPlayPause();
+      const root = await mountPlaying();
+
+      try {
+        playPauseButton(root).click(); // pause before selecting a duration
+        await nextTick();
+        expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
+
+        selectSleepTimerOption(root, "15");
+        await nextTick();
+
+        const fullText = sleepTimerCountdownText(root);
+        expect(fullText).toBeTruthy();
+        expect(/^Sleep Timer: \d{1,2}:\d{2}$/.test(fullText)).toBeTruthy();
+
+        await wait(150);
+        expect(sleepTimerCountdownText(root)).toBe(fullText);
+        expect(sleepTimerPanel(root)).toBeTruthy();
+
+        playPauseButton(root).click(); // now start playing
+        await nextTick();
+        expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("true");
+
+        await waitFor(() => sleepTimerCountdownText(root) !== fullText);
+        expect(sleepTimerCountdownText(root) === fullText).toBeFalsy();
       } finally {
         spy.restore();
         unloadAlbumPromo(root);
