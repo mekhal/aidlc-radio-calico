@@ -639,10 +639,42 @@ body {
   margin: 0 0 1rem;
 }
 
+.chloe-share-modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.chloe-share-modal__copied-status {
+  font-family: var(--chloe-sans);
+  font-size: 0.8rem;
+  color: var(--chloe-ink);
+  opacity: 0;
+  animation-name: chloe-share-copied-fade;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes chloe-share-copied-fade {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .chloe-share-modal__copy {
   display: block;
   width: fit-content;
-  margin-left: auto;
   border: none;
   border-radius: 8px;
   background: var(--chloe-pink-deep);

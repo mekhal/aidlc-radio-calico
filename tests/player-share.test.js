@@ -66,6 +66,14 @@
  * player-sleep-timer.test.js/player-audio-quality.test.js (exercises
  * PlayerControls, not app.js's own interface), so wired directly into
  * tests/test-runner.html only.
+ *
+ * Second follow-up (same day, same issue #449 thread): in addition to
+ * Option A above, also add Option B — a small inline `<span>` next to the
+ * Copy Link button (`data-testid="player-share-copied-status"`) that shows
+ * while the button is in its copied state and clears when it reverts. The
+ * human explicitly waived a separate Test PR for this one, so its assertion
+ * is bundled directly into this file's Code PR commit instead — see the
+ * "AC5 follow-up (Option B)" test below.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -157,6 +165,11 @@
   function copyLinkButton(root) {
     const modal = shareModal(root);
     return modal && modal.querySelector('[data-testid="player-share-copy-link"]');
+  }
+
+  function copiedStatusSpan(root) {
+    const modal = shareModal(root);
+    return modal && modal.querySelector('[data-testid="player-share-copied-status"]');
   }
 
   async function mountPlaying() {
@@ -321,6 +334,41 @@
 
         expect(button.getAttribute("data-copied")).toBe("false");
         expect(button.textContent).toBe(originalLabel);
+      } finally {
+        delete window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__;
+        spy.restore();
+        clipboard.restore();
+        unloadAlbumPromo(root);
+      }
+    });
+
+    // Bundled directly into this Code PR (Test PR waived for this specific
+    // follow-up, per the human's request on issue #449) rather than a
+    // separate Test PR — still demonstrates the added behavior per the
+    // CLAUDE.md Definition of Done for a waived Test PR.
+    it("AC5 follow-up (Option B): an inline status span next to Copy Link appears while copied and clears after revert", async () => {
+      window.installMockHls();
+      const spy = spyOnPlayPause();
+      const clipboard = stubClipboardHook();
+      window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__ = 10;
+      const root = await mountPlaying();
+
+      try {
+        openShareModal(root);
+        await nextTick();
+
+        expect(copiedStatusSpan(root)).toBe(null);
+
+        copyLinkButton(root).click();
+        await nextTick();
+
+        const status = copiedStatusSpan(root);
+        expect(status).not.toBe(null);
+        expect(status.textContent.length > 0).toBe(true);
+
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(copiedStatusSpan(root)).toBe(null);
       } finally {
         delete window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__;
         spy.restore();
