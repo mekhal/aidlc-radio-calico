@@ -348,6 +348,7 @@ body {
   position: relative; /* anchors the More Options dropdown (issue #446) */
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* lets the Sleep Timer Countdown Panel (issue #447) wrap onto its own row below */
   gap: 1rem;
 }
 
@@ -540,6 +541,36 @@ body {
   height: 1px;
   margin: 0.35rem 0;
   background: rgb(0 0 0 / 0.08);
+}
+
+/* --- Issue #447 (Ticket 1, parent #421): Sleep Timer Countdown Panel —
+   docked below the main player bar (flex-basis: 100% on the flex-wrap
+   container above), not inside the ⋮ dropdown. */
+.chloe-player-controls__sleep-timer-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-basis: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  font-size: 0.85rem;
+}
+
+.chloe-player-controls__sleep-timer-cancel {
+  border: none;
+  background: transparent;
+  color: var(--chloe-pink-deep);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+
+.chloe-player-controls__sleep-timer-cancel:hover {
+  text-decoration: underline;
 }
 
 /* --- Ticket A: mobile — page-shell adjustments for the sidebar's bottom-bar
