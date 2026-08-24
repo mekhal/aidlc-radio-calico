@@ -19,6 +19,28 @@
  * These fail today (RED) — there is no modal, no Copy Link button, and no
  * clipboard wiring anywhere in album-promo.js yet.
  *
+ * Follow-up (2026-08-24, same issue #449 thread, "Option A" chosen at the
+ * review turn): clicking Copy Link gave no visible/screen-reader confirmation
+ * that the copy happened. This adds one AC on top of the four above:
+ *
+ *   AC5: clicking Copy Link shows a "copied" confirmation (the button's own
+ *        text swaps to a distinct copied-state label, `aria-live="polite"`
+ *        announces it) for a short time, then reverts automatically.
+ *
+ * Per the "interval-tick-override-and-cleanup-pattern" published skill
+ * (docs/knowledge-asset/published/interval-tick-override-and-cleanup-pattern.md),
+ * the revert delay is not hardcoded-and-awaited in real time; the Code PR
+ * must read it from an overridable window global with a sane default:
+ *
+ *   window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__
+ *     Optional test-only override (default 2000ms in real use). When set,
+ *     the "copied" auto-revert timeout uses this value instead.
+ *
+ * The exact copied-state label text is i18n-dependent, so this test asserts
+ * on a stable `data-copied="true"/"false"` attribute on the Copy Link button
+ * (data-testid stays "player-share-copy-link" — no new element/testid) plus
+ * a text-content change, rather than a hardcoded translated string.
+ *
  * Per the "test-pr-native-api-and-self-ref-checklist" published skill
  * (docs/knowledge-asset/published/test-pr-native-api-and-self-ref-checklist.md),
  * this suite does not override `navigator.clipboard.writeText` directly
@@ -271,5 +293,41 @@
         unloadAlbumPromo(root);
       }
     });
+
+    it("AC5: clicking Copy Link shows a 'copied' confirmation, announced via aria-live, that auto-reverts", async () => {
+      window.installMockHls();
+      const spy = spyOnPlayPause();
+      const clipboard = stubClipboardHook();
+      window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__ = 10;
+      const root = await mountPlaying();
+
+      try {
+        openShareModal(root);
+        await nextTick();
+
+        const button = copyLinkButton(root);
+        expect(button.getAttribute("aria-live")).toBe("polite");
+        const originalLabel = button.textContent;
+        expect(button.getAttribute("data-copied")).toBe("false");
+
+        button.click();
+        await nextTick();
+
+        expect(clipboard.calls.length).toBe(1);
+        expect(button.getAttribute("data-copied")).toBe("true");
+        expect(button.textContent).not.toBe(originalLabel);
+
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(button.getAttribute("data-copied")).toBe("false");
+        expect(button.textContent).toBe(originalLabel);
+      } finally {
+        delete window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__;
+        spy.restore();
+        clipboard.restore();
+        unloadAlbumPromo(root);
+      }
+    });
+
   });
 })();
