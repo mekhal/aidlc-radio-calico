@@ -22,6 +22,8 @@
   "playerMenuSleepTimerLabel": "Sleep Timer",
   "playerMenuAudioQualityLabel": "Audio Quality",
   "playerMenuShareLabel": "Share",
+  "playerShareModalCloseLabel": "Close Share",
+  "playerShareCopyLinkLabel": "Copy Link",
   "playerSleepTimerOff": "Off",
   "playerSleepTimerMin15": "15 minutes",
   "playerSleepTimerMin30": "30 minutes",

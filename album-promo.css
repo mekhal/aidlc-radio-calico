@@ -573,6 +573,84 @@ body {
   text-decoration: underline;
 }
 
+/* --- Issue #449 (Ticket 3, parent #421): Share Modal — Copy Link only.
+   Same fixed-backdrop/centered-panel pattern as the Recently Played Modal
+   above (issue #209), reusing the --chloe-* theme-aware custom properties. */
+.chloe-share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  z-index: 1000;
+}
+
+.chloe-share-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 420px);
+  background: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-radius: 16px;
+  padding: 1.5rem;
+  z-index: 1001;
+  font-family: var(--chloe-sans);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.chloe-share-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chloe-share-modal__title {
+  font-family: var(--chloe-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.chloe-share-modal__close {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: var(--chloe-ink);
+  font-family: var(--chloe-sans);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0.25rem 0.6rem;
+  opacity: 0.8;
+}
+
+.chloe-share-modal__close:hover {
+  opacity: 1;
+}
+
+.chloe-share-modal__url {
+  font-family: var(--chloe-sans);
+  font-size: 0.85rem;
+  word-break: break-all;
+  background: rgb(0 0 0 / 0.06);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.chloe-share-modal__copy {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  background: var(--chloe-pink-deep);
+  color: #ffffff;
+  font-family: var(--chloe-sans);
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
+
 /* --- Ticket A: mobile — page-shell adjustments for the sidebar's bottom-bar
    collapse (sidebar's own rules moved to sidebar/sidebar.css, issue #256) --- */
 @media (max-width: 767.98px) {
