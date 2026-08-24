@@ -364,6 +364,15 @@
     return window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ || SLEEP_TIMER_DEFAULT_TICK_MS;
   }
 
+  // Issue #449 follow-up (AC5): how long the Copy Link button shows its
+  // "copied" confirmation before reverting. Same override-hook convention as
+  // getSleepTimerTickMs above.
+  const SHARE_COPIED_DEFAULT_FEEDBACK_MS = 2000;
+
+  function getShareCopiedFeedbackMs() {
+    return window.__ALBUM_PROMO_SHARE_COPIED_FEEDBACK_MS__ || SHARE_COPIED_DEFAULT_FEEDBACK_MS;
+  }
+
   function getSleepTimerTotalSeconds(value) {
     const override = window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__;
     if (override) return override;
@@ -473,6 +482,10 @@
     // sub-menu panel (AC1) — it opens this Modal instead of setting
     // openSubmenu, so it never renders a "player-share-menu-panel".
     const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+    // AC5 follow-up: true while the Copy Link button shows its "copied"
+    // confirmation; reverts to false after getShareCopiedFeedbackMs().
+    const [isShareLinkCopied, setIsShareLinkCopied] = React.useState(false);
+    const shareCopiedTimeoutRef = React.useRef(null);
     const [sleepTimerOption, setSleepTimerOption] = React.useState(SLEEP_TIMER_OPTIONS[0].value);
     const [audioQualityOption, setAudioQualityOption] = React.useState(AUDIO_QUALITY_OPTIONS[0].value);
     // null = no Sleep Timer active/Countdown Panel hidden (AC5/AC6); a
@@ -703,12 +716,35 @@
       return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isShareModalOpen]);
 
+    // AC5 follow-up: closing the modal (Escape/backdrop/close button all set
+    // isShareModalOpen false) drops any pending "copied" revert so reopening
+    // never shows a stale confirmation state. Also clears on unmount.
+    React.useEffect(() => {
+      if (isShareModalOpen) return;
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+        shareCopiedTimeoutRef.current = null;
+      }
+      setIsShareLinkCopied(false);
+    }, [isShareModalOpen]);
+
+    React.useEffect(() => {
+      return () => {
+        if (shareCopiedTimeoutRef.current) clearTimeout(shareCopiedTimeoutRef.current);
+      };
+    }, []);
+
     // AC2/AC3: copies window.location.href through the app-level clipboard
     // seam (window.__ALBUM_PROMO_COPY_TO_CLIPBOARD__) when a test has set it,
     // falling back to the real Clipboard API otherwise — never
     // navigator.share() (AC3). Same override-hook pattern as
     // window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ elsewhere in this file; see
     // tests/player-share.test.js for the contract.
+    //
+    // AC5 follow-up: also flips isShareLinkCopied true for
+    // getShareCopiedFeedbackMs() so the button shows a "copied" confirmation
+    // (data-copied attribute + label swap, aria-live="polite" on the button
+    // announces it), reverting automatically afterward.
     function copyShareLink() {
       const text = window.location.href;
       const override = window.__ALBUM_PROMO_COPY_TO_CLIPBOARD__;
@@ -717,6 +753,13 @@
       } else if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text);
       }
+
+      if (shareCopiedTimeoutRef.current) clearTimeout(shareCopiedTimeoutRef.current);
+      setIsShareLinkCopied(true);
+      shareCopiedTimeoutRef.current = setTimeout(() => {
+        setIsShareLinkCopied(false);
+        shareCopiedTimeoutRef.current = null;
+      }, getShareCopiedFeedbackMs());
     }
 
     function togglePlayback() {
@@ -954,9 +997,11 @@
                 type: "button",
                 className: "chloe-share-modal__copy",
                 "data-testid": "player-share-copy-link",
+                "aria-live": "polite",
+                "data-copied": isShareLinkCopied ? "true" : "false",
                 onClick: copyShareLink,
               },
-              t.playerShareCopyLinkLabel
+              isShareLinkCopied ? t.playerShareCopiedLabel : t.playerShareCopyLinkLabel
             )
           )
         )
