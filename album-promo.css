@@ -640,14 +640,17 @@ body {
 }
 
 .chloe-share-modal__copy {
-  width: 100%;
+  display: block;
+  width: fit-content;
+  margin-left: auto;
   border: none;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--chloe-pink-deep);
   color: #ffffff;
   font-family: var(--chloe-sans);
   font-weight: 700;
-  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
   cursor: pointer;
 }
 
