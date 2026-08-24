@@ -991,17 +991,37 @@
               { className: "chloe-share-modal__url", "data-testid": "player-share-modal-url" },
               window.location.href
             ),
+            // 2026-08-24 follow-up (Option B, requested alongside the
+            // already-shipped Option A button-label swap): a small status
+            // span fades in/out next to the button. aria-hidden because the
+            // button itself already carries aria-live="polite" and announces
+            // the same change — this span is a sighted-user visual cue only.
             React.createElement(
-              "button",
-              {
-                type: "button",
-                className: "chloe-share-modal__copy",
-                "data-testid": "player-share-copy-link",
-                "aria-live": "polite",
-                "data-copied": isShareLinkCopied ? "true" : "false",
-                onClick: copyShareLink,
-              },
-              isShareLinkCopied ? t.playerShareCopiedLabel : t.playerShareCopyLinkLabel
+              "div",
+              { className: "chloe-share-modal__actions" },
+              isShareLinkCopied &&
+                React.createElement(
+                  "span",
+                  {
+                    className: "chloe-share-modal__copied-status",
+                    "data-testid": "player-share-copied-status",
+                    "aria-hidden": "true",
+                    style: { animationDuration: `${getShareCopiedFeedbackMs()}ms` },
+                  },
+                  t.playerShareCopiedStatusLabel
+                ),
+              React.createElement(
+                "button",
+                {
+                  type: "button",
+                  className: "chloe-share-modal__copy",
+                  "data-testid": "player-share-copy-link",
+                  "aria-live": "polite",
+                  "data-copied": isShareLinkCopied ? "true" : "false",
+                  onClick: copyShareLink,
+                },
+                isShareLinkCopied ? t.playerShareCopiedLabel : t.playerShareCopyLinkLabel
+              )
             )
           )
         )
