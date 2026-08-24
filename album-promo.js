@@ -324,14 +324,36 @@
     { value: "low", label: "Low" },
   ];
 
-  // Reused by both Sleep Timer and Audio Quality sections — same
+  function findOptionLabel(options, value) {
+    const match = options.find((option) => option.value === value);
+    return match ? match.label : "";
+  }
+
+  // Reused by both Sleep Timer and Audio Quality sub-menu panels — same
   // menuitemradio + active-highlight rendering (AC3), only the option list
-  // and testid prefix differ.
-  function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect) {
+  // and testid prefix differ. Rendered as its own nested panel (2026-08-24
+  // review, #446) rather than inline under a heading in the top-level list.
+  function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect, onBack) {
     return React.createElement(
       "div",
-      { className: "chloe-player-controls__menu-section", role: "group", "aria-label": heading },
-      React.createElement("div", { className: "chloe-player-controls__menu-heading" }, heading),
+      {
+        className: "chloe-player-controls__menu-section",
+        role: "group",
+        "aria-label": heading,
+        "data-testid": `player-${testidPrefix}-panel`,
+      },
+      React.createElement(
+        "button",
+        {
+          type: "button",
+          className: "chloe-player-controls__menu-back",
+          "data-testid": `player-${testidPrefix}-back`,
+          "aria-label": "Back to more options",
+          onClick: onBack,
+        },
+        React.createElement("i", { className: "bi bi-chevron-left", "aria-hidden": "true" }),
+        heading
+      ),
       options.map((option) =>
         React.createElement(
           "button",
@@ -343,11 +365,41 @@
             className:
               "chloe-player-controls__menu-item" + (option.value === activeValue ? " is-active" : ""),
             "data-testid": `player-${testidPrefix}-option-${option.value}`,
-            onClick: () => onSelect(option.value),
+            onClick: () => {
+              onSelect(option.value);
+              onBack();
+            },
           },
           option.label
         )
       )
+    );
+  }
+
+  // Top-level ⋮ menu row that navigates into a nested sub-menu panel
+  // (Sleep Timer / Audio Quality), showing the currently active option as a
+  // subtitle so the setting is visible without opening the panel.
+  function renderMenuNavRow(label, testidPrefix, currentValueLabel, onOpen) {
+    return React.createElement(
+      "button",
+      {
+        type: "button",
+        role: "menuitem",
+        className: "chloe-player-controls__menu-item chloe-player-controls__menu-item--nav",
+        "data-testid": `player-menu-${testidPrefix}-row`,
+        onClick: onOpen,
+      },
+      React.createElement(
+        "span",
+        { className: "chloe-player-controls__menu-item-text" },
+        React.createElement("span", null, label),
+        React.createElement(
+          "span",
+          { className: "chloe-player-controls__menu-item-value" },
+          currentValueLabel
+        )
+      ),
+      React.createElement("i", { className: "bi bi-chevron-right", "aria-hidden": "true" })
     );
   }
 
@@ -356,6 +408,10 @@
     const [volume, setVolume] = React.useState(80);
     const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
     const [isMoreMenuOpen, setIsMoreMenuOpen] = React.useState(false);
+    // null = top-level menu; "sleep-timer" / "audio-quality" = that option
+    // list's nested panel is open (2026-08-24 review, #446: sub-menu instead
+    // of both option lists always expanded inline).
+    const [openSubmenu, setOpenSubmenu] = React.useState(null);
     const [sleepTimerOption, setSleepTimerOption] = React.useState(SLEEP_TIMER_OPTIONS[0].value);
     const [audioQualityOption, setAudioQualityOption] = React.useState(AUDIO_QUALITY_OPTIONS[0].value);
     const audioRef = React.useRef(null);
@@ -435,11 +491,15 @@
       function handleOutsideClick(event) {
         if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
           setIsMoreMenuOpen(false);
+          setOpenSubmenu(null);
         }
       }
 
       function handleKeyDown(event) {
-        if (event.key === "Escape") setIsMoreMenuOpen(false);
+        if (event.key === "Escape") {
+          setIsMoreMenuOpen(false);
+          setOpenSubmenu(null);
+        }
       }
 
       document.addEventListener("mousedown", handleOutsideClick);
@@ -519,7 +579,12 @@
             "aria-haspopup": "true",
             "aria-expanded": isMoreMenuOpen,
             "aria-label": "More options",
-            onClick: () => setIsMoreMenuOpen((open) => !open),
+            onClick: () =>
+              setIsMoreMenuOpen((open) => {
+                const next = !open;
+                if (!next) setOpenSubmenu(null);
+                return next;
+              }),
           },
           React.createElement("i", { className: "bi bi-three-dots-vertical", "aria-hidden": "true" })
         ),
@@ -532,27 +597,57 @@
               "data-testid": "player-more-menu",
               "aria-label": "More options",
             },
-            renderMenuSection("Sleep Timer", "sleep-timer", SLEEP_TIMER_OPTIONS, sleepTimerOption, setSleepTimerOption),
-            renderMenuSection(
-              "Audio Quality",
-              "audio-quality",
-              AUDIO_QUALITY_OPTIONS,
-              audioQualityOption,
-              setAudioQualityOption
-            ),
-            React.createElement("div", { className: "chloe-player-controls__menu-divider", "aria-hidden": "true" }),
-            React.createElement(
-              "button",
-              {
-                type: "button",
-                role: "menuitem",
-                className: "chloe-player-controls__menu-item chloe-player-controls__menu-item--share",
-                "data-testid": "player-share",
-                onClick: () => setIsMoreMenuOpen(false),
-              },
-              React.createElement("i", { className: "bi bi-share", "aria-hidden": "true" }),
-              "Share"
-            )
+            openSubmenu === "sleep-timer" &&
+              renderMenuSection(
+                "Sleep Timer",
+                "sleep-timer",
+                SLEEP_TIMER_OPTIONS,
+                sleepTimerOption,
+                setSleepTimerOption,
+                () => setOpenSubmenu(null)
+              ),
+            openSubmenu === "audio-quality" &&
+              renderMenuSection(
+                "Audio Quality",
+                "audio-quality",
+                AUDIO_QUALITY_OPTIONS,
+                audioQualityOption,
+                setAudioQualityOption,
+                () => setOpenSubmenu(null)
+              ),
+            openSubmenu === null &&
+              React.createElement(
+                React.Fragment,
+                null,
+                renderMenuNavRow(
+                  "Sleep Timer",
+                  "sleep-timer",
+                  findOptionLabel(SLEEP_TIMER_OPTIONS, sleepTimerOption),
+                  () => setOpenSubmenu("sleep-timer")
+                ),
+                renderMenuNavRow(
+                  "Audio Quality",
+                  "audio-quality",
+                  findOptionLabel(AUDIO_QUALITY_OPTIONS, audioQualityOption),
+                  () => setOpenSubmenu("audio-quality")
+                ),
+                React.createElement("div", {
+                  className: "chloe-player-controls__menu-divider",
+                  "aria-hidden": "true",
+                }),
+                React.createElement(
+                  "button",
+                  {
+                    type: "button",
+                    role: "menuitem",
+                    className: "chloe-player-controls__menu-item chloe-player-controls__menu-item--share",
+                    "data-testid": "player-share",
+                    onClick: () => setIsMoreMenuOpen(false),
+                  },
+                  React.createElement("i", { className: "bi bi-share", "aria-hidden": "true" }),
+                  "Share"
+                )
+              )
           )
       )
     );
