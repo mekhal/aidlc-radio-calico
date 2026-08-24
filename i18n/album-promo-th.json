@@ -27,6 +27,7 @@
   "playerSleepTimerMin30": "30 นาที",
   "playerSleepTimerMin45": "45 นาที",
   "playerSleepTimerHour1": "1 ชั่วโมง",
+  "playerSleepTimerCancelLabel": "ยกเลิก",
   "playerAudioQualityAuto": "อัตโนมัติ (แนะนำ)",
   "playerAudioQualityHigh": "สูง",
   "playerAudioQualityMedium": "ปานกลาง",

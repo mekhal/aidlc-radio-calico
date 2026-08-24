@@ -335,10 +335,46 @@
     return match ? t[match.labelKey] : "";
   }
 
+  // Issue #447 (Ticket 1, parent #421): Sleep Timer countdown. Tick cadence
+  // is overridable for tests, mirroring the existing
+  // window.__ALBUM_PROMO_TIMER_TICK_MS__ convention (getPlayerTimerTickMs
+  // above). Since a real duration is minutes long,
+  // window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__ additionally lets a
+  // test shrink whichever option was selected down to a handful of seconds,
+  // per the "interval-tick-override-and-cleanup-pattern" published skill.
+  const SLEEP_TIMER_DEFAULT_TICK_MS = 1000;
+  const SLEEP_TIMER_DURATION_MINUTES = { 15: 15, 30: 30, 45: 45, 60: 60 };
+
+  function getSleepTimerTickMs() {
+    return window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ || SLEEP_TIMER_DEFAULT_TICK_MS;
+  }
+
+  function getSleepTimerTotalSeconds(value) {
+    const override = window.__ALBUM_PROMO_SLEEP_TIMER_SECONDS_OVERRIDE__;
+    if (override) return override;
+    const minutes = SLEEP_TIMER_DURATION_MINUTES[value];
+    return minutes ? minutes * 60 : 0;
+  }
+
+  // AC2: a plain sentence, no leading icon (a prior ⏱️ prefix was cut per
+  // #421's latest decision) — kept as a literal English string rather than
+  // an i18n key, matching the exact "Sleep Timer: MM:SS" example in #447's
+  // own Acceptance Criteria.
+  function formatSleepTimerCountdown(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `Sleep Timer: ${mins}:${String(secs).padStart(2, "0")}`;
+  }
+
   // Reused by both Sleep Timer and Audio Quality sub-menu panels — same
   // menuitemradio + active-highlight rendering (AC3), only the option list
   // and testid prefix differ. Rendered as its own nested panel (2026-08-24
   // review, #446) rather than inline under a heading in the top-level list.
+  //
+  // testid is "...-menu-panel" (not "...-panel") so it never collides with
+  // issue #447's Sleep Timer Countdown Panel, which owns the
+  // "player-sleep-timer-panel" testid (docked under the player bar, not
+  // inside this dropdown — see PlayerControls below).
   function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect, onBack, t) {
     return React.createElement(
       "div",
@@ -346,7 +382,7 @@
         className: "chloe-player-controls__menu-section",
         role: "group",
         "aria-label": heading,
-        "data-testid": `player-${testidPrefix}-panel`,
+        "data-testid": `player-${testidPrefix}-menu-panel`,
       },
       React.createElement(
         "button",
@@ -420,9 +456,13 @@
     const [openSubmenu, setOpenSubmenu] = React.useState(null);
     const [sleepTimerOption, setSleepTimerOption] = React.useState(SLEEP_TIMER_OPTIONS[0].value);
     const [audioQualityOption, setAudioQualityOption] = React.useState(AUDIO_QUALITY_OPTIONS[0].value);
+    // null = no Sleep Timer active/Countdown Panel hidden (AC5/AC6); a
+    // number = seconds remaining, shown by the Countdown Panel (AC2).
+    const [sleepTimerSecondsRemaining, setSleepTimerSecondsRemaining] = React.useState(null);
     const audioRef = React.useRef(null);
     const hlsRef = React.useRef(null);
     const timerIntervalRef = React.useRef(null);
+    const sleepTimerIntervalRef = React.useRef(null);
     const moreMenuRef = React.useRef(null);
 
     // Follow-up to #446: the ⋮ menu's labels weren't hooked into the page's
@@ -465,11 +505,53 @@
       }, getPlayerTimerTickMs());
     }
 
+    function clearSleepTimerInterval() {
+      if (sleepTimerIntervalRef.current !== null) {
+        clearInterval(sleepTimerIntervalRef.current);
+        sleepTimerIntervalRef.current = null;
+      }
+    }
+
+    // AC5: Cancel and reselecting Off both route through here (value ===
+    // "off" just clears/hides). AC3: this interval is entirely independent
+    // of timerIntervalRef (elapsed-time counter) and isPlaying — play/pause
+    // and Audio Quality changes never touch it, so it keeps counting
+    // regardless. AC6: session-only — nothing here touches localStorage.
+    function selectSleepTimer(value) {
+      setSleepTimerOption(value);
+      clearSleepTimerInterval();
+
+      if (value === "off") {
+        setSleepTimerSecondsRemaining(null);
+        return;
+      }
+
+      setSleepTimerSecondsRemaining(getSleepTimerTotalSeconds(value));
+      sleepTimerIntervalRef.current = setInterval(() => {
+        setSleepTimerSecondsRemaining((seconds) => (seconds === null || seconds <= 0 ? seconds : seconds - 1));
+      }, getSleepTimerTickMs());
+    }
+
+    // AC4: once the countdown reaches zero, pause playback and hide the
+    // panel. Reuses stopTimer()/setIsPlaying(false) — the same cleanup
+    // togglePlayback's pause branch performs below — rather than a second
+    // pause code path.
+    React.useEffect(() => {
+      if (sleepTimerSecondsRemaining !== 0) return;
+      clearSleepTimerInterval();
+      setSleepTimerSecondsRemaining(null);
+      setSleepTimerOption("off");
+      stopTimer();
+      if (audioRef.current) audioRef.current.pause();
+      setIsPlaying(false);
+    }, [sleepTimerSecondsRemaining]);
+
     React.useEffect(() => {
       const audio = audioRef.current;
 
       function stopPlayback() {
         stopTimer();
+        clearSleepTimerInterval();
         audio.pause();
         if (hlsRef.current) {
           hlsRef.current.destroy();
@@ -638,7 +720,7 @@
                 "sleep-timer",
                 SLEEP_TIMER_OPTIONS,
                 sleepTimerOption,
-                setSleepTimerOption,
+                selectSleepTimer,
                 () => setOpenSubmenu(null),
                 t
               ),
@@ -686,7 +768,32 @@
                 )
               )
           )
-      )
+      ),
+      // AC2/AC4/AC5: Countdown Panel, docked under the main player bar (not
+      // inside the ⋮ dropdown above — kept visible even after that dropdown
+      // closes, and independent of it). Rendered only while a Sleep Timer is
+      // active (sleepTimerSecondsRemaining !== null); hidden the instant it's
+      // cancelled, reselected to Off, or reaches zero.
+      sleepTimerSecondsRemaining !== null &&
+        React.createElement(
+          "div",
+          { className: "chloe-player-controls__sleep-timer-panel", "data-testid": "player-sleep-timer-panel" },
+          React.createElement(
+            "span",
+            { "data-testid": "player-sleep-timer-countdown" },
+            formatSleepTimerCountdown(sleepTimerSecondsRemaining)
+          ),
+          React.createElement(
+            "button",
+            {
+              type: "button",
+              className: "chloe-player-controls__sleep-timer-cancel",
+              "data-testid": "player-sleep-timer-cancel",
+              onClick: () => selectSleepTimer("off"),
+            },
+            t ? t.playerSleepTimerCancelLabel : "Cancel"
+          )
+        )
     );
   }
 
