@@ -25,6 +25,7 @@
   "playerShareModalCloseLabel": "Close Share",
   "playerShareCopyLinkLabel": "Copy Link",
   "playerShareCopiedLabel": "Copied!",
+  "playerShareCopiedStatusLabel": "Copied to clipboard",
   "playerSleepTimerOff": "Off",
   "playerSleepTimerMin15": "15 minutes",
   "playerSleepTimerMin30": "30 minutes",

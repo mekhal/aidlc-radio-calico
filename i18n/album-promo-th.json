@@ -25,6 +25,7 @@
   "playerShareModalCloseLabel": "ปิดหน้าต่างแชร์",
   "playerShareCopyLinkLabel": "คัดลอกลิงก์",
   "playerShareCopiedLabel": "คัดลอกแล้ว!",
+  "playerShareCopiedStatusLabel": "คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว",
   "playerSleepTimerOff": "ปิด",
   "playerSleepTimerMin15": "15 นาที",
   "playerSleepTimerMin30": "30 นาที",
