@@ -469,6 +469,10 @@
     // list's nested panel is open (2026-08-24 review, #446: sub-menu instead
     // of both option lists always expanded inline).
     const [openSubmenu, setOpenSubmenu] = React.useState(null);
+    // Issue #449 (Ticket 3, parent #421): Share is a single action, not a
+    // sub-menu panel (AC1) — it opens this Modal instead of setting
+    // openSubmenu, so it never renders a "player-share-menu-panel".
+    const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
     const [sleepTimerOption, setSleepTimerOption] = React.useState(SLEEP_TIMER_OPTIONS[0].value);
     const [audioQualityOption, setAudioQualityOption] = React.useState(AUDIO_QUALITY_OPTIONS[0].value);
     // null = no Sleep Timer active/Countdown Panel hidden (AC5/AC6); a
@@ -686,6 +690,35 @@
       };
     }, [isMoreMenuOpen]);
 
+    // Escape closes the Share modal the same way it closes the ⋮ menu above
+    // (backdrop click is wired directly on the backdrop element below).
+    React.useEffect(() => {
+      if (!isShareModalOpen) return;
+
+      function handleKeyDown(event) {
+        if (event.key === "Escape") setIsShareModalOpen(false);
+      }
+
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isShareModalOpen]);
+
+    // AC2/AC3: copies window.location.href through the app-level clipboard
+    // seam (window.__ALBUM_PROMO_COPY_TO_CLIPBOARD__) when a test has set it,
+    // falling back to the real Clipboard API otherwise — never
+    // navigator.share() (AC3). Same override-hook pattern as
+    // window.__ALBUM_PROMO_SLEEP_TIMER_TICK_MS__ elsewhere in this file; see
+    // tests/player-share.test.js for the contract.
+    function copyShareLink() {
+      const text = window.location.href;
+      const override = window.__ALBUM_PROMO_COPY_TO_CLIPBOARD__;
+      if (override) {
+        override(text);
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+      }
+    }
+
     function togglePlayback() {
       const audio = audioRef.current;
       if (isPlaying) {
@@ -835,7 +868,10 @@
                     role: "menuitem",
                     className: "chloe-player-controls__menu-item chloe-player-controls__menu-item--share",
                     "data-testid": "player-share",
-                    onClick: () => setIsMoreMenuOpen(false),
+                    onClick: () => {
+                      setIsMoreMenuOpen(false);
+                      setIsShareModalOpen(true);
+                    },
                   },
                   React.createElement("i", { className: "bi bi-share", "aria-hidden": "true" }),
                   t.playerMenuShareLabel
@@ -866,6 +902,62 @@
               onClick: () => selectSleepTimer("off"),
             },
             t ? t.playerSleepTimerCancelLabel : "Cancel"
+          )
+        ),
+      // Issue #449 (Ticket 3, parent #421): Share modal — Copy Link only, no
+      // Web Share API, no social icons (locked AC). Rendered as a sibling of
+      // the ⋮ dropdown (not nested inside it) so it stays open/visible even
+      // though the Share click above already closed that menu.
+      isShareModalOpen &&
+        t &&
+        React.createElement(
+          React.Fragment,
+          null,
+          React.createElement("div", {
+            className: "chloe-share-modal-backdrop",
+            "data-testid": "player-share-modal-backdrop",
+            onClick: () => setIsShareModalOpen(false),
+          }),
+          React.createElement(
+            "div",
+            {
+              className: "chloe-share-modal",
+              role: "dialog",
+              "aria-modal": "true",
+              "aria-label": t.playerMenuShareLabel,
+              "data-testid": "player-share-modal",
+            },
+            React.createElement(
+              "div",
+              { className: "chloe-share-modal__header" },
+              React.createElement("span", { className: "chloe-share-modal__title" }, t.playerMenuShareLabel),
+              React.createElement(
+                "button",
+                {
+                  type: "button",
+                  className: "chloe-share-modal__close",
+                  "data-testid": "player-share-modal-close",
+                  "aria-label": t.playerShareModalCloseLabel,
+                  onClick: () => setIsShareModalOpen(false),
+                },
+                React.createElement("i", { className: "bi bi-x-lg", "aria-hidden": "true" })
+              )
+            ),
+            React.createElement(
+              "p",
+              { className: "chloe-share-modal__url", "data-testid": "player-share-modal-url" },
+              window.location.href
+            ),
+            React.createElement(
+              "button",
+              {
+                type: "button",
+                className: "chloe-share-modal__copy",
+                "data-testid": "player-share-copy-link",
+                onClick: copyShareLink,
+              },
+              t.playerShareCopyLinkLabel
+            )
           )
         )
     );
