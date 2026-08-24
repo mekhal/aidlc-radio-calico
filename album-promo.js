@@ -262,7 +262,7 @@
     panel.appendChild(status);
     panel.appendChild(playerBox);
 
-    mountPlayerControls(controlsRoot);
+    mountPlayerControls(controlsRoot, state);
 
     state.nowPlaying.artistEl = artist;
     state.nowPlaying.titleEl = title;
@@ -309,31 +309,37 @@
   // Options sub-menu. Selecting an option here only updates which item is
   // highlighted (AC3) — wiring the actual countdown/HLS-level-switch
   // behavior behind each option is Ticket 1 (#447)/Ticket 2 (#448).
+  //
+  // labelKey (not a literal label) so option text stays in sync with the
+  // page's existing EN/TH i18n system (i18n/album-promo-{en,th}.json) —
+  // 2026-08-24 follow-up, #446: these were the "new labels" that shipped
+  // English-only in the shell/nested-submenu turns and needed hooking into
+  // the same ALBUM_PROMO_TRANSLATIONS the rest of the page already uses.
   const SLEEP_TIMER_OPTIONS = [
-    { value: "off", label: "Off" },
-    { value: "15", label: "15 minutes" },
-    { value: "30", label: "30 minutes" },
-    { value: "45", label: "45 minutes" },
-    { value: "60", label: "1 hour" },
+    { value: "off", labelKey: "playerSleepTimerOff" },
+    { value: "15", labelKey: "playerSleepTimerMin15" },
+    { value: "30", labelKey: "playerSleepTimerMin30" },
+    { value: "45", labelKey: "playerSleepTimerMin45" },
+    { value: "60", labelKey: "playerSleepTimerHour1" },
   ];
 
   const AUDIO_QUALITY_OPTIONS = [
-    { value: "auto", label: "Auto (Recommended)" },
-    { value: "high", label: "High" },
-    { value: "medium", label: "Medium" },
-    { value: "low", label: "Low" },
+    { value: "auto", labelKey: "playerAudioQualityAuto" },
+    { value: "high", labelKey: "playerAudioQualityHigh" },
+    { value: "medium", labelKey: "playerAudioQualityMedium" },
+    { value: "low", labelKey: "playerAudioQualityLow" },
   ];
 
-  function findOptionLabel(options, value) {
+  function findOptionLabel(options, value, t) {
     const match = options.find((option) => option.value === value);
-    return match ? match.label : "";
+    return match ? t[match.labelKey] : "";
   }
 
   // Reused by both Sleep Timer and Audio Quality sub-menu panels — same
   // menuitemradio + active-highlight rendering (AC3), only the option list
   // and testid prefix differ. Rendered as its own nested panel (2026-08-24
   // review, #446) rather than inline under a heading in the top-level list.
-  function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect, onBack) {
+  function renderMenuSection(heading, testidPrefix, options, activeValue, onSelect, onBack, t) {
     return React.createElement(
       "div",
       {
@@ -348,7 +354,7 @@
           type: "button",
           className: "chloe-player-controls__menu-back",
           "data-testid": `player-${testidPrefix}-back`,
-          "aria-label": "Back to more options",
+          "aria-label": t.playerMenuBackLabel,
           onClick: onBack,
         },
         React.createElement("i", { className: "bi bi-chevron-left", "aria-hidden": "true" }),
@@ -370,7 +376,7 @@
               onBack();
             },
           },
-          option.label
+          t[option.labelKey]
         )
       )
     );
@@ -403,7 +409,7 @@
     );
   }
 
-  function PlayerControls() {
+  function PlayerControls({ state }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
     const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
@@ -418,6 +424,29 @@
     const hlsRef = React.useRef(null);
     const timerIntervalRef = React.useRef(null);
     const moreMenuRef = React.useRef(null);
+
+    // Follow-up to #446: the ⋮ menu's labels weren't hooked into the page's
+    // EN/TH i18n system when the shell first shipped. This is the same
+    // "re-render on language change" pattern used elsewhere on this page
+    // (e.g. buildMenu()'s render() in menu/menu.js) — state.onLanguageChange
+    // is a plain array of callbacks, so a React component needs its own
+    // subscribe/unsubscribe via useEffect rather than a global re-render.
+    const [, forceRerender] = React.useState(0);
+    React.useEffect(() => {
+      function onLanguageChange() {
+        forceRerender((tick) => tick + 1);
+      }
+      state.onLanguageChange.push(onLanguageChange);
+      return () => {
+        const index = state.onLanguageChange.indexOf(onLanguageChange);
+        if (index !== -1) state.onLanguageChange.splice(index, 1);
+      };
+    }, [state]);
+
+    // Same guard as renderMeta()/buildMenu() elsewhere on this page:
+    // translations fetch async (shared/translations.js) and PlayerControls
+    // mounts before that resolves, so t is briefly null on first paint.
+    const t = ALBUM_PROMO_TRANSLATIONS ? ALBUM_PROMO_TRANSLATIONS[state.lang] : null;
 
     function stopTimer() {
       if (timerIntervalRef.current !== null) {
@@ -566,7 +595,12 @@
         })
       ),
       // Issue #446 (Ticket 0, parent #421): More Options button + sub-menu
-      // shell, placed after the volume slider per AC1.
+      // shell, placed after the volume slider per AC1. Menu strings are
+      // translated via t (2026-08-24 follow-up, #446) — the button's own
+      // aria-label falls back to the English literal on the rare first
+      // paint before translations have loaded, same as menu/menu.js's nav
+      // links; the menu body itself only renders once t is available, since
+      // it can't be opened before then anyway.
       React.createElement(
         "div",
         { className: "chloe-player-controls__more-wrap", ref: moreMenuRef },
@@ -578,7 +612,7 @@
             "data-testid": "player-more-options",
             "aria-haspopup": "true",
             "aria-expanded": isMoreMenuOpen,
-            "aria-label": "More options",
+            "aria-label": t ? t.playerMoreOptionsLabel : "More options",
             onClick: () =>
               setIsMoreMenuOpen((open) => {
                 const next = !open;
@@ -589,46 +623,49 @@
           React.createElement("i", { className: "bi bi-three-dots-vertical", "aria-hidden": "true" })
         ),
         isMoreMenuOpen &&
+          t &&
           React.createElement(
             "div",
             {
               className: "chloe-player-controls__menu",
               role: "menu",
               "data-testid": "player-more-menu",
-              "aria-label": "More options",
+              "aria-label": t.playerMoreOptionsLabel,
             },
             openSubmenu === "sleep-timer" &&
               renderMenuSection(
-                "Sleep Timer",
+                t.playerMenuSleepTimerLabel,
                 "sleep-timer",
                 SLEEP_TIMER_OPTIONS,
                 sleepTimerOption,
                 setSleepTimerOption,
-                () => setOpenSubmenu(null)
+                () => setOpenSubmenu(null),
+                t
               ),
             openSubmenu === "audio-quality" &&
               renderMenuSection(
-                "Audio Quality",
+                t.playerMenuAudioQualityLabel,
                 "audio-quality",
                 AUDIO_QUALITY_OPTIONS,
                 audioQualityOption,
                 setAudioQualityOption,
-                () => setOpenSubmenu(null)
+                () => setOpenSubmenu(null),
+                t
               ),
             openSubmenu === null &&
               React.createElement(
                 React.Fragment,
                 null,
                 renderMenuNavRow(
-                  "Sleep Timer",
+                  t.playerMenuSleepTimerLabel,
                   "sleep-timer",
-                  findOptionLabel(SLEEP_TIMER_OPTIONS, sleepTimerOption),
+                  findOptionLabel(SLEEP_TIMER_OPTIONS, sleepTimerOption, t),
                   () => setOpenSubmenu("sleep-timer")
                 ),
                 renderMenuNavRow(
-                  "Audio Quality",
+                  t.playerMenuAudioQualityLabel,
                   "audio-quality",
-                  findOptionLabel(AUDIO_QUALITY_OPTIONS, audioQualityOption),
+                  findOptionLabel(AUDIO_QUALITY_OPTIONS, audioQualityOption, t),
                   () => setOpenSubmenu("audio-quality")
                 ),
                 React.createElement("div", {
@@ -645,7 +682,7 @@
                     onClick: () => setIsMoreMenuOpen(false),
                   },
                   React.createElement("i", { className: "bi bi-share", "aria-hidden": "true" }),
-                  "Share"
+                  t.playerMenuShareLabel
                 )
               )
           )
@@ -653,8 +690,8 @@
     );
   }
 
-  function mountPlayerControls(container) {
-    ReactDOM.createRoot(container).render(React.createElement(PlayerControls));
+  function mountPlayerControls(container, state) {
+    ReactDOM.createRoot(container).render(React.createElement(PlayerControls, { state }));
   }
 
   // Ticket D (issue #158): Now Playing data fetch + Recently Played +
