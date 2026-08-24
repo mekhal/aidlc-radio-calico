@@ -462,21 +462,6 @@ body {
   font-family: var(--chloe-sans);
 }
 
-.chloe-player-controls__menu-section + .chloe-player-controls__menu-section {
-  border-top: 1px solid rgb(0 0 0 / 0.08);
-  margin-top: 0.35rem;
-  padding-top: 0.35rem;
-}
-
-.chloe-player-controls__menu-heading {
-  padding: 0.3rem 1rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.6;
-}
-
 .chloe-player-controls__menu-item {
   display: block;
   width: 100%;
@@ -504,6 +489,51 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* Top-level nav row (Sleep Timer / Audio Quality) that opens a nested
+   sub-menu panel — 2026-08-24 review, #446: replaces the earlier layout
+   where both option lists were always expanded inline in one flat panel. */
+.chloe-player-controls__menu-item--nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.chloe-player-controls__menu-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.chloe-player-controls__menu-item-value {
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+/* Nested panel's back row — a real button (not a static heading) so it can
+   navigate back to the top-level menu (click-to-expand/collapse, no
+   hover-flyout — see #446 review). */
+.chloe-player-controls__menu-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+  padding: 0.3rem 1rem 0.5rem;
+  cursor: pointer;
+}
+
+.chloe-player-controls__menu-back:hover {
+  opacity: 1;
 }
 
 .chloe-player-controls__menu-divider {
