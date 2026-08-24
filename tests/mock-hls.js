@@ -7,6 +7,13 @@
     class MockHls {
       constructor() {
         this._listeners = {};
+        // Issue #448 (Ticket 2 of #421, Audio Quality): mirrors real hls.js's
+        // shape closely enough for AC3's bitrate-based currentLevel mapping
+        // to be testable — levels defaults empty (tests set it explicitly
+        // per-case) and currentLevel defaults to -1 (hls.js's own "Auto"/ABR
+        // sentinel, matching AUDIO_QUALITY_OPTIONS' "auto" default).
+        this.levels = [];
+        this.currentLevel = -1;
         MockHls.instances.push(this);
       }
       loadSource(url) {
