@@ -58,6 +58,16 @@
  * translatable text now takes `state` first, self-renders, and
  * self-subscribes to state.onLanguageChange - same pattern as about.js's
  * buildProjectSection(state)/buildProductionStandardsTable(state, standards).
+ *
+ * Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
+ * of #505), AC1-AC5: each of the 3 sections embeds one diagram image via a
+ * new shared buildSectionImage(state, image) helper (reuse-first, AC4) -
+ * a responsive <img> (img-fluid) plus a bilingual caption underneath,
+ * self-rendering/self-subscribing to state.onLanguageChange like every
+ * other builder here (AC3). The two content-mismatched image files were
+ * renamed via git mv to match their actual diagram content (AC1):
+ * code-pr-gates.png -> skill-reuse-gates.png, skill-reuse-gates.jpg ->
+ * code-pr-gates.jpg; aidlc-loop-gates.jpg was already correctly named.
  */
 (function () {
   "use strict";
@@ -84,6 +94,33 @@
     return row;
   }
 
+  function buildSectionImage(state, image) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "whats-this-image";
+    wrapper.dataset.testid = "whats-this-image";
+
+    const img = document.createElement("img");
+    img.className = "img-fluid whats-this-image__img";
+    img.src = image.src;
+
+    const caption = document.createElement("p");
+    caption.className = "whats-this-image__caption";
+    caption.dataset.testid = "whats-this-image-caption";
+
+    function render() {
+      img.alt = resolveBilingualField(image.alt, state.lang);
+      caption.textContent = resolveBilingualField(image.caption, state.lang);
+    }
+
+    render();
+    state.onLanguageChange.push(render);
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(caption);
+
+    return wrapper;
+  }
+
   function buildWhatIsThisSection(state, content) {
     const section = document.createElement("section");
     section.className = "chloe-whats-this-what";
@@ -105,6 +142,7 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
+    section.appendChild(buildSectionImage(state, content.image));
     section.appendChild(body);
     section.appendChild(buildBadgeRow(content.badges));
 
@@ -173,6 +211,7 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
+    section.appendChild(buildSectionImage(state, content.image));
     section.appendChild(buildAiDlcLoopGrid(state, content.steps));
 
     return section;
@@ -236,6 +275,7 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
+    section.appendChild(buildSectionImage(state, content.image));
     section.appendChild(buildSkillCaptureGrid(state, content));
 
     return section;
@@ -243,6 +283,7 @@
 
   window.loadWhatsThisContent = loadWhatsThisContent;
   window.buildBadgeRow = buildBadgeRow;
+  window.buildSectionImage = buildSectionImage;
   window.buildWhatIsThisSection = buildWhatIsThisSection;
   window.buildAiDlcLoopCard = buildAiDlcLoopCard;
   window.buildAiDlcLoopGrid = buildAiDlcLoopGrid;
