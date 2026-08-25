@@ -472,6 +472,16 @@
   function PlayerControls({ state }) {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [volume, setVolume] = React.useState(80);
+    // Issue #465: explicit mute toggle, independent of the slider's own
+    // value — muting must not move the slider (AC1). Combined with
+    // volume === 0 below for the "effective" muted state, since dragging
+    // the slider to 0 auto-mutes without the button being clicked (AC3).
+    const [isMuted, setIsMuted] = React.useState(false);
+    // Remembers the last non-zero slider value so unmuting from
+    // volume === 0 (whether auto-muted by the slider or manually muted
+    // while already at 0) restores that value instead of staying silent
+    // (approved default, issue #465).
+    const lastNonZeroVolumeRef = React.useRef(80);
     const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
     const [isMoreMenuOpen, setIsMoreMenuOpen] = React.useState(false);
     // null = top-level menu; "sleep-timer" / "audio-quality" = that option
@@ -674,6 +684,12 @@
       if (audioRef.current) audioRef.current.volume = volume / 100;
     }, [volume]);
 
+    // AC3: volume === 0 counts as muted even without an explicit click.
+    const effectiveMuted = isMuted || volume === 0;
+    React.useEffect(() => {
+      if (audioRef.current) audioRef.current.muted = effectiveMuted;
+    }, [effectiveMuted]);
+
     // Baseline dropdown affordance (click-outside / Escape to close) — the
     // richer keyboard-menu-navigation and aria-live questions raised in
     // #421's review were never answered, so this stays minimal rather than
@@ -804,6 +820,19 @@
       setIsPlaying((playing) => !playing);
     }
 
+    // Issue #465 (AC1, approved default): unmuting while the slider is at
+    // 0 restores the last non-zero volume rather than leaving it silent;
+    // unmuting a manual mute (slider already > 0) just clears the flag and
+    // leaves the slider untouched.
+    function toggleMute() {
+      if (effectiveMuted) {
+        if (volume === 0) setVolume(lastNonZeroVolumeRef.current || 80);
+        setIsMuted(false);
+      } else {
+        setIsMuted(true);
+      }
+    }
+
     return React.createElement(
       "div",
       { className: "chloe-player-controls", "data-testid": "player-controls" },
@@ -835,16 +864,34 @@
         "Live"
       ),
       React.createElement(
+        "button",
+        {
+          type: "button",
+          className: "chloe-player-controls__mute",
+          "data-testid": "player-mute",
+          "aria-pressed": effectiveMuted,
+          "aria-label": effectiveMuted ? "Unmute" : "Mute",
+          onClick: toggleMute,
+        },
+        React.createElement("i", {
+          className: `bi ${effectiveMuted ? "bi-volume-mute" : "bi-volume-up"}`,
+          "aria-hidden": "true",
+        })
+      ),
+      React.createElement(
         "label",
         { className: "chloe-player-controls__volume", "data-testid": "player-volume" },
-        React.createElement("i", { className: "bi bi-volume-up", "aria-hidden": "true" }),
         React.createElement("input", {
           type: "range",
           min: 0,
           max: 100,
           value: volume,
           "aria-label": "Volume",
-          onChange: (event) => setVolume(Number(event.target.value)),
+          onChange: (event) => {
+            const next = Number(event.target.value);
+            setVolume(next);
+            if (next > 0) lastNonZeroVolumeRef.current = next;
+          },
         })
       ),
       // Issue #446 (Ticket 0, parent #421): More Options button + sub-menu
