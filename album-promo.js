@@ -762,6 +762,26 @@
       }, getShareCopiedFeedbackMs());
     }
 
+    // Issue #482: Pause never tears down hls.js, so its buffer keeps
+    // sitting at wherever it was when paused — a plain audio.play() on
+    // resume just continues from that stale position, which can be
+    // seconds-to-minutes behind live depending on pause duration. Snap back
+    // to the live edge on every resume instead. hls.js keeps
+    // liveSyncPosition current in the background even while paused, so it's
+    // the authoritative live point on that path; the native-HLS fallback
+    // (no hlsRef.current, e.g. Safari) has no such property, so it seeks to
+    // the end of the browser-reported seekable range instead.
+    function resyncToLiveEdge(audio) {
+      const hls = hlsRef.current;
+      if (hls && Number.isFinite(hls.liveSyncPosition)) {
+        audio.currentTime = hls.liveSyncPosition;
+        return;
+      }
+      if (audio.seekable && audio.seekable.length > 0) {
+        audio.currentTime = audio.seekable.end(audio.seekable.length - 1);
+      }
+    }
+
     function togglePlayback() {
       const audio = audioRef.current;
       if (isPlaying) {
@@ -772,6 +792,7 @@
         clearSleepTimerInterval();
         audio.pause();
       } else {
+        resyncToLiveEdge(audio);
         audio.play();
         startTimer();
         // Resume a frozen countdown (if one is active) from the remaining
