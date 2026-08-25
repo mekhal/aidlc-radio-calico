@@ -1,12 +1,13 @@
 # Mega-Linter config (issue #120, rescoped under issue #314, JS flavor
-# rescoped again under issue #317).
+# rescoped again under issue #317, HTML re-added under issue #195).
 #
 # ENABLE is scoped to this repo's "Core Components" per issue #314's
 # decision: JS + CSS (+ YAML/POWERSHELL, left untouched from issue #120 since
-# #314 only named JS/CSS as Core and HTML/Markdown as Non-Core). HTML and
-# MARKDOWN were dropped — issue #314 explicitly asked to disable linting for
-# those as Non-Core, reversing part of issue #120's original "match the
-# decided tech stack" scope (see
+# #314 only named JS/CSS as Core and HTML/Markdown as Non-Core). Issue #314
+# dropped HTML and MARKDOWN as Non-Core; issue #195 re-adds HTML only
+# (@mekhal explicitly asked for it back in both the lint scope and the
+# report — MARKDOWN stays out, matching #195's report scope of
+# CSS+JavaScript+YAML+HTML), reversing that part of #314 (see
 # docs/decisions/2026-07-19-mega-linter-scan-scope.md; issue #314's own
 # decision doc is recorded at its close step).
 #
@@ -18,6 +19,7 @@
 # stack, and running those linters was pure wasted scan time.
 ENABLE:
   - CSS
+  - HTML
   - JAVASCRIPT
   - YAML
   - POWERSHELL

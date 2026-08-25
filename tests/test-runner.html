@@ -352,6 +352,13 @@
          so wired directly here rather than into test-report-suite-files.js. -->
     <script src="reused-js-iife-safety.test.js"></script>
 
+    <!-- issue #195: reports/lint/report-render.js has no app.js DOM surface
+         (it's the standalone Mega-Linter HTML report generator) — same
+         category as the suites above, loaded via shared/load-shared-module.js's
+         generic fetch+inject loader (already included above), so wired
+         directly here rather than into test-report-suite-files.js. -->
+    <script src="lint-report-render.test.js"></script>
+
     <!-- issue #205: report-storage.js/test-report-dashboard.js have no
          app.js DOM surface (same category as the two files above), so their
          suites are wired directly here too. -->
