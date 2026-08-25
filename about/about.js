@@ -46,6 +46,12 @@
  * this PR). Same fixed-English-data-driven-body / i18n-heading split as
  * Section 2's buildProductionStandardsTable()/buildStandardsSection(). See
  * tests/about/about-references.test.js.
+ *
+ * Issue #394 (further review, 2026-08-25): the list-group itself (rendered
+ * by buildReferencesList() above) gets the same theme-token treatment
+ * Section 2's table got — see about.css's .chloe-about-references__list
+ * rule and tests/about/about-references-theme.test.js. No markup change
+ * here, CSS-only fix.
  */
 (function () {
   "use strict";
