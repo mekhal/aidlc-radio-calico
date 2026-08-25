@@ -40,6 +40,19 @@
  * about/about.js's ALBUM_PROMO_TRANSLATIONS gain the whatsThisSkillsHeading
  * key, and before whats-this/whats-this.js's signatures change, per TDD —
  * fails until this issue's Code PR (step 6) adds all three.
+ *
+ * Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
+ * of #505): this section embeds one diagram image via the shared
+ * `buildSectionImage(state, image)` helper (AC2, AC4; see
+ * tests/whats-this/whats-this-images.test.js for that helper's own tests).
+ * Per the issue's approved plan, this section's image is the renamed
+ * `skill-reuse-gates.png` (Capture -> Distill -> Store -> Reuse -> Evolve
+ * diagram — AC1 renames it from `code-pr-gates.png`, its pre-rename,
+ * content-mismatched name).
+ *
+ * Written before data/whats-this-content.json's skillCapture object gains an
+ * `image` field and before whats-this.js exports buildSectionImage, per
+ * TDD — fails until this issue's Code PR (step 6) adds both.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -48,6 +61,18 @@
   const SAMPLE_TRANSLATIONS = {
     en: { whatsThisSkillsHeading: "SKILL CAPTURE & REUSE" },
     th: { whatsThisSkillsHeading: "การเก็บและใช้ทักษะซ้ำ" },
+  };
+
+  const SAMPLE_SKILL_IMAGE = {
+    src: "skill-reuse-gates.png",
+    alt: {
+      en: "Diagram of the Capture, Distill, Store, Reuse, Evolve skill lifecycle",
+      th: "แผนภาพวงจรทักษะ: เก็บ กลั่นกรอง จัดเก็บ นำกลับมาใช้ พัฒนา",
+    },
+    caption: {
+      en: "Every human decision can become a reusable skill for next time.",
+      th: "การตัดสินใจของมนุษย์ทุกครั้งสามารถกลายเป็นทักษะที่นำกลับมาใช้ใหม่ได้",
+    },
   };
 
   const SAMPLE_CONTENT = {
@@ -59,6 +84,7 @@
       title: { en: "Next Time", th: "ครั้งต่อไป" },
       body: { en: "Sample next-time body copy.", th: "ตัวอย่างเนื้อหาครั้งต่อไป" },
     },
+    image: SAMPLE_SKILL_IMAGE,
   };
 
   async function loadWhatsThisContentModule() {
@@ -189,6 +215,48 @@
       expect(section.textContent).not.toContain("The heart of making the agent");
       expect(section.textContent).not.toContain("turning **human decisions** into **reusable skills**");
       expect(section.textContent).not.toContain("clears the same kind of gates as a Code PR");
+    });
+
+    it("loadWhatsThisContent() returns the skillCapture section's image, renamed to skill-reuse-gates.png (the Capture/Distill/Store/Reuse/Evolve diagram), with bilingual alt/caption (issue #509 AC1, AC3)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+
+      expect(content.skillCapture.image).toBeTruthy();
+      expect(content.skillCapture.image.src).toBe("skill-reuse-gates.png");
+      expect(typeof content.skillCapture.image.alt.en).toBe("string");
+      expect(content.skillCapture.image.alt.en.length > 0).toBeTruthy();
+      expect(typeof content.skillCapture.image.alt.th).toBe("string");
+      expect(content.skillCapture.image.alt.th.length > 0).toBeTruthy();
+      expect(typeof content.skillCapture.image.caption.en).toBe("string");
+      expect(content.skillCapture.image.caption.en.length > 0).toBeTruthy();
+      expect(typeof content.skillCapture.image.caption.th).toBe("string");
+      expect(content.skillCapture.image.caption.th.length > 0).toBeTruthy();
+    });
+
+    it("buildSkillCaptureSection(state, content) embeds exactly one image matching the section's image field, via the shared buildSectionImage helper (issue #509 AC2, AC4)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      const images = section.querySelectorAll('[data-testid="whats-this-image"]');
+
+      expect(images.length).toBe(1);
+      const img = images[0].querySelector("img");
+      expect(img.getAttribute("src")).toBe(SAMPLE_SKILL_IMAGE.src);
+      expect(img.getAttribute("alt")).toBe(SAMPLE_SKILL_IMAGE.alt.en);
+    });
+
+    it("buildSkillCaptureSection(state, content) re-renders the image caption in Thai when the language changes (issue #509 AC3)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      state.lang = "th";
+      state.onLanguageChange.forEach((fn) => fn());
+
+      const caption = section.querySelector('[data-testid="whats-this-image-caption"]');
+      expect(caption.textContent).toBe(SAMPLE_SKILL_IMAGE.caption.th);
     });
   });
 })();

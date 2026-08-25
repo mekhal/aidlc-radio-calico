@@ -40,6 +40,17 @@
  * about/about.js's ALBUM_PROMO_TRANSLATIONS gain the whatsThisLoopHeading
  * key, and before whats-this/whats-this.js's signatures change, per TDD —
  * fails until this issue's Code PR (step 6) adds all three.
+ *
+ * Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
+ * of #505): this section embeds one diagram image via the shared
+ * `buildSectionImage(state, image)` helper (AC2, AC4; see
+ * tests/whats-this/whats-this-images.test.js for that helper's own tests).
+ * Per the issue's approved plan, this section's image is the (untouched)
+ * `aidlc-loop-gates.jpg` — the full 7-step loop diagram.
+ *
+ * Written before data/whats-this-content.json's aidlcLoop object gains an
+ * `image` field and before whats-this.js exports buildSectionImage, per
+ * TDD — fails until this issue's Code PR (step 6) adds both.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -72,6 +83,20 @@
     title: { en: titleEn, th: EXPECTED_TITLES_TH[i] },
     description: { en: `Sample description for ${titleEn}.`, th: `คำอธิบายตัวอย่างสำหรับ ${titleEn}` },
   }));
+
+  const SAMPLE_LOOP_IMAGE = {
+    src: "aidlc-loop-gates.jpg",
+    alt: {
+      en: "Diagram of the full 7-step AI-DLC loop with human gates at every odd step",
+      th: "แผนภาพวงจร AI-DLC ทั้ง 7 ขั้นตอน พร้อมประตูอนุมัติของมนุษย์ในทุกขั้นตอนคี่",
+    },
+    caption: {
+      en: "A human gate sits at every odd step of the loop.",
+      th: "ทุกขั้นตอนคี่ของวงจรมีประตูอนุมัติของมนุษย์",
+    },
+  };
+
+  const SAMPLE_AIDLC_CONTENT = { steps: SAMPLE_STEPS, image: SAMPLE_LOOP_IMAGE };
 
   async function loadWhatsThisContentModule() {
     await loadSharedModule(window.__ALBUM_PROMO_SHARED_STATE_JS_PATH__ || "../shared/state.js");
@@ -109,7 +134,7 @@
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const section = window.buildAiDlcLoopSection(state, { steps: SAMPLE_STEPS });
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
       const heading = section.querySelector("h2");
 
       expect(heading).toBeTruthy();
@@ -131,7 +156,7 @@
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const section = window.buildAiDlcLoopSection(state, { steps: SAMPLE_STEPS });
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
       state.lang = "th";
       state.onLanguageChange.forEach((fn) => fn());
 
@@ -153,7 +178,7 @@
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const section = window.buildAiDlcLoopSection(state, { steps: SAMPLE_STEPS });
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
       const cards = Array.from(section.querySelectorAll(".whats-this-loop-card"));
 
       expect(cards.length).toBe(6);
@@ -193,6 +218,48 @@
       const grid = window.buildAiDlcLoopGrid(state, SAMPLE_STEPS);
 
       expect(grid.className).toContain("row");
+    });
+
+    it("loadWhatsThisContent() returns the aidlcLoop section's image, aidlc-loop-gates.jpg (unchanged, already correctly named), with bilingual alt/caption (issue #509 AC1, AC3)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+
+      expect(content.aidlcLoop.image).toBeTruthy();
+      expect(content.aidlcLoop.image.src).toBe("aidlc-loop-gates.jpg");
+      expect(typeof content.aidlcLoop.image.alt.en).toBe("string");
+      expect(content.aidlcLoop.image.alt.en.length > 0).toBeTruthy();
+      expect(typeof content.aidlcLoop.image.alt.th).toBe("string");
+      expect(content.aidlcLoop.image.alt.th.length > 0).toBeTruthy();
+      expect(typeof content.aidlcLoop.image.caption.en).toBe("string");
+      expect(content.aidlcLoop.image.caption.en.length > 0).toBeTruthy();
+      expect(typeof content.aidlcLoop.image.caption.th).toBe("string");
+      expect(content.aidlcLoop.image.caption.th.length > 0).toBeTruthy();
+    });
+
+    it("buildAiDlcLoopSection(state, content) embeds exactly one image matching the section's image field, via the shared buildSectionImage helper (issue #509 AC2, AC4)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
+      const images = section.querySelectorAll('[data-testid="whats-this-image"]');
+
+      expect(images.length).toBe(1);
+      const img = images[0].querySelector("img");
+      expect(img.getAttribute("src")).toBe(SAMPLE_LOOP_IMAGE.src);
+      expect(img.getAttribute("alt")).toBe(SAMPLE_LOOP_IMAGE.alt.en);
+    });
+
+    it("buildAiDlcLoopSection(state, content) re-renders the image caption in Thai when the language changes (issue #509 AC3)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
+      state.lang = "th";
+      state.onLanguageChange.forEach((fn) => fn());
+
+      const caption = section.querySelector('[data-testid="whats-this-image-caption"]');
+      expect(caption.textContent).toBe(SAMPLE_LOOP_IMAGE.caption.th);
     });
   });
 })();
