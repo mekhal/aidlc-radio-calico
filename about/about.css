@@ -36,9 +36,16 @@
 }
 
 /* Issue #151 (Ticket 3 of the About page story): Section 2, "Production-grade
-   Standards" — table content/colors come from Bootstrap's own table.table
-   styling; this only handles the section's heading/spacing, matching
-   Section 1's .chloe-about-project rules above. */
+   Standards" — this handles the section's heading/spacing, matching
+   Section 1's .chloe-about-project rules above.
+
+   Issue #394: the table itself now uses the page's own --chloe-* theme
+   tokens instead of Bootstrap's default table.table styling (white surface,
+   gray borders), so it matches the mint/sage/serif theme in both light and
+   dark mode. Body uses --chloe-sage/--chloe-ink (the page's own section
+   background/text elsewhere); thead uses --chloe-player-box-bg/-fg for
+   contrast — both pairs already flip under [data-chloe-theme="dark"] in
+   shared/tokens.css. */
 
 .chloe-about-standards {
   padding: 2rem;
@@ -48,6 +55,22 @@
   font-style: italic;
   font-weight: 600;
   margin: 0 0 1rem;
+}
+
+.chloe-about-standards__table {
+  background-color: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-color: var(--chloe-ink);
+}
+
+.chloe-about-standards__table thead {
+  background-color: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+}
+
+.chloe-about-standards__table th,
+.chloe-about-standards__table td {
+  border-color: var(--chloe-ink);
 }
 
 /* Issue #151 (Ticket 4 of the About page story): Section 3, "References &
