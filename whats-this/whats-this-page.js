@@ -114,9 +114,9 @@
 
     // Mirrors about-page.js's window.__aboutPageContentReady.
     window.__whatsThisPageContentReady = loadWhatsThisContent().then((content) => {
-      main.appendChild(buildWhatIsThisSection(content.whatIsThis));
-      main.appendChild(buildAiDlcLoopSection(content.aidlcLoop));
-      main.appendChild(buildSkillCaptureSection(content.skillCapture));
+      main.appendChild(buildWhatIsThisSection(state, content.whatIsThis));
+      main.appendChild(buildAiDlcLoopSection(state, content.aidlcLoop));
+      main.appendChild(buildSkillCaptureSection(state, content.skillCapture));
     });
   }
 
