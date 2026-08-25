@@ -8,24 +8,36 @@
   ],
   "productionStandards": [
     {
-      "category": "Code Quality & Linting",
+      "category": { "en": "Code Quality & Linting", "th": "คุณภาพโค้ดและการลินต์" },
       "tool": "Mega-Linter",
-      "description": "Diff-only scan on every PR into develop for fast feedback; full-codebase scan on push to develop and on a weekly schedule."
+      "description": {
+        "en": "Diff-only scan on every PR into develop for fast feedback; full-codebase scan on push to develop and on a weekly schedule.",
+        "th": "สแกนเฉพาะส่วนที่เปลี่ยนแปลง (diff) ทุกครั้งที่มี PR เข้า develop เพื่อผลตอบรับที่รวดเร็ว และสแกนทั้งโค้ดเบสเมื่อ push เข้า develop และตามตารางรายสัปดาห์"
+      }
     },
     {
-      "category": "Security Scan",
+      "category": { "en": "Security Scan", "th": "การสแกนความปลอดภัย" },
       "tool": "Trivy",
-      "description": "Filesystem scan on every PR into develop and on push; results upload as SARIF to GitHub Code Scanning."
+      "description": {
+        "en": "Filesystem scan on every PR into develop and on push; results upload as SARIF to GitHub Code Scanning.",
+        "th": "สแกนระบบไฟล์ทุกครั้งที่มี PR เข้า develop และเมื่อ push ผลลัพธ์จะอัปโหลดเป็น SARIF ไปยัง GitHub Code Scanning"
+      }
     },
     {
-      "category": "Test Coverage",
-      "tool": "100% AC pass rate",
-      "description": "Every feature is covered by unit/integration tests scoped to its Acceptance Criteria (AC); all AC tests must pass before a human can merge."
+      "category": { "en": "Test Coverage", "th": "ความครอบคลุมของการทดสอบ" },
+      "tool": { "en": "100% AC pass rate", "th": "ผ่านเกณฑ์ AC 100%" },
+      "description": {
+        "en": "Every feature is covered by unit/integration tests scoped to its Acceptance Criteria (AC); all AC tests must pass before a human can merge.",
+        "th": "ทุกฟีเจอร์ถูกครอบคลุมด้วยการทดสอบ unit/integration ที่ขอบเขตตาม Acceptance Criteria (AC) โดยการทดสอบทั้งหมดต้องผ่านก่อนที่มนุษย์จะ merge ได้"
+      }
     },
     {
-      "category": "Process Integrity",
-      "tool": "Human decision gates",
-      "description": "Every step of the AI-DLC loop has a human decision gate — a human reviews and approves the plan, the tests, and the code before anything merges."
+      "category": { "en": "Process Integrity", "th": "ความสมบูรณ์ของกระบวนการ" },
+      "tool": { "en": "Human decision gates", "th": "จุดตัดสินใจของมนุษย์" },
+      "description": {
+        "en": "Every step of the AI-DLC loop has a human decision gate — a human reviews and approves the plan, the tests, and the code before anything merges.",
+        "th": "ทุกขั้นตอนของ AI-DLC loop มีจุดตัดสินใจของมนุษย์ — มนุษย์จะตรวจสอบและอนุมัติแผน การทดสอบ และโค้ด ก่อนที่จะ merge ใด ๆ"
+      }
     }
   ],
   "references": [

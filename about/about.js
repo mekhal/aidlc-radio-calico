@@ -27,9 +27,20 @@
  * Standards" — a Bootstrap table listing the four Code-PR gates from the
  * issue body, data-driven from data/about-content.json's new
  * `productionStandards` field (category/tool fixed by the issue body,
- * description sourced from README.md sections 11/12). Table content is fixed
- * English data (no state.lang branching); only buildStandardsSection()'s
- * heading is i18n'd. See tests/about/about-standards.test.js.
+ * description sourced from README.md sections 11/12). See
+ * tests/about/about-standards.test.js.
+ *
+ * Issue #394 (split from #151's close): the table's `category`/`description`
+ * are now bilingual `{ en, th }` objects per row, and `tool` is bilingual for
+ * translatable phrases but stays a fixed string for proper nouns
+ * ("Mega-Linter", "Trivy") — resolve() below picks the right value for
+ * state.lang. Column headers move into ALBUM_PROMO_TRANSLATIONS
+ * (aboutStandardsColCategory/ColTooling/ColDescription), same as
+ * aboutStandardsHeading. buildProductionStandardsTable(standards) becomes
+ * buildProductionStandardsTable(state, standards) — it self-renders and
+ * self-subscribes to state.onLanguageChange, same pattern as
+ * buildProjectSection(state, palette). The table also gets its own theme
+ * tokens in about.css instead of relying on Bootstrap defaults.
  *
  * Issue #151 (Ticket 4 of the About page story): Section 3, "References &
  * Acknowledgements" — a Bootstrap list-group crediting the tools/concepts
@@ -109,16 +120,29 @@
     return section;
   }
 
-  // Fixed English content (category/tool/description all sourced from
-  // data/about-content.json) — same "plain data, no state.lang branching"
-  // precedent as case-study/case-study.js's cards. Only the section heading
-  // is i18n'd, via buildStandardsSection().
-  function buildProductionStandardsTable(standards) {
+  // A row field is either a fixed string (proper nouns like "Mega-Linter")
+  // or a bilingual { en, th } object — resolve() picks the right value for
+  // state.lang.
+  function resolveStandardField(field, lang) {
+    return typeof field === "string" ? field : field[lang];
+  }
+
+  function buildProductionStandardsTable(state, standards) {
     const table = document.createElement("table");
     table.className = "table chloe-about-standards__table";
 
     const thead = document.createElement("thead");
-    thead.innerHTML = "<tr><th scope=\"col\">Category</th><th scope=\"col\">Tooling</th><th scope=\"col\">Description</th></tr>";
+    const headerRow = document.createElement("tr");
+    const categoryHeader = document.createElement("th");
+    categoryHeader.scope = "col";
+    const toolingHeader = document.createElement("th");
+    toolingHeader.scope = "col";
+    const descriptionHeader = document.createElement("th");
+    descriptionHeader.scope = "col";
+    headerRow.appendChild(categoryHeader);
+    headerRow.appendChild(toolingHeader);
+    headerRow.appendChild(descriptionHeader);
+    thead.appendChild(headerRow);
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
@@ -126,13 +150,8 @@
       const row = document.createElement("tr");
 
       const category = document.createElement("td");
-      category.textContent = standard.category;
-
       const tool = document.createElement("td");
-      tool.textContent = standard.tool;
-
       const description = document.createElement("td");
-      description.textContent = standard.description;
 
       row.appendChild(category);
       row.appendChild(tool);
@@ -140,6 +159,24 @@
       tbody.appendChild(row);
     });
     table.appendChild(tbody);
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
+      categoryHeader.textContent = t.aboutStandardsColCategory;
+      toolingHeader.textContent = t.aboutStandardsColTooling;
+      descriptionHeader.textContent = t.aboutStandardsColDescription;
+
+      Array.from(tbody.children).forEach((row, i) => {
+        const standard = standards[i];
+        row.children[0].textContent = resolveStandardField(standard.category, state.lang);
+        row.children[1].textContent = resolveStandardField(standard.tool, state.lang);
+        row.children[2].textContent = resolveStandardField(standard.description, state.lang);
+      });
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     return table;
   }
@@ -161,7 +198,7 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
-    section.appendChild(buildProductionStandardsTable(standards));
+    section.appendChild(buildProductionStandardsTable(state, standards));
 
     return section;
   }
