@@ -251,6 +251,13 @@
          standalone-loader pattern as the about/ block above. -->
     <script src="about/about-standards.test.js"></script>
 
+    <!-- issue #394 (split from #151's close): about/about.css's
+         .chloe-about-standards__table theme-token coverage (AC3) — CSS
+         source-text assertions, same category/pattern as
+         test-report-dashboard-dark-theme.test.js below, so wired directly
+         here rather than into test-report-suite-files.js. -->
+    <script src="about/about-standards-theme.test.js"></script>
+
     <!-- issue #151 (Ticket 4 of the About page story): about/about.js's
          Section 3 ("References & Acknowledgements") content builders — i18n'd
          heading + a Bootstrap list-group crediting the tools/concepts named
