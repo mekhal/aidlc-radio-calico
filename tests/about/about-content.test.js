@@ -2,11 +2,10 @@
  * Issue #151 (Ticket 2 of the About page story), plan confirmed at step 3
  * re-approval (2026-08-16): Section 1, "The Radio Calico Project" — a
  * serif-styled heading + description (i18n, per the human's 2.5 answer
- * "reuse theme & use i18n") plus the 5-swatch brand color palette from the
- * issue body, data-driven from data/about-content.json (per the human's
- * 2.4 answer "content must reusable") rather than hardcoded per-swatch
- * markup — same fetch-a-JSON-file pattern as case-study/case-study.js's
- * loadCaseStudies() (see tests/case-study/case-study.test.js).
+ * "reuse theme & use i18n"), data-driven from data/about-content.json (per
+ * the human's 2.4 answer "content must reusable") — same fetch-a-JSON-file
+ * pattern as case-study/case-study.js's loadCaseStudies() (see
+ * tests/case-study/case-study.test.js).
  *
  * about/about.js is a new content-building module for About's sections
  * (mirrors the case-study.js / case-study-page.js split already shipped
@@ -17,15 +16,14 @@
  * (about-page.js's own scaffold behavior is Ticket 1's already-shipped
  * scope, see tests/about/about-page.test.js), so it is not re-tested here.
  *
- * Palette values are fixed by the issue body: Mint #D8F2D5, Forest Green
- * #1F4E23, Teal #38A29D, Calico Orange #EFA63C, Charcoal #231F20.
- *
- * buildProjectSection(state, palette) takes the resolved palette array as a
- * plain argument rather than calling loadAboutContent() itself, so the
- * section builder stays synchronous/directly testable — the Code PR's
- * about-page.js wiring is responsible for awaiting loadAboutContent() once
- * (mirrors the already-shipped window.__aboutPageI18nReady await pattern)
- * and passing the resolved array in.
+ * Issue #394 (further review, 2026-08-25): the 5-swatch brand color palette
+ * card grid was removed entirely per the human's explicit decision — this
+ * suite no longer asserts palette/swatch rendering, and
+ * buildProjectSection(state) no longer takes a palette argument. The fixed
+ * palette values (Mint #D8F2D5, Forest Green #1F4E23, Teal #38A29D, Calico
+ * Orange #EFA63C, Charcoal #231F20) still round-trip through
+ * loadAboutContent() below since data/about-content.json's `colorPalette`
+ * field itself wasn't the target of this fix.
  *
  * Written before about/about.js and data/about-content.json exist, per
  * TDD — fails until this ticket's Code PR (step 6) creates both.
@@ -80,27 +78,11 @@
       });
     });
 
-    it("buildColorPalette(palette) renders one swatch per entry in a responsive Bootstrap grid, with the correct background color", async () => {
-      await loadAboutContentModule();
-
-      const grid = window.buildColorPalette(EXPECTED_PALETTE);
-      const swatches = Array.from(grid.querySelectorAll(".about-palette__swatch"));
-
-      expect(grid.classList.contains("row")).toBeTruthy();
-      expect(swatches.length).toBe(5);
-      swatches.forEach((swatch, i) => {
-        expect(swatch.closest('[class*="col-"]')).toBeTruthy();
-        expect(swatch.style.backgroundColor).toBeTruthy();
-        expect(swatch.textContent).toContain(EXPECTED_PALETTE[i].name);
-        expect(swatch.textContent).toContain(EXPECTED_PALETTE[i].hex);
-      });
-    });
-
-    it("buildProjectSection(state, palette) renders a serif-styled heading and description sourced from i18n", async () => {
+    it("buildProjectSection(state) renders a serif-styled heading and description sourced from i18n", async () => {
       await loadAboutContentModule();
       const state = sampleState();
 
-      const section = window.buildProjectSection(state, EXPECTED_PALETTE);
+      const section = window.buildProjectSection(state);
       const heading = section.querySelector("h1, h2");
 
       expect(heading).toBeTruthy();
@@ -108,11 +90,11 @@
       expect(section.textContent).toContain(SAMPLE_TRANSLATIONS.en.aboutProjectDescription);
     });
 
-    it("buildProjectSection(state, palette) re-renders its heading/description text when the language changes", async () => {
+    it("buildProjectSection(state) re-renders its heading/description text when the language changes", async () => {
       await loadAboutContentModule();
       const state = sampleState();
 
-      const section = window.buildProjectSection(state, EXPECTED_PALETTE);
+      const section = window.buildProjectSection(state);
       state.lang = "th";
       state.onLanguageChange.forEach((fn) => fn());
 
@@ -121,13 +103,14 @@
       expect(section.textContent).toContain(SAMPLE_TRANSLATIONS.th.aboutProjectDescription);
     });
 
-    it("buildProjectSection(state, palette) embeds the color palette grid within the section", async () => {
+    it("buildProjectSection(state) renders no color palette swatch card (removed per issue #394)", async () => {
       await loadAboutContentModule();
       const state = sampleState();
 
-      const section = window.buildProjectSection(state, EXPECTED_PALETTE);
+      const section = window.buildProjectSection(state);
 
-      expect(section.querySelector(".about-palette__swatch")).toBeTruthy();
+      expect(section.querySelector(".about-palette__swatch")).toBeFalsy();
+      expect(window.buildColorPalette).toBeFalsy();
     });
   });
 })();

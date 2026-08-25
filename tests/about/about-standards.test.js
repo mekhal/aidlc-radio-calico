@@ -53,7 +53,7 @@
  * buildProductionStandardsTable(state, standards) — it now needs state.lang
  * (for row content) and ALBUM_PROMO_TRANSLATIONS (for headers), so it
  * self-renders and self-subscribes to state.onLanguageChange, same pattern
- * as buildProjectSection(state, palette)'s render()/state.onLanguageChange.push().
+ * as buildProjectSection(state)'s render()/state.onLanguageChange.push().
  * buildStandardsSection(state, standards) passes state through instead of
  * building the table from plain data.
  *

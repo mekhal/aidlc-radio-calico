@@ -1,9 +1,11 @@
 /* Issue #151 (Ticket 2 of the About page story): Section 1, "The Radio
    Calico Project" — heading/description inherit the page's existing serif
    font-family and --chloe-sage background from album-promo.css (already
-   linked by pages/about.html), so only the palette grid needs its own
-   rules here. Swatch fill colors come from data/about-content.json via
-   about/about.js's inline style.backgroundColor, not CSS, per AC2.2/AC2.3. */
+   linked by pages/about.html).
+
+   Issue #394 (further review, 2026-08-25): the palette swatch grid
+   (.about-palette__col / .about-palette__swatch) was removed along with its
+   markup in about/about.js — no swatch visuals render in this section. */
 
 .chloe-about-project {
   padding: 2rem;
@@ -20,21 +22,6 @@
   margin: 0 0 2rem;
 }
 
-.about-palette__col {
-  margin-bottom: 1rem;
-}
-
-.about-palette__swatch {
-  border-radius: 0.5rem;
-  padding: 1.5rem 1rem;
-  min-height: 5rem;
-  display: flex;
-  align-items: flex-end;
-  font-family: "Montserrat", sans-serif;
-  font-size: 0.85rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
 /* Issue #151 (Ticket 3 of the About page story): Section 2, "Production-grade
    Standards" — this handles the section's heading/spacing, matching
    Section 1's .chloe-about-project rules above.
@@ -45,7 +32,17 @@
    dark mode. Body uses --chloe-sage/--chloe-ink (the page's own section
    background/text elsewhere); thead uses --chloe-player-box-bg/-fg for
    contrast — both pairs already flip under [data-chloe-theme="dark"] in
-   shared/tokens.css. */
+   shared/tokens.css.
+
+   Issue #394 (further review, 2026-08-25): the first pass only set
+   background-color/color on the <table> element, which doesn't reach the
+   cells — background-color never inherits, and Bootstrap 5.3's
+   `.table > :not(caption) > * > *` rule re-declares `color`/
+   `background-color` on every th/td directly via its own --bs-table-color/
+   --bs-table-bg custom properties, so the table still rendered
+   Bootstrap-default white/black regardless. Fix: set those same Bootstrap
+   custom properties (which DO inherit) instead of plain background-color/
+   color, so Bootstrap's own cell rule resolves to our theme tokens. */
 
 .chloe-about-standards {
   padding: 2rem;
@@ -58,12 +55,16 @@
 }
 
 .chloe-about-standards__table {
+  --bs-table-bg: var(--chloe-sage);
+  --bs-table-color: var(--chloe-ink);
   background-color: var(--chloe-sage);
   color: var(--chloe-ink);
   border-color: var(--chloe-ink);
 }
 
 .chloe-about-standards__table thead {
+  --bs-table-bg: var(--chloe-player-box-bg);
+  --bs-table-color: var(--chloe-player-box-fg);
   background-color: var(--chloe-player-box-bg);
   color: var(--chloe-player-box-fg);
 }
