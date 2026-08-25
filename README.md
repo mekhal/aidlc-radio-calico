@@ -180,7 +180,7 @@ The AI then does **step 4** (Test PR) → Human **approves (step 5)** → AI **s
 The heart of making the agent "keep getting better" is turning **human decisions** into **reusable skills** — but a skill is only trusted for reuse once it clears the same kind of gates as a Code PR.
 
 <div align="center">
-  <img src="skill-reuse-gates.jpg" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, and Traceability, all required before a skill is reused" width="900" />
+  <img src="skill-reuse-gates.png" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, and Traceability, all required before a skill is reused" width="900" />
 </div>
 
 **Quality & Safety Gates for Skill Reuse:** before a decision captured from a closed loop is trusted as a reusable skill, the loop it came from must have cleared:
@@ -282,7 +282,7 @@ This autonomy is **knowledge-governed, not open-ended**: a decision only becomes
 ## 11. Production-grade Standards
 
 <div align="center">
-  <img src="code-pr-gates.png" alt="Step 6: Code PR Gates — Security, Quality, Reviewability, and Traceability, all required before Human Merge" width="900" />
+  <img src="code-pr-gates.jpg" alt="Step 6: Code PR Gates — Security, Quality, Reviewability, and Traceability, all required before Human Merge" width="900" />
 </div>
 
 Every Code PR (step 6) must pass **all four gates** below — Security, Quality, Reviewability, Traceability — before a human can merge:

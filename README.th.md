@@ -180,7 +180,7 @@ Integration test: HLS player โหลด stream URL สำเร็จ
 หัวใจของการทำให้ agent "เก่งขึ้นเรื่อย ๆ" คือการเปลี่ยน **การตัดสินใจของมนุษย์** ให้กลายเป็น **skill ที่นำกลับมาใช้ซ้ำได้** — แต่ skill จะถูกไว้ใจให้ reuse ได้ก็ต่อเมื่อผ่าน gate แบบเดียวกับ Code PR ก่อน
 
 <div align="center">
-  <img src="skill-reuse-gates.jpg" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อนนำ skill กลับมาใช้ซ้ำ" width="900" />
+  <img src="skill-reuse-gates.png" alt="Quality & Safety Gates for Skill Reuse — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อนนำ skill กลับมาใช้ซ้ำ" width="900" />
 </div>
 
 **Quality & Safety Gates for Skill Reuse:** ก่อนที่การตัดสินใจจาก loop ที่ปิดไปแล้วจะถูกไว้ใจให้เป็น skill ที่ reuse ได้ loop ที่มันมาจากต้องผ่าน:
@@ -282,7 +282,7 @@ Autonomy นี้ **ถูกควบคุมด้วยความรู�
 ## 11. มาตรฐาน Production-grade
 
 <div align="center">
-  <img src="code-pr-gates.png" alt="ขั้น 6: Code PR Gates — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อน Human Merge" width="900" />
+  <img src="code-pr-gates.jpg" alt="ขั้น 6: Code PR Gates — Security, Quality, Reviewability, Traceability ต้องผ่านทั้งหมดก่อน Human Merge" width="900" />
 </div>
 
 ทุก Code PR (ขั้น 6) ต้องผ่าน **ทั้ง 4 gate** ด้านล่าง — Security, Quality, Reviewability, Traceability — ก่อนมนุษย์จะ merge:

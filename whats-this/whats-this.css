@@ -148,3 +148,23 @@
     padding: 1.25rem;
   }
 }
+
+/* Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
+   of #505): shared buildSectionImage() output (AC4) - reused by all 3
+   sections above, so styled once here rather than per-section. */
+
+.whats-this-image {
+  margin: 0 0 1.5rem;
+}
+
+.whats-this-image__img {
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.whats-this-image__caption {
+  font-size: 0.85rem;
+  color: var(--chloe-ink);
+  opacity: 0.75;
+  margin: 0.5rem 0 0;
+}

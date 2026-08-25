@@ -4,7 +4,18 @@
       "en": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
       "th": "Radio Calico ไม่ใช่แค่เครื่องเล่นวิทยุ แต่คือการสาธิตสด สิ่งที่ถูกทดสอบจริงคือกระบวนการทำงานเอง: มนุษย์และ Claude GitHub agent ทำงานร่วมกันทั้งหมดผ่าน GitHub issues และ pull requests ตั้งแต่การวางแผน ทดสอบ เขียนโค้ด ไปจนถึงรีวิว เพื่อพิสูจน์ว่า AI agent สามารถส่งมอบงานระดับโปรดักชันได้ครบวงจร โดยมีมนุษย์อนุมัติทุกขั้นตอน"
     },
-    "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"]
+    "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"],
+    "image": {
+      "src": "code-pr-gates.jpg",
+      "alt": {
+        "en": "Diagram of the Step 7 Code PR gates: Security, Quality, Reviewability, and Traceability, all required before a human merges",
+        "th": "แผนภาพประตูตรวจสอบขั้นที่ 7 ของ Code PR: Security, Quality, Reviewability และ Traceability ต้องผ่านทั้งหมดก่อนมนุษย์ merge"
+      },
+      "caption": {
+        "en": "Every Code PR clears four quality gates before a human merges it.",
+        "th": "ทุก Code PR ต้องผ่านสี่ประตูคุณภาพก่อนมนุษย์จะ merge"
+      }
+    }
   },
   "aidlcLoop": {
     "steps": [
@@ -50,7 +61,18 @@
           "th": "บทเรียนที่ได้ระหว่างทางถูกบันทึกและแปลงเป็นความรู้ที่นำกลับมาใช้ใหม่ได้ในรอบถัดไป"
         }
       }
-    ]
+    ],
+    "image": {
+      "src": "aidlc-loop-gates.jpg",
+      "alt": {
+        "en": "Diagram of the full 7-step AI-DLC loop, from issue trigger through to close and capture",
+        "th": "แผนภาพวงจร AI-DLC ทั้ง 7 ขั้นตอน ตั้งแต่เปิด issue จนถึงปิดงานและบันทึกทักษะ"
+      },
+      "caption": {
+        "en": "The loop repeats every time, with a human gate at every odd step.",
+        "th": "วงจรนี้วนซ้ำทุกครั้ง โดยมีประตูให้มนุษย์ตรวจสอบในทุกขั้นคี่"
+      }
+    }
   },
   "skillCapture": {
     "firstTime": {
@@ -65,6 +87,17 @@
       "body": {
         "en": "In later loops, the agent automatically checks that stored skill and applies it, so its behavior stays consistent with what was decided before.",
         "th": "ในรอบถัดไป agent จะตรวจสอบทักษะที่บันทึกไว้โดยอัตโนมัติและนำมาใช้ เพื่อให้พฤติกรรมสอดคล้องกับสิ่งที่ตัดสินใจไว้ก่อนหน้า"
+      }
+    },
+    "image": {
+      "src": "skill-reuse-gates.png",
+      "alt": {
+        "en": "Diagram of the skill lifecycle: Capture, Distill, Store, Reuse, and Evolve",
+        "th": "แผนภาพวงจรทักษะ: Capture, Distill, Store, Reuse และ Evolve"
+      },
+      "caption": {
+        "en": "A human decision becomes a skill the agent reuses and refines over time.",
+        "th": "การตัดสินใจของมนุษย์กลายเป็นทักษะที่ agent นำกลับมาใช้และพัฒนาต่อได้"
       }
     }
   }
