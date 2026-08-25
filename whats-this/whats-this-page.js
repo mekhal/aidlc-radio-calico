@@ -85,6 +85,19 @@
     return main;
   }
 
+  // Issue #509 follow-up: content.image.src values (e.g. "aidlc-loop-gates.jpg")
+  // are repo-root-relative, same as the logo path buildHeader() above already
+  // rewrites with a "../" prefix — pages/whats-this.html sits one directory
+  // below the repo root. buildSectionImage() (whats-this.js) stays root-relative
+  // and untouched, same as buildLogo() does for the logo, so this page-level
+  // helper applies the rewrite instead of baking a page assumption into the
+  // reusable builder.
+  function rewriteSectionImagePaths(root) {
+    root.querySelectorAll(".whats-this-image__img").forEach((img) => {
+      img.setAttribute("src", `../${img.getAttribute("src")}`);
+    });
+  }
+
   function initWhatsThisPage() {
     const root = document.getElementById("whats-this-root");
     if (!root) return;
@@ -117,11 +130,13 @@
       main.appendChild(buildWhatIsThisSection(state, content.whatIsThis));
       main.appendChild(buildAiDlcLoopSection(state, content.aidlcLoop));
       main.appendChild(buildSkillCaptureSection(state, content.skillCapture));
+      rewriteSectionImagePaths(main);
     });
   }
 
   window.buildHeader = buildHeader;
   window.buildWhatsThisMain = buildWhatsThisMain;
+  window.rewriteSectionImagePaths = rewriteSectionImagePaths;
 
   initWhatsThisPage();
 })();
