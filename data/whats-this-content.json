@@ -1,47 +1,71 @@
 {
   "whatIsThis": {
-    "heading": "WHAT IS THIS?",
-    "body": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
+    "body": {
+      "en": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
+      "th": "Radio Calico ไม่ใช่แค่เครื่องเล่นวิทยุ แต่คือการสาธิตสด สิ่งที่ถูกทดสอบจริงคือกระบวนการทำงานเอง: มนุษย์และ Claude GitHub agent ทำงานร่วมกันทั้งหมดผ่าน GitHub issues และ pull requests ตั้งแต่การวางแผน ทดสอบ เขียนโค้ด ไปจนถึงรีวิว เพื่อพิสูจน์ว่า AI agent สามารถส่งมอบงานระดับโปรดักชันได้ครบวงจร โดยมีมนุษย์อนุมัติทุกขั้นตอน"
+    },
     "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"]
   },
   "aidlcLoop": {
-    "heading": "THE AI-DLC LOOP",
     "steps": [
       {
-        "title": "Issue Trigger",
-        "description": "A human kicks things off by opening a GitHub issue describing what's needed."
+        "title": { "en": "Issue Trigger", "th": "จุดเริ่ม Issue" },
+        "description": {
+          "en": "A human kicks things off by opening a GitHub issue describing what's needed.",
+          "th": "มนุษย์เป็นผู้เริ่มต้นด้วยการเปิด GitHub issue อธิบายสิ่งที่ต้องการ"
+        }
       },
       {
-        "title": "Plan & AC Gate",
-        "description": "The AI proposes a plan with clear success criteria, and a human must approve it before anything else happens."
+        "title": { "en": "Plan & AC Gate", "th": "ประตูแผน & AC" },
+        "description": {
+          "en": "The AI proposes a plan with clear success criteria, and a human must approve it before anything else happens.",
+          "th": "AI เสนอแผนพร้อมเกณฑ์ความสำเร็จที่ชัดเจน และมนุษย์ต้องอนุมัติก่อนที่จะเริ่มขั้นตอนอื่นใด"
+        }
       },
       {
-        "title": "TDD Gate",
-        "description": "The AI writes tests that describe the desired outcome before any feature code exists, and a human signs off on them first."
+        "title": { "en": "TDD Gate", "th": "ประตู TDD" },
+        "description": {
+          "en": "The AI writes tests that describe the desired outcome before any feature code exists, and a human signs off on them first.",
+          "th": "AI เขียนเทสต์ที่อธิบายผลลัพธ์ที่ต้องการก่อนที่โค้ดฟีเจอร์จะมีอยู่ และมนุษย์ต้องอนุมัติเทสต์ก่อน"
+        }
       },
       {
-        "title": "Implementation Gate",
-        "description": "Only after the tests are approved does the AI write the actual feature code to make them pass."
+        "title": { "en": "Implementation Gate", "th": "ประตูการพัฒนาโค้ด" },
+        "description": {
+          "en": "Only after the tests are approved does the AI write the actual feature code to make them pass.",
+          "th": "หลังจากเทสต์ได้รับการอนุมัติแล้วเท่านั้น AI จะเขียนโค้ดฟีเจอร์จริงเพื่อให้เทสต์ผ่าน"
+        }
       },
       {
-        "title": "Review & Merge Gate",
-        "description": "A human reviews the finished work against quality and security checks, then merges it in to close the loop."
+        "title": { "en": "Review & Merge Gate", "th": "ประตูรีวิว & Merge" },
+        "description": {
+          "en": "A human reviews the finished work against quality and security checks, then merges it in to close the loop.",
+          "th": "มนุษย์รีวิวงานที่เสร็จแล้วตามเกณฑ์คุณภาพและความปลอดภัย จากนั้น merge เพื่อปิดวงจร"
+        }
       },
       {
-        "title": "Close & Capture Gate",
-        "description": "Lessons learned along the way get written down and turned into reusable know-how for the next round."
+        "title": { "en": "Close & Capture Gate", "th": "ประตูปิดงาน & บันทึกทักษะ" },
+        "description": {
+          "en": "Lessons learned along the way get written down and turned into reusable know-how for the next round.",
+          "th": "บทเรียนที่ได้ระหว่างทางถูกบันทึกและแปลงเป็นความรู้ที่นำกลับมาใช้ใหม่ได้ในรอบถัดไป"
+        }
       }
     ]
   },
   "skillCapture": {
-    "heading": "SKILL CAPTURE & REUSE",
     "firstTime": {
-      "title": "First Time",
-      "body": "When a human makes a call - choosing an approach, setting a rule, giving feedback - the agent writes it down and saves it as a new skill in .claude/skills/."
+      "title": { "en": "First Time", "th": "ครั้งแรก" },
+      "body": {
+        "en": "When a human makes a call - choosing an approach, setting a rule, giving feedback - the agent writes it down and saves it as a new skill in .claude/skills/.",
+        "th": "เมื่อมนุษย์ตัดสินใจ - เลือกแนวทาง ตั้งกฎ หรือให้ฟีดแบ็ก - agent จะบันทึกไว้และเก็บเป็นทักษะใหม่ใน .claude/skills/"
+      }
     },
     "nextTime": {
-      "title": "Next Time",
-      "body": "In later loops, the agent automatically checks that stored skill and applies it, so its behavior stays consistent with what was decided before."
+      "title": { "en": "Next Time", "th": "ครั้งต่อไป" },
+      "body": {
+        "en": "In later loops, the agent automatically checks that stored skill and applies it, so its behavior stays consistent with what was decided before.",
+        "th": "ในรอบถัดไป agent จะตรวจสอบทักษะที่บันทึกไว้โดยอัตโนมัติและนำมาใช้ เพื่อให้พฤติกรรมสอดคล้องกับสิ่งที่ตัดสินใจไว้ก่อนหน้า"
+      }
     }
   }
 }

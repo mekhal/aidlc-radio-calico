@@ -10,13 +10,6 @@
  * fetch-a-JSON-file pattern as about/about.js's loadAboutContent() and
  * case-study/case-study.js's loadCaseStudies().
  *
- * Unlike about/about.js's buildProjectSection() (i18n'd heading/description
- * via ALBUM_PROMO_TRANSLATIONS), this section has no i18n branching - AC4
- * sources all of its copy from whats-this-content.json directly, matching
- * about.js's Section 2/3 precedent of fixed-English-data-driven body content
- * (buildProductionStandardsTable()/buildReferencesList()), extended here to
- * the heading as well since AC1 fixes the heading text itself.
- *
  * buildWhatIsThisSection(content) takes the resolved whatIsThis object as a
  * plain argument rather than calling loadWhatsThisContent() itself, so the
  * section builder stays synchronous/directly testable - whats-this-page.js
@@ -40,10 +33,6 @@
  * Reuses case-study/case-study.js's buildCaseStudyCard()/buildCaseStudyGrid()
  * Bootstrap col-md-4 responsive-grid precedent (AC3: stacks vertically below
  * md, 3-per-row grid at md and up) rather than inventing a new layout.
- * buildAiDlcLoopSection(content) takes the resolved aidlcLoop object as a
- * plain argument, same synchronous/directly-testable convention as
- * buildWhatIsThisSection() above - whats-this-page.js awaits
- * loadWhatsThisContent() once and passes both resolved sub-objects in.
  *
  * Issue #405 (Ticket 4 of the "What's this" page story, part of #152), step 3
  * waiver approved (2026-08-20): Section 3, "Skill Capture & Reuse" - a
@@ -55,10 +44,20 @@
  * the agent automatically reuses that stored skill in later loops for more
  * consistent behavior (AC3) - both a general-audience paraphrase of README
  * section 7, not verbatim (AC4). Sourced from data/whats-this-content.json's
- * new skillCapture field. buildSkillCaptureSection(content) takes the
- * resolved skillCapture object as a plain argument, same
- * synchronous/directly-testable convention as the two section builders
- * above.
+ * new skillCapture field.
+ *
+ * Issue #508 (Ticket 1 of the "What's this" bilingual story, part of #505),
+ * AC1-AC5: all 3 sections become bilingual. Each content field is now either
+ * a fixed string (badges - proper nouns/terms-of-art, same treatment as
+ * about.js's "Mega-Linter"/"Trivy") or a bilingual { en, th } object,
+ * resolved via the shared resolveBilingualField() (shared/helpers.js). The
+ * 3 section headings and the 6 AI-DLC loop step names (per @mekhal's
+ * 2026-08-25 decision to translate everything) move out of the content JSON
+ * into ALBUM_PROMO_TRANSLATIONS i18n keys (whatsThisWhatHeading/
+ * whatsThisLoopHeading/whatsThisSkillsHeading). Every builder that renders
+ * translatable text now takes `state` first, self-renders, and
+ * self-subscribes to state.onLanguageChange - same pattern as about.js's
+ * buildProjectSection(state)/buildProductionStandardsTable(state, standards).
  */
 (function () {
   "use strict";
@@ -85,18 +84,25 @@
     return row;
   }
 
-  function buildWhatIsThisSection(content) {
+  function buildWhatIsThisSection(state, content) {
     const section = document.createElement("section");
     section.className = "chloe-whats-this-what";
     section.dataset.testid = "whats-this-what-section";
 
     const heading = document.createElement("h2");
     heading.className = "chloe-whats-this-what__heading";
-    heading.textContent = content.heading;
 
     const body = document.createElement("p");
     body.className = "chloe-whats-this-what__body";
-    body.textContent = content.body;
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].whatsThisWhatHeading;
+      body.textContent = resolveBilingualField(content.body, state.lang);
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     section.appendChild(heading);
     section.appendChild(body);
@@ -105,7 +111,7 @@
     return section;
   }
 
-  function buildAiDlcLoopCard(step, index) {
+  function buildAiDlcLoopCard(state, step, index) {
     const col = document.createElement("div");
     col.className = "col-md-4 whats-this-loop-card-col";
     col.dataset.testid = "whats-this-loop-card-col";
@@ -120,11 +126,17 @@
 
     const title = document.createElement("h3");
     title.className = "whats-this-loop-card__title";
-    title.textContent = step.title;
 
     const description = document.createElement("p");
     description.className = "whats-this-loop-card__description";
-    description.textContent = step.description;
+
+    function render() {
+      title.textContent = resolveBilingualField(step.title, state.lang);
+      description.textContent = resolveBilingualField(step.description, state.lang);
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     card.appendChild(number);
     card.appendChild(title);
@@ -134,32 +146,39 @@
     return col;
   }
 
-  function buildAiDlcLoopGrid(steps) {
+  function buildAiDlcLoopGrid(state, steps) {
     const grid = document.createElement("div");
     grid.className = "row whats-this-loop-grid";
     grid.dataset.testid = "whats-this-loop-grid";
 
-    steps.forEach((step, index) => grid.appendChild(buildAiDlcLoopCard(step, index)));
+    steps.forEach((step, index) => grid.appendChild(buildAiDlcLoopCard(state, step, index)));
 
     return grid;
   }
 
-  function buildAiDlcLoopSection(content) {
+  function buildAiDlcLoopSection(state, content) {
     const section = document.createElement("section");
     section.className = "chloe-whats-this-loop";
     section.dataset.testid = "whats-this-loop-section";
 
     const heading = document.createElement("h2");
     heading.className = "chloe-whats-this-loop__heading";
-    heading.textContent = content.heading;
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].whatsThisLoopHeading;
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     section.appendChild(heading);
-    section.appendChild(buildAiDlcLoopGrid(content.steps));
+    section.appendChild(buildAiDlcLoopGrid(state, content.steps));
 
     return section;
   }
 
-  function buildSkillCaptureCard(card, modifierClass) {
+  function buildSkillCaptureCard(state, card, modifierClass) {
     const col = document.createElement("div");
     col.className = "col-md-6 whats-this-skill-card-col";
     col.dataset.testid = "whats-this-skill-card-col";
@@ -170,11 +189,17 @@
 
     const title = document.createElement("h3");
     title.className = "whats-this-skill-card__title";
-    title.textContent = card.title;
 
     const body = document.createElement("p");
     body.className = "whats-this-skill-card__body";
-    body.textContent = card.body;
+
+    function render() {
+      title.textContent = resolveBilingualField(card.title, state.lang);
+      body.textContent = resolveBilingualField(card.body, state.lang);
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     box.appendChild(title);
     box.appendChild(body);
@@ -183,28 +208,35 @@
     return col;
   }
 
-  function buildSkillCaptureGrid(content) {
+  function buildSkillCaptureGrid(state, content) {
     const grid = document.createElement("div");
     grid.className = "row whats-this-skill-grid";
     grid.dataset.testid = "whats-this-skill-grid";
 
-    grid.appendChild(buildSkillCaptureCard(content.firstTime, "whats-this-skill-card--first"));
-    grid.appendChild(buildSkillCaptureCard(content.nextTime, "whats-this-skill-card--next"));
+    grid.appendChild(buildSkillCaptureCard(state, content.firstTime, "whats-this-skill-card--first"));
+    grid.appendChild(buildSkillCaptureCard(state, content.nextTime, "whats-this-skill-card--next"));
 
     return grid;
   }
 
-  function buildSkillCaptureSection(content) {
+  function buildSkillCaptureSection(state, content) {
     const section = document.createElement("section");
     section.className = "chloe-whats-this-skills";
     section.dataset.testid = "whats-this-skills-section";
 
     const heading = document.createElement("h2");
     heading.className = "chloe-whats-this-skills__heading";
-    heading.textContent = content.heading;
+
+    function render() {
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].whatsThisSkillsHeading;
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     section.appendChild(heading);
-    section.appendChild(buildSkillCaptureGrid(content));
+    section.appendChild(buildSkillCaptureGrid(state, content));
 
     return section;
   }
@@ -215,12 +247,6 @@
   window.buildAiDlcLoopCard = buildAiDlcLoopCard;
   window.buildAiDlcLoopGrid = buildAiDlcLoopGrid;
   window.buildAiDlcLoopSection = buildAiDlcLoopSection;
-  window.buildSkillCaptureCard = buildSkillCaptureCard;
-  window.buildSkillCaptureGrid = buildSkillCaptureGrid;
-  window.buildSkillCaptureSection = buildSkillCaptureSection;
-  window.loadWhatsThisContent = loadWhatsThisContent;
-  window.buildBadgeRow = buildBadgeRow;
-  window.buildWhatIsThisSection = buildWhatIsThisSection;
   window.buildSkillCaptureCard = buildSkillCaptureCard;
   window.buildSkillCaptureGrid = buildSkillCaptureGrid;
   window.buildSkillCaptureSection = buildSkillCaptureSection;

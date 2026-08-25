@@ -99,13 +99,6 @@
     return section;
   }
 
-  // A field is either a fixed string (proper nouns like "Mega-Linter") or a
-  // bilingual { en, th } object — resolve() picks the right value for
-  // state.lang. Shared by the Standards table and the References list.
-  function resolveBilingualField(field, lang) {
-    return typeof field === "string" ? field : field[lang];
-  }
-
   function buildProductionStandardsTable(state, standards) {
     const table = document.createElement("table");
     table.className = "table chloe-about-standards__table";
