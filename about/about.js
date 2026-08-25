@@ -50,8 +50,18 @@
  * Issue #394 (further review, 2026-08-25): the list-group itself (rendered
  * by buildReferencesList() above) gets the same theme-token treatment
  * Section 2's table got — see about.css's .chloe-about-references__list
- * rule and tests/about/about-references-theme.test.js. No markup change
- * here, CSS-only fix.
+ * rule and tests/about/about-references-theme.test.js.
+ *
+ * Issue #394 (further review, 2026-08-25, second pass): each reference's
+ * `name`/`description` are now bilingual `{ en, th }` objects (proper nouns
+ * like "Claude GitHub Agent" and the Udemy course title stay fixed strings,
+ * same mixed-shape rule already applied to the Standards table's `tool`
+ * column) — resolveBilingualField() picks the right value for state.lang.
+ * buildReferencesList(references) becomes buildReferencesList(state,
+ * references) — it self-renders and self-subscribes to
+ * state.onLanguageChange, same pattern as buildProductionStandardsTable().
+ * Test PR waived this turn; coverage bundled into this Code PR instead —
+ * see tests/about/about-references.test.js.
  */
 (function () {
   "use strict";
@@ -89,10 +99,10 @@
     return section;
   }
 
-  // A row field is either a fixed string (proper nouns like "Mega-Linter")
-  // or a bilingual { en, th } object — resolve() picks the right value for
-  // state.lang.
-  function resolveStandardField(field, lang) {
+  // A field is either a fixed string (proper nouns like "Mega-Linter") or a
+  // bilingual { en, th } object — resolve() picks the right value for
+  // state.lang. Shared by the Standards table and the References list.
+  function resolveBilingualField(field, lang) {
     return typeof field === "string" ? field : field[lang];
   }
 
@@ -138,9 +148,9 @@
 
       Array.from(tbody.children).forEach((row, i) => {
         const standard = standards[i];
-        row.children[0].textContent = resolveStandardField(standard.category, state.lang);
-        row.children[1].textContent = resolveStandardField(standard.tool, state.lang);
-        row.children[2].textContent = resolveStandardField(standard.description, state.lang);
+        row.children[0].textContent = resolveBilingualField(standard.category, state.lang);
+        row.children[1].textContent = resolveBilingualField(standard.tool, state.lang);
+        row.children[2].textContent = resolveBilingualField(standard.description, state.lang);
       });
     }
 
@@ -172,43 +182,62 @@
     return section;
   }
 
-  // Fixed English content (name/description both sourced from
-  // data/about-content.json) — same "plain data, no state.lang branching"
-  // precedent as buildProductionStandardsTable() above. Only the section
-  // heading is i18n'd, via buildReferencesSection().
+  // Issue #394 (further review, 2026-08-25): each reference's `name`/
+  // `description` is now either a fixed string (proper nouns like "Claude
+  // GitHub Agent") or a bilingual { en, th } object — resolveBilingualField()
+  // picks the right value for state.lang, same pattern as
+  // buildProductionStandardsTable() above. The list self-renders and
+  // self-subscribes to state.onLanguageChange, same pattern as
+  // buildProjectSection(state)/buildProductionStandardsTable(state, ...).
   //
   // Issue #397: a reference may carry a `url` (currently only the Udemy
   // course credit) — when present, its name renders as a link that opens in
   // a new tab; entries without `url` keep rendering as plain text.
-  function buildReferencesList(references) {
+  function buildReferencesList(state, references) {
     const list = document.createElement("div");
     list.className = "list-group chloe-about-references__list";
 
-    references.forEach((reference) => {
+    const items = references.map((reference) => {
       const item = document.createElement("div");
       item.className = "list-group-item chloe-about-references__item";
 
       const name = document.createElement("div");
       name.className = "chloe-about-references__name";
-      if (reference.url) {
-        const link = document.createElement("a");
-        link.href = reference.url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = reference.name;
-        name.appendChild(link);
-      } else {
-        name.textContent = reference.name;
-      }
 
       const description = document.createElement("div");
       description.className = "chloe-about-references__description";
-      description.textContent = reference.description;
 
       item.appendChild(name);
       item.appendChild(description);
       list.appendChild(item);
+
+      return { item, name, description };
     });
+
+    function render() {
+      items.forEach(({ name, description }, i) => {
+        const reference = references[i];
+        const nameText = resolveBilingualField(reference.name, state.lang);
+        const descriptionText = resolveBilingualField(reference.description, state.lang);
+
+        name.textContent = "";
+        if (reference.url) {
+          const link = document.createElement("a");
+          link.href = reference.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = nameText;
+          name.appendChild(link);
+        } else {
+          name.textContent = nameText;
+        }
+
+        description.textContent = descriptionText;
+      });
+    }
+
+    render();
+    state.onLanguageChange.push(render);
 
     return list;
   }
@@ -230,7 +259,7 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
-    section.appendChild(buildReferencesList(references));
+    section.appendChild(buildReferencesList(state, references));
 
     return section;
   }
