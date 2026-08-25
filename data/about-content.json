@@ -43,19 +43,31 @@
   "references": [
     {
       "name": "Claude GitHub Agent",
-      "description": "The @claude agent that drives each step of this loop directly from GitHub issue and PR comments."
+      "description": {
+        "en": "The @claude agent that drives each step of this loop directly from GitHub issue and PR comments.",
+        "th": "เอเจนต์ @claude ที่ขับเคลื่อนทุกขั้นตอนของ loop นี้โดยตรงจากคอมเมนต์ใน GitHub issue และ PR"
+      }
     },
     {
       "name": "AI-DLC Process",
-      "description": "The 7-step, human-gated development loop this site itself was built with — see README.md."
+      "description": {
+        "en": "The 7-step, human-gated development loop this site itself was built with — see README.md.",
+        "th": "loop การพัฒนาแบบ 7 ขั้นตอนที่มีมนุษย์เป็นผู้อนุมัติในทุกขั้น ซึ่งเว็บไซต์นี้ถูกสร้างขึ้นด้วยกระบวนการนี้เอง — ดูรายละเอียดที่ README.md"
+      }
     },
     {
-      "name": "Open Source Libraries",
-      "description": "Bootstrap 5, Bootstrap Icons, and hls.js, loaded via CDN with no build step or bundler."
+      "name": { "en": "Open Source Libraries", "th": "ไลบรารีโอเพนซอร์ส" },
+      "description": {
+        "en": "Bootstrap 5, Bootstrap Icons, and hls.js, loaded via CDN with no build step or bundler.",
+        "th": "Bootstrap 5, Bootstrap Icons และ hls.js โหลดผ่าน CDN โดยไม่มีขั้นตอน build หรือ bundler"
+      }
     },
     {
       "name": "Udemy Course – Claude Code: Building Faster with AI, from Prototype to Prod",
-      "description": "The ideas and process in this project were inspired by the Udemy course \"Claude Code: Building Faster with AI, from Prototype to Prod\" thanks to Frank Kane.",
+      "description": {
+        "en": "The ideas and process in this project were inspired by the Udemy course \"Claude Code: Building Faster with AI, from Prototype to Prod\" thanks to Frank Kane.",
+        "th": "แนวคิดและกระบวนการในโปรเจกต์นี้ได้รับแรงบันดาลใจจากคอร์ส Udemy \"Claude Code: Building Faster with AI, from Prototype to Prod\" ขอขอบคุณ Frank Kane"
+      },
       "url": "https://www.udemy.com/course/anthropic-claude-code/?srsltid=AfmBOoq1FmiJvG_rDMQgx4J-4xfD1qbJy9rJ2-c44YEslEFGdG1TC_wR&couponCode=CP260817G2"
     }
   ]

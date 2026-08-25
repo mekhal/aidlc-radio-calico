@@ -13,35 +13,26 @@
  * tests/about/about-standards.test.js) rather than hardcoded per-item
  * markup.
  *
- * Only each entry's `name` is fixed by the issue body; the accompanying
- * `description` prose is not specified there, so this suite asserts it is
- * present/non-empty without pinning its exact wording, leaving the Code PR
- * free to draft it.
- *
- * buildReferencesList(references) takes a plain references array (not
- * state) — the list content itself is not i18n (same "fixed English
- * data-driven content" precedent as Section 2's buildProductionStandardsTable,
- * plain data, no state.lang branching). buildReferencesSection(state,
- * references) wraps it with an i18n'd heading (per the human's 2.5 answer
- * "reuse theme & use i18n"), mirroring about/about.js's existing
- * buildProjectSection(state) / buildStandardsSection(state,
- * standards) split between i18n heading and data-driven body content.
- *
- * Written before about/about.js gains these exports and
- * data/about-content.json gains `references`, per TDD — fails until this
- * ticket's Code PR (step 6) adds both.
+ * Issue #394 (further review, 2026-08-25, second pass): each reference's
+ * `name`/`description` are now bilingual `{ en, th }` objects — proper nouns
+ * ("Claude GitHub Agent", the Udemy course title) stay fixed strings, same
+ * mixed-shape rule already applied to the Standards table's `tool` column.
+ * buildReferencesList(references) becomes buildReferencesList(state,
+ * references) — it self-renders and self-subscribes to
+ * state.onLanguageChange, same pattern as buildProductionStandardsTable(state,
+ * standards). Test PR waived this turn (human's step-3 decision); this
+ * coverage is bundled directly into the Code PR per CLAUDE.md's Definition
+ * of Done.
  *
  * Issue #397, plan approved at step 3 (2026-08-19): reference item 4
  * ("Style Guide") is replaced with a credit for the Udemy course "Claude
  * Code: Building Faster with AI, from Prototype to Prod" (Frank Kane) —
  * same text as the existing README.md/README.th.md §13 bullet, now with a
  * clickable link. This is the first reference entry with a `url` field, so
- * buildReferencesList() must render `reference.name` as an
+ * buildReferencesList() must render the resolved name as an
  * `<a href target="_blank" rel="noopener noreferrer">` when `url` is
  * present, while entries without `url` keep rendering as plain text (no
- * regression). Written before about/about.js gains this branch and
- * data/about-content.json's item 4 gains `url`, per TDD — fails until this
- * ticket's Code PR (step 6) adds both.
+ * regression).
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -56,20 +47,31 @@
     },
   };
 
-  // Fixed by the issue body — name only; description is open.
+  // Fixed by the issue body — `name` is a fixed string for proper nouns, or
+  // a bilingual { en, th } object (e.g. "Open Source Libraries").
+  // `description` is always bilingual { en, th } (issue #394, second pass).
   const EXPECTED_REFERENCES = [
     { name: "Claude GitHub Agent" },
     { name: "AI-DLC Process" },
-    { name: "Open Source Libraries" },
+    { name: { en: "Open Source Libraries", th: "ไลบรารีโอเพนซอร์ส" } },
   ];
 
+  // A field is either a fixed string (proper nouns) or a bilingual
+  // { en, th } object — resolve() picks the right value for the language
+  // under test, same shape the Code PR must implement.
+  function resolve(field, lang) {
+    return typeof field === "string" ? field : field[lang];
+  }
+
   // Issue #397: item 4 ("Style Guide") is replaced with this Udemy course
-  // credit — name, description, and url are all fixed by the human's step-3
-  // answer, not left open like the other entries.
+  // credit — name/url are fixed by the human's step-3 answer (proper noun,
+  // not translated); description is bilingual like the other entries.
   const UDEMY_COURSE_REFERENCE = {
     name: "Udemy Course – Claude Code: Building Faster with AI, from Prototype to Prod",
-    description:
-      "The ideas and process in this project were inspired by the Udemy course \"Claude Code: Building Faster with AI, from Prototype to Prod\" thanks to Frank Kane.",
+    description: {
+      en: "The ideas and process in this project were inspired by the Udemy course \"Claude Code: Building Faster with AI, from Prototype to Prod\" thanks to Frank Kane.",
+      th: "แนวคิดและกระบวนการในโปรเจกต์นี้ได้รับแรงบันดาลใจจากคอร์ส Udemy \"Claude Code: Building Faster with AI, from Prototype to Prod\" ขอขอบคุณ Frank Kane",
+    },
     url: "https://www.udemy.com/course/anthropic-claude-code/?srsltid=AfmBOoq1FmiJvG_rDMQgx4J-4xfD1qbJy9rJ2-c44YEslEFGdG1TC_wR&couponCode=CP260817G2",
   };
 
@@ -79,7 +81,10 @@
   const REFERENCES_FIXTURE = [
     ...EXPECTED_REFERENCES.map((entry) => ({
       ...entry,
-      description: `${entry.name} description text.`,
+      description: {
+        en: `${resolve(entry.name, "en")} description text (en).`,
+        th: `${resolve(entry.name, "en")} description text (th).`,
+      },
     })),
     UDEMY_COURSE_REFERENCE,
   ];
@@ -98,17 +103,21 @@
   }
 
   describe("about/about.js (issue #151, Ticket 4 — Section 3: References & Acknowledgements)", () => {
-    it("loadAboutContent() fetches data/about-content.json and returns the 4 references", async () => {
+    it("loadAboutContent() fetches data/about-content.json and returns the 4 references, bilingual per row (issue #394)", async () => {
       await loadAboutContentModule();
 
       const content = await window.loadAboutContent();
 
       expect(content.references.length).toBe(4);
       EXPECTED_REFERENCES.forEach((expected) => {
-        const match = content.references.find((row) => row.name === expected.name);
+        const expectedEnName = resolve(expected.name, "en");
+        const match = content.references.find((row) => resolve(row.name, "en") === expectedEnName);
         expect(match).toBeTruthy();
-        expect(typeof match.description).toBe("string");
-        expect(match.description.length > 0).toBeTruthy();
+
+        expect(typeof match.description.en).toBe("string");
+        expect(match.description.en.length > 0).toBeTruthy();
+        expect(typeof match.description.th).toBe("string");
+        expect(match.description.th.length > 0).toBeTruthy();
       });
     });
 
@@ -118,30 +127,50 @@
       const content = await window.loadAboutContent();
       const udemyEntry = content.references[3];
 
-      expect(content.references.find((row) => row.name === "Style Guide")).toBeFalsy();
+      expect(content.references.find((row) => resolve(row.name, "en") === "Style Guide")).toBeFalsy();
       expect(udemyEntry.name).toBe(UDEMY_COURSE_REFERENCE.name);
-      expect(udemyEntry.description).toBe(UDEMY_COURSE_REFERENCE.description);
+      expect(udemyEntry.description.en).toBe(UDEMY_COURSE_REFERENCE.description.en);
+      expect(udemyEntry.description.th).toBe(UDEMY_COURSE_REFERENCE.description.th);
       expect(udemyEntry.url).toBe(UDEMY_COURSE_REFERENCE.url);
     });
 
-    it("buildReferencesList(references) renders a Bootstrap list-group with one item per reference", async () => {
+    it("buildReferencesList(state, references) renders a Bootstrap list-group with one item per reference, in English by default", async () => {
       await loadAboutContentModule();
+      const state = sampleState();
 
-      const list = window.buildReferencesList(REFERENCES_FIXTURE);
+      const list = window.buildReferencesList(state, REFERENCES_FIXTURE);
       const items = Array.from(list.querySelectorAll(".list-group-item"));
 
       expect(list.classList.contains("list-group")).toBeTruthy();
       expect(items.length).toBe(4);
       items.forEach((item, i) => {
-        expect(item.textContent).toContain(REFERENCES_FIXTURE[i].name);
-        expect(item.textContent).toContain(REFERENCES_FIXTURE[i].description);
+        const fixture = REFERENCES_FIXTURE[i];
+        expect(item.textContent).toContain(resolve(fixture.name, "en"));
+        expect(item.textContent).toContain(resolve(fixture.description, "en"));
       });
     });
 
-    it("buildReferencesList(references) renders a reference with a `url` as a link opening in a new tab", async () => {
+    it("buildReferencesList(state, references) re-renders name/description in Thai when the language changes", async () => {
       await loadAboutContentModule();
+      const state = sampleState();
 
-      const list = window.buildReferencesList(REFERENCES_FIXTURE);
+      const list = window.buildReferencesList(state, REFERENCES_FIXTURE);
+      state.lang = "th";
+      state.onLanguageChange.forEach((fn) => fn());
+
+      const items = Array.from(list.querySelectorAll(".list-group-item"));
+      items.forEach((item, i) => {
+        const fixture = REFERENCES_FIXTURE[i];
+        expect(item.textContent).toContain(resolve(fixture.name, "th"));
+        expect(item.textContent).toContain(resolve(fixture.description, "th"));
+      });
+    });
+
+    it("buildReferencesList(state, references) renders a reference with a `url` as a link opening in a new tab", async () => {
+      await loadAboutContentModule();
+      const state = sampleState();
+
+      const list = window.buildReferencesList(state, REFERENCES_FIXTURE);
       const items = Array.from(list.querySelectorAll(".list-group-item"));
       const udemyItem = items[3];
       const link = udemyItem.querySelector("a");
@@ -153,10 +182,11 @@
       expect(link.textContent).toBe(UDEMY_COURSE_REFERENCE.name);
     });
 
-    it("buildReferencesList(references) renders references without a `url` as plain text, not a link", async () => {
+    it("buildReferencesList(state, references) renders references without a `url` as plain text, not a link", async () => {
       await loadAboutContentModule();
+      const state = sampleState();
 
-      const list = window.buildReferencesList(REFERENCES_FIXTURE);
+      const list = window.buildReferencesList(state, REFERENCES_FIXTURE);
       const items = Array.from(list.querySelectorAll(".list-group-item"));
 
       items.slice(0, 3).forEach((item) => {
@@ -176,7 +206,7 @@
       expect(section.querySelector(".list-group")).toBeTruthy();
     });
 
-    it("buildReferencesSection(state, references) re-renders its heading text when the language changes", async () => {
+    it("buildReferencesSection(state, references) re-renders its heading AND its list content when the language changes", async () => {
       await loadAboutContentModule();
       const state = sampleState();
 
@@ -186,6 +216,9 @@
 
       const heading = section.querySelector("h1, h2");
       expect(heading.textContent).toBe(SAMPLE_TRANSLATIONS.th.aboutReferencesHeading);
+
+      const firstItem = section.querySelector(".list-group-item");
+      expect(firstItem.textContent).toContain(resolve(REFERENCES_FIXTURE[0].name, "th"));
     });
   });
 })();
