@@ -121,5 +121,30 @@
       expect(main.className).toContain("chloe-main");
       expect(main.children.length).toBe(0);
     });
+
+    it("rewriteSectionImagePaths(root) rewrites each .whats-this-image__img src with a ../ prefix (issue #509 follow-up: pages/whats-this.html sits one directory below the repo root, same as the logo rewrite above)", async () => {
+      await loadWhatsThisPageModule();
+
+      const root = document.createElement("main");
+      root.innerHTML =
+        '<div class="whats-this-image"><img class="img-fluid whats-this-image__img" src="aidlc-loop-gates.jpg"></div>';
+
+      window.rewriteSectionImagePaths(root);
+
+      const img = root.querySelector(".whats-this-image__img");
+      expect(img.getAttribute("src")).toBe("../aidlc-loop-gates.jpg");
+    });
+
+    it("rewriteSectionImagePaths(root) leaves non-section-image <img> elements (e.g. the logo, rewritten separately by buildHeader) untouched", async () => {
+      await loadWhatsThisPageModule();
+
+      const root = document.createElement("div");
+      root.innerHTML = '<img class="chloe-wordmark__logo" src="RadioCalicoStyle/RadioCalicoLogoTM.png">';
+
+      window.rewriteSectionImagePaths(root);
+
+      const logoImg = root.querySelector(".chloe-wordmark__logo");
+      expect(logoImg.getAttribute("src")).toBe("RadioCalicoStyle/RadioCalicoLogoTM.png");
+    });
   });
 })();
