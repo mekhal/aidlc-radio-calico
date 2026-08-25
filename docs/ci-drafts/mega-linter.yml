@@ -59,6 +59,15 @@ jobs:
           MARKDOWN_SUMMARY_REPORTER: true
 
       - name: Stage report under reports/lint
+        # Issue #195: single-file HTML report (CSS/SVG bar chart + readable
+        # list) instead of the plain Markdown-in-<pre> shell. Still no new
+        # Mega-Linter reporter/dependency — this embeds the same
+        # MARKDOWN_SUMMARY_REPORTER table, plus this repo's own
+        # reports/lint/report-render.js (parsing/chart-math, unit-tested via
+        # tests/lint-report-render.test.js), report-style.css, and
+        # report-boot.js (DOM wiring) directly into the page. Parsing/
+        # rendering happens client-side when a reader opens the file, so it
+        # stays one self-contained static page with no build step.
         run: |
           mkdir -p reports/lint
           SUMMARY_FILE=$(find megalinter-reports -maxdepth 1 -iname 'megalinter-report.md' -o -iname '*-summary.md' 2>/dev/null | head -n1)
@@ -68,9 +77,23 @@ jobs:
             exit 1
           fi
           {
-            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Mega-Linter Report</title></head><body><pre>'
-            sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$SUMMARY_FILE"
-            echo '</pre></body></html>'
+            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Mega-Linter Report</title><style>'
+            cat reports/lint/report-style.css
+            echo '</style></head><body>'
+            echo '<h1>🦙 Mega-Linter Report</h1>'
+            echo '<div class="subtitle">CSS &middot; JavaScript &middot; YAML &middot; HTML &mdash; generated every CI run</div>'
+            echo '<div class="card"><div id="megalinter-chart"></div></div>'
+            echo '<div class="card"><div id="megalinter-list"></div></div>'
+            echo '<script id="megalinter-markdown" type="text/plain">'
+            cat "$SUMMARY_FILE"
+            echo '</script>'
+            echo '<script>'
+            cat reports/lint/report-render.js
+            echo '</script>'
+            echo '<script>'
+            cat reports/lint/report-boot.js
+            echo '</script>'
+            echo '</body></html>'
           } > reports/lint/megalinter-report.html
 
       - name: Upload report as CI artifact (develop feedback)
