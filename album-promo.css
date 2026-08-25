@@ -400,11 +400,34 @@ body {
   }
 }
 
+/* Issue #465: speaker icon is its own button (keyboard/aria-pressed
+   semantics, same pattern as .chloe-player-controls__more), separate from
+   the slider's label. margin-left: auto moved here since this button is
+   now the first element of the "push right" volume group. */
+.chloe-player-controls__mute {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.chloe-player-controls__mute:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
 .chloe-player-controls__volume {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
   flex: 1;
   min-width: 0;
 }
