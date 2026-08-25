@@ -119,7 +119,7 @@
     });
 
     window.__aboutPageContentReady = loadAboutContent().then((content) => {
-      main.appendChild(buildProjectSection(state, content.colorPalette));
+      main.appendChild(buildProjectSection(state));
       main.appendChild(buildStandardsSection(state, content.productionStandards));
       main.appendChild(buildReferencesSection(state, content.references));
     });

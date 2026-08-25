@@ -24,7 +24,7 @@
  * plain data, no state.lang branching). buildReferencesSection(state,
  * references) wraps it with an i18n'd heading (per the human's 2.5 answer
  * "reuse theme & use i18n"), mirroring about/about.js's existing
- * buildProjectSection(state, palette) / buildStandardsSection(state,
+ * buildProjectSection(state) / buildStandardsSection(state,
  * standards) split between i18n heading and data-driven body content.
  *
  * Written before about/about.js gains these exports and
