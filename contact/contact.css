@@ -1,19 +1,43 @@
 /* Issue #420 (Ticket 3 of the "Contact" page story): Contact Form column —
-   AC5 calls for a white/clean card (paired with the page's soft
-   --chloe-sage background from album-promo.css), minimal border/subtle
-   shadow — same box-shadow treatment as about.css's .about-palette__swatch
-   and case-study.css's card rules. */
+   AC5 calls for a white/clean card, minimal border/subtle shadow — same
+   box-shadow treatment as about.css's .about-palette__swatch and
+   case-study.css's card rules.
+   Issue #506: the card's background/text was hardcoded to a literal
+   #ffffff/Bootstrap default instead of the page's theme tokens, so it stayed
+   pinned to white under [data-chloe-theme="dark"] while the rest of the page
+   flips. Reuses the --chloe-sage/--chloe-ink pair About's cards already use
+   (shared/tokens.css), plus --chloe-pink/--chloe-pink-deep for
+   borders/focus and --chloe-sans for typography, so it flips correctly. */
 
 .chloe-contact-form {
-  background-color: #ffffff;
+  background-color: var(--chloe-sage);
+  color: var(--chloe-ink);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   padding: 2rem;
 }
 
+.chloe-contact-form .form-label {
+  color: var(--chloe-ink);
+  font-family: var(--chloe-sans);
+}
+
+.chloe-contact-form .form-control {
+  border-color: var(--chloe-pink-deep);
+  background-color: var(--chloe-sage);
+  color: var(--chloe-ink);
+  font-family: var(--chloe-sans);
+}
+
+.chloe-contact-form .form-control:focus {
+  border-color: var(--chloe-pink-deep);
+  box-shadow: 0 0 0 0.2rem var(--chloe-pink);
+}
+
 .chloe-contact-form__submit {
   background-color: var(--chloe-pink-deep);
   color: #ffffff;
   border: none;
+  font-family: var(--chloe-sans);
 }
