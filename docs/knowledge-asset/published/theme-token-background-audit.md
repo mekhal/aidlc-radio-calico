@@ -34,4 +34,11 @@ reused `--chloe-mint`/`--chloe-pink`/`--chloe-cream` as full backgrounds against
 text; none of the first three had a dark-theme override in `shared/tokens.css`, and
 `--chloe-cream` was never defined at all. Fixed in #294 (#297) by switching to
 `--chloe-player-box-bg`/`-fg` plus a `border-left` accent for the pass/fail distinction.
+
+**Confirmed a second time (issue #506):** `.chloe-contact-form` in `contact/contact.css` hardcoded
+`background-color: #ffffff` paired with `--chloe-ink` text, producing the same fixed-background/
+flipping-text mismatch. Fixed by pointing it at the same `--chloe-sage`/`--chloe-ink` pair About's
+cards already use. Closing this issue, @mekhal asked to note explicitly: any form/card color
+shades must match the site's current theme (not just contact) — treat this as a standing check
+whenever a plan touches a background color on a card, form, or modal.
 <!-- END SKILL.md -->
