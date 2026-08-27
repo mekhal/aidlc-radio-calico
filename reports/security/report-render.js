@@ -11,39 +11,21 @@
  * report-boot.js (issue #195): loaded as a plain <script> global, no
  * npm/imports.
  *
- * Issue #544 follow-up (2026-08-27 review): unlike reports/lint/
- * megalinter-report.html (issue #195, internal-CI-artifact carve-out from
- * bilingual), this page's labels are reachable via the footer/sidebar so
- * mekhal asked for bilingual body labels — but explicitly not a full
- * language-toggle (that's the sidebar's job, out of scope here). So EN/TH
- * are shown together rather than switched: STRINGS/CATEGORIES carry
- * { en, th } pairs and formatBilingualLabel()/formatFindingsCount() render
- * both at once.
+ * Issue #544 follow-up (2026-08-27, mekhal): the initial "show EN and TH
+ * together" approach is replaced by a real language toggle, mirroring the
+ * app's existing lang-switch pattern (state.lang + a stored preference)
+ * rather than rendering both languages at once. Copy text itself moves out
+ * of this file into i18n/security-report-en.json + i18n/security-report-th.json
+ * (report-boot.js fetches and resolves them) — this file goes back to being
+ * purely about SARIF parsing/categorization, with only formatFindingsCount()
+ * staying here since it's a small pure string-templating function worth
+ * covering directly, same reasoning as before.
  */
 (function (global) {
-  const STRINGS = {
-    loading: { en: "Loading scan results...", th: "กำลังโหลดผลการสแกน..." },
-    error: {
-      en: "Could not load trivy.sarif — the scan report may not have been published for this build yet.",
-      th: "ไม่สามารถโหลด trivy.sarif ได้ — รายงานผลการสแกนอาจยังไม่ถูกเผยแพร่สำหรับ build นี้",
-    },
-    statusPassed: { en: "Passed", th: "ผ่าน" },
-    statusFailed: { en: "Failed", th: "ไม่ผ่าน" },
-  };
+  const CATEGORY_KEYS = ["secrets", "sca", "misconfig", "license"];
 
-  const CATEGORIES = [
-    { key: "secrets", label: { en: "Secrets Detection", th: "การตรวจจับข้อมูลลับ" } },
-    { key: "sca", label: { en: "Dependencies (SCA)", th: "การพึ่งพา (SCA)" } },
-    { key: "misconfig", label: { en: "Misconfigurations", th: "การตั้งค่าที่ผิดพลาด" } },
-    { key: "license", label: { en: "License Compliance", th: "การปฏิบัติตามสัญญาอนุญาต" } },
-  ];
-
-  function formatBilingualLabel(field) {
-    return `${field.en} / ${field.th}`;
-  }
-
-  function formatFindingsCount(count) {
-    return `${count} finding(s) / พบ ${count} รายการ`;
+  function formatFindingsCount(template, count) {
+    return template.replace("{count}", count);
   }
 
   function parseTrivySarif(sarif) {
@@ -78,19 +60,14 @@
     (results || []).forEach((result) => {
       counts[categoryForResult(result)] += 1;
     });
-    return CATEGORIES.map((category) => ({
-      key: category.key,
-      label: formatBilingualLabel(category.label),
-      count: counts[category.key],
-    }));
+    return CATEGORY_KEYS.map((key) => ({ key, count: counts[key] }));
   }
 
   global.SecurityReportRender = {
-    STRINGS,
+    CATEGORY_KEYS,
     parseTrivySarif,
     categoryForResult,
     buildCategorySummary,
-    formatBilingualLabel,
     formatFindingsCount,
   };
 })(window);
