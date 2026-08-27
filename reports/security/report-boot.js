@@ -7,43 +7,53 @@
    #security-categories/#security-download-link are present. Unlike
    reports/lint/report-boot.js, nothing here is inlined by CI — the data is
    fetched live at read time, so no workflow change was needed for this
-   issue. */
+   issue.
+
+   Issue #544 follow-up (2026-08-27 review): dynamic status/category/count
+   text renders bilingual (EN / TH) via report-render.js's STRINGS/
+   formatBilingualLabel/formatFindingsCount — no language toggle here (out
+   of scope per mekhal's approval; that's the sidebar's job). */
 (function () {
   const statusEl = document.getElementById("security-status");
   const categoriesEl = document.getElementById("security-categories");
   const downloadLink = document.getElementById("security-download-link");
 
   function renderLoading() {
+    const { STRINGS, formatBilingualLabel } = window.SecurityReportRender;
     statusEl.innerHTML = "";
     const p = document.createElement("p");
     p.className = "empty-state";
-    p.textContent = "Loading scan results...";
+    p.textContent = formatBilingualLabel(STRINGS.loading);
     statusEl.appendChild(p);
   }
 
   function renderError() {
+    const { STRINGS, formatBilingualLabel } = window.SecurityReportRender;
     statusEl.innerHTML = "";
     const p = document.createElement("p");
     p.className = "empty-state";
-    p.textContent = "Could not load trivy.sarif — the scan report may not have been published for this build yet.";
+    p.textContent = formatBilingualLabel(STRINGS.error);
     statusEl.appendChild(p);
     categoriesEl.innerHTML = "";
     downloadLink.style.display = "none";
   }
 
   function renderStatus(parsed) {
+    const { STRINGS, formatBilingualLabel, formatFindingsCount } = window.SecurityReportRender;
     statusEl.innerHTML = "";
     const badge = document.createElement("span");
     badge.className = parsed.status === "passed" ? "status-badge status-passed" : "status-badge status-failed";
-    badge.textContent = parsed.status === "passed" ? "✅ Passed" : "❌ Failed";
+    const statusLabel = formatBilingualLabel(parsed.status === "passed" ? STRINGS.statusPassed : STRINGS.statusFailed);
+    badge.textContent = parsed.status === "passed" ? `✅ ${statusLabel}` : `❌ ${statusLabel}`;
     const meta = document.createElement("p");
     meta.className = "subtitle";
-    meta.textContent = `${parsed.toolName} ${parsed.toolVersion} — ${parsed.results.length} finding(s)`;
+    meta.textContent = `${parsed.toolName} ${parsed.toolVersion} — ${formatFindingsCount(parsed.results.length)}`;
     statusEl.appendChild(badge);
     statusEl.appendChild(meta);
   }
 
   function renderCategories(summary) {
+    const { formatFindingsCount } = window.SecurityReportRender;
     categoriesEl.innerHTML = "";
     summary.forEach((category) => {
       const row = document.createElement("div");
@@ -53,7 +63,7 @@
       label.textContent = category.label;
       const count = document.createElement("div");
       count.className = "category-count";
-      count.textContent = category.count === 0 ? "0 findings" : `${category.count} finding(s)`;
+      count.textContent = formatFindingsCount(category.count);
       row.appendChild(label);
       row.appendChild(count);
       categoriesEl.appendChild(row);
