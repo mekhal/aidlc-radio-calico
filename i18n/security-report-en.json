@@ -1,0 +1,15 @@
+{
+  "title": "🛡️ Security Scan Report",
+  "subtitle": "Trivy filesystem scan — generated every CI run",
+  "loading": "Loading scan results...",
+  "error": "Could not load trivy.sarif — the scan report may not have been published for this build yet.",
+  "statusPassed": "Passed",
+  "statusFailed": "Failed",
+  "findingsCount": "{count} finding(s)",
+  "downloadLink": "⬇ Download report (trivy.sarif)",
+  "languageToggleLabel": "Switch language",
+  "categorySecrets": "Secrets Detection",
+  "categorySca": "Dependencies (SCA)",
+  "categoryMisconfig": "Misconfigurations",
+  "categoryLicense": "License Compliance"
+}

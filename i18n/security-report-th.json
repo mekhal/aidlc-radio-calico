@@ -1,0 +1,15 @@
+{
+  "title": "🛡️ รายงานผลการสแกนความปลอดภัย",
+  "subtitle": "สแกนไฟล์ระบบด้วย Trivy — สร้างขึ้นทุกครั้งที่ CI รัน",
+  "loading": "กำลังโหลดผลการสแกน...",
+  "error": "ไม่สามารถโหลด trivy.sarif ได้ — รายงานผลการสแกนอาจยังไม่ถูกเผยแพร่สำหรับ build นี้",
+  "statusPassed": "ผ่าน",
+  "statusFailed": "ไม่ผ่าน",
+  "findingsCount": "พบ {count} รายการ",
+  "downloadLink": "⬇ ดาวน์โหลดรายงาน (trivy.sarif)",
+  "languageToggleLabel": "สลับภาษา",
+  "categorySecrets": "การตรวจจับข้อมูลลับ",
+  "categorySca": "การพึ่งพา (SCA)",
+  "categoryMisconfig": "การตั้งค่าที่ผิดพลาด",
+  "categoryLicense": "การปฏิบัติตามสัญญาอนุญาต"
+}
