@@ -68,6 +68,20 @@
  * renamed via git mv to match their actual diagram content (AC1):
  * code-pr-gates.png -> skill-reuse-gates.png, skill-reuse-gates.jpg ->
  * code-pr-gates.jpg; aidlc-loop-gates.jpg was already correctly named.
+ *
+ * Issue #522 (follow-up from #505, reported after #509 shipped): per
+ * @mekhal's live review, all 3 images rendered close to full page width,
+ * uncropped, and 2 of the 3 captions/alt text were too generic. AC1:
+ * buildWhatIsThisSection stops calling buildSectionImage entirely -
+ * whatIsThis has no image field anymore. code-pr-gates.jpg itself is kept
+ * (not deleted) because README.md/README.th.md independently embed the
+ * same file in their own "Production-grade Standards" section - see
+ * tests/whats-this/whats-this-content.test.js's header comment. AC2:
+ * the remaining aidlcLoop/skillCapture images are capped at
+ * max-width: 42rem via .whats-this-image (whats-this.css), matching the
+ * text column - buildSectionImage itself is unchanged. AC3/AC4: their
+ * alt/caption copy (data/whats-this-content.json) was rewritten to
+ * describe each diagram's actual content instead of a generic summary.
  */
 (function () {
   "use strict";
@@ -142,7 +156,6 @@
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
-    section.appendChild(buildSectionImage(state, content.image));
     section.appendChild(body);
     section.appendChild(buildBadgeRow(content.badges));
 

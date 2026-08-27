@@ -151,9 +151,16 @@
 
 /* Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
    of #505): shared buildSectionImage() output (AC4) - reused by all 3
-   sections above, so styled once here rather than per-section. */
+   sections above, so styled once here rather than per-section.
+
+   Issue #522 (follow-up from #505): max-width: 42rem added (AC2) - without
+   it, the wrapper had no cap of its own (only img-fluid's max-width: 100%
+   of its *container*, and the section container itself has no cap either),
+   so wide source images rendered close to full page width instead of
+   matching the ~42rem text column (.chloe-whats-this-what__body above). */
 
 .whats-this-image {
+  max-width: 42rem;
   margin: 0 0 1.5rem;
 }
 

@@ -51,6 +51,19 @@
  * Written before data/whats-this-content.json's whatIsThis object gains an
  * `image` field and before whats-this.js exports buildSectionImage, per
  * TDD — fails until this issue's Code PR (step 6) adds both.
+ *
+ * Issue #522 (follow-up from #505, reported after #509 shipped): per
+ * @mekhal's live review, this section's image is removed again entirely
+ * (AC1) — whatIsThis.image no longer exists in
+ * data/whats-this-content.json. `code-pr-gates.jpg` itself is kept in the
+ * repo (not deleted) because README.md/README.th.md's own "Production-grade
+ * Standards" section independently embeds the same file — discovered after
+ * the human's file-deletion approval was given without that context, so the
+ * file-only-unreferenced-by-the-whats-this-page reading was applied
+ * instead; flagged back to the human in this turn's comment. Step 3 waiver
+ * approved (2026-08-27): Test PR skipped, these test updates are bundled
+ * directly into the Code PR instead (CLAUDE.md's Definition of Done, "tests
+ * bundled into the Code PR" option).
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -63,22 +76,9 @@
     th: { whatsThisWhatHeading: "นี่คืออะไร?" },
   };
 
-  const SAMPLE_WHAT_IMAGE = {
-    src: "code-pr-gates.jpg",
-    alt: {
-      en: "Diagram of the Step 7 Code PR review and merge gate",
-      th: "แผนภาพขั้นตอนที่ 7 ประตูรีวิวและ merge ของ Code PR",
-    },
-    caption: {
-      en: "Every Code PR clears human review before it merges.",
-      th: "ทุก Code PR ต้องผ่านการรีวิวจากมนุษย์ก่อน merge",
-    },
-  };
-
   const SAMPLE_WHAT_IS_THIS = {
     body: { en: "A process demo, not just a radio app.", th: "การสาธิตกระบวนการ ไม่ใช่แค่แอปวิทยุ" },
     badges: EXPECTED_BADGES,
-    image: SAMPLE_WHAT_IMAGE,
   };
 
   async function loadWhatsThisContentModule() {
@@ -187,46 +187,22 @@
       expect(badges.map((b) => b.textContent)).toEqual(EXPECTED_BADGES);
     });
 
-    it("loadWhatsThisContent() returns the whatIsThis section's image, renamed to code-pr-gates.jpg (the Step 7 Code PR Gates diagram), with bilingual alt/caption (issue #509 AC1, AC3)", async () => {
+    it("loadWhatsThisContent() returns no image field for the whatIsThis section (issue #522 AC1 — the Step 7 Code PR Gates diagram was removed from this section)", async () => {
       await loadWhatsThisContentModule();
 
       const content = await window.loadWhatsThisContent();
 
-      expect(content.whatIsThis.image).toBeTruthy();
-      expect(content.whatIsThis.image.src).toBe("code-pr-gates.jpg");
-      expect(typeof content.whatIsThis.image.alt.en).toBe("string");
-      expect(content.whatIsThis.image.alt.en.length > 0).toBeTruthy();
-      expect(typeof content.whatIsThis.image.alt.th).toBe("string");
-      expect(content.whatIsThis.image.alt.th.length > 0).toBeTruthy();
-      expect(typeof content.whatIsThis.image.caption.en).toBe("string");
-      expect(content.whatIsThis.image.caption.en.length > 0).toBeTruthy();
-      expect(typeof content.whatIsThis.image.caption.th).toBe("string");
-      expect(content.whatIsThis.image.caption.th.length > 0).toBeTruthy();
+      expect(content.whatIsThis.image).toBeFalsy();
     });
 
-    it("buildWhatIsThisSection(state, content) embeds exactly one image matching the section's image field, via the shared buildSectionImage helper (issue #509 AC2, AC4)", async () => {
+    it("buildWhatIsThisSection(state, content) renders no image (issue #522 AC1)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const section = window.buildWhatIsThisSection(state, SAMPLE_WHAT_IS_THIS);
       const images = section.querySelectorAll('[data-testid="whats-this-image"]');
 
-      expect(images.length).toBe(1);
-      const img = images[0].querySelector("img");
-      expect(img.getAttribute("src")).toBe(SAMPLE_WHAT_IMAGE.src);
-      expect(img.getAttribute("alt")).toBe(SAMPLE_WHAT_IMAGE.alt.en);
-    });
-
-    it("buildWhatIsThisSection(state, content) re-renders the image caption in Thai when the language changes (issue #509 AC3)", async () => {
-      await loadWhatsThisContentModule();
-      const state = sampleState();
-
-      const section = window.buildWhatIsThisSection(state, SAMPLE_WHAT_IS_THIS);
-      state.lang = "th";
-      state.onLanguageChange.forEach((fn) => fn());
-
-      const caption = section.querySelector('[data-testid="whats-this-image-caption"]');
-      expect(caption.textContent).toBe(SAMPLE_WHAT_IMAGE.caption.th);
+      expect(images.length).toBe(0);
     });
   });
 })();
