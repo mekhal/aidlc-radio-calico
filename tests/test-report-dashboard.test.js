@@ -46,6 +46,8 @@
   }
 
   function cleanupStray() {
+    const skeleton = document.querySelector('[data-testid="report-dashboard-skeleton"]');
+    if (skeleton) skeleton.remove();
     const backdrop = document.querySelector('[data-testid="report-loading-backdrop"]');
     if (backdrop) backdrop.remove();
     const iframe = document.querySelector('[data-testid="report-test-runner-iframe"]');
@@ -69,14 +71,24 @@
       cleanupStray();
     });
 
-    it("shows an empty state when no test run has been saved yet", async () => {
+    // Issue #533: AC-B3 (issue #205) already auto-runs the suite whenever
+    // localStorage is empty, with no async gap between the dashboard's
+    // initial (empty) render and that auto-run starting — so a genuinely
+    // idle "no test run yet" empty state was never actually observable by a
+    // real user even before this change; the old full-screen backdrop just
+    // happened to leave the (now-invisible, backdrop-covered) empty-state
+    // markup sitting untouched underneath it, which is what let this test
+    // assert on it. Now that loading renders in place of main's content
+    // (report-dashboard-skeleton, see test-report-dashboard-skeleton.test.js),
+    // that dead DOM state is gone too — this test is updated to assert the
+    // skeleton is what's actually shown.
+    it("shows the loading skeleton (not a dead empty state) on first-ever load, since empty storage auto-runs (AC-B3)", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
       const stub = stubIframeNavigation();
       const root = await loadTestReportDashboard();
       await nextTick();
 
-      const emptyState = root.querySelector('[data-testid="report-empty-state"]');
-      expect(emptyState).toBeTruthy();
+      expect(root.querySelector('[data-testid="report-dashboard-skeleton"]')).toBeTruthy();
       expect(root.querySelector('[data-testid="report-stats-row"]')).toBeFalsy();
 
       unloadTestReportDashboard(root);
