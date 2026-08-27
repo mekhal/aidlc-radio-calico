@@ -41,8 +41,11 @@ Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
   `.mega-linter.yml` at the repo root further scopes which linters run at
   all, to this repo's decided tech stack.
 - **Report paths match the footer links already in `app.js`:**
-  `reports/lint/megalinter-report.html` and `reports/security/trivy.sarif`,
-  both at the site root so they resolve once published to `main`.
+  `reports/lint/megalinter-report.html` and (since issue #544)
+  `reports/security/security-report.html`, both at the site root so they
+  resolve once published to `main`. Trivy's workflow still stages the raw
+  `reports/security/trivy.sarif` alongside it unchanged — `security-report.html`
+  fetches that file client-side, so no workflow change was needed for #544.
 - **No infinite loop.** The publish step's commit uses the default
   `GITHUB_TOKEN`, never a PAT or deploy key. GitHub does not trigger further
   workflow runs from a `GITHUB_TOKEN` push by design, so there's no

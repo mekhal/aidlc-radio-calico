@@ -629,7 +629,7 @@
 
     const securityReportLink = document.createElement("a");
     securityReportLink.dataset.testid = "footer-security-report-link";
-    securityReportLink.href = "reports/security/trivy.sarif";
+    securityReportLink.href = "reports/security/security-report.html";
     securityReportLink.target = "_blank";
     securityReportLink.rel = "noopener noreferrer";
     securityReportLink.textContent = "Security Scan Report";

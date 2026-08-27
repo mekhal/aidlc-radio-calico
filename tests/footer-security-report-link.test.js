@@ -1,11 +1,15 @@
 /**
- * Issue #87 (supersedes issue #79's version of this link): footer link now
- * points directly at the Trivy SARIF report published by CI, instead of
- * GitHub's native Code Scanning Alerts page. Per the human's step-3
- * decision on #87 — "ให้ลิ้งไปเปิดไฟล์ sarif เลยแล้วกัน" — this stays a
- * simple direct link to the raw report file rather than a custom grouped
- * HTML viewer. Same <a target="_blank"> shape as
- * tests/footer-lint-report-link.test.js, just re-pointed and renamed.
+ * Issue #87 (supersedes issue #79's version of this link): footer link
+ * pointed directly at the Trivy SARIF report published by CI, instead of
+ * GitHub's native Code Scanning Alerts page.
+ *
+ * Issue #544: re-pointed again, this time at the new
+ * reports/security/security-report.html text-summary report (Option A —
+ * see this issue's review thread) instead of the raw .sarif file, so a
+ * human reviewer gets a readable Passed/Failed + category breakdown instead
+ * of downloading raw SARIF JSON. The raw file is still reachable via that
+ * page's own download link. Same <a target="_blank"> shape as
+ * tests/footer-lint-report-link.test.js, just re-pointed.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -29,7 +33,7 @@
       expect(link).toBeTruthy();
       expect(link.tagName).toBe("A");
       expect(link.textContent).toBe("Security Scan Report");
-      expect(link.getAttribute("href")).toBe("reports/security/trivy.sarif");
+      expect(link.getAttribute("href")).toBe("reports/security/security-report.html");
       expect(link.getAttribute("target")).toBe("_blank");
       expect(link.getAttribute("rel")).toContain("noopener");
 

@@ -135,7 +135,7 @@
         "../reports/lint/megalinter-report.html"
       );
       expect(nav.querySelector('[data-testid="sidebar-footer-security-report-link"]').getAttribute("href")).toBe(
-        "../reports/security/trivy.sarif"
+        "../reports/security/security-report.html"
       );
 
       expect(nav.querySelector('[data-testid="sidebar-footer-site-link"]').getAttribute("href")).toBe(
