@@ -398,6 +398,12 @@
          directly here rather than into test-report-suite-files.js. -->
     <script src="lint-report-render.test.js"></script>
 
+    <!-- issue #544: reports/security/report-render.js has no app.js DOM
+         surface (it's the standalone Security Scan Report generator), same
+         category as reports/lint/report-render.js above, loaded via the
+         same generic fetch+inject loader — wired directly here too. -->
+    <script src="security-report-render.test.js"></script>
+
     <!-- issue #205: report-storage.js/test-report-dashboard.js have no
          app.js DOM surface (same category as the two files above), so their
          suites are wired directly here too. -->
