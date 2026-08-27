@@ -116,6 +116,14 @@
   margin: 0 0 1.5rem;
 }
 
+/* Issue #522 follow-up review: clarifies this capture-and-reuse cycle runs
+   after the 7-step loop closes rather than being one of its numbered
+   steps - same 42rem text-column width as .chloe-whats-this-what__body. */
+.chloe-whats-this-skills__intro {
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+}
+
 .whats-this-skill-card-col {
   margin-bottom: 1.5rem;
 }

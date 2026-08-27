@@ -9,45 +9,52 @@
   "aidlcLoop": {
     "steps": [
       {
-        "title": { "en": "Issue Trigger", "th": "จุดเริ่ม Issue" },
+        "title": { "en": "1. Issue Trigger", "th": "1. จุดเริ่ม Issue" },
         "description": {
-          "en": "A human kicks things off by opening a GitHub issue describing what's needed.",
+          "en": "A human opens a GitHub issue describing what's needed.",
           "th": "มนุษย์เป็นผู้เริ่มต้นด้วยการเปิด GitHub issue อธิบายสิ่งที่ต้องการ"
         }
       },
       {
-        "title": { "en": "Plan & AC Gate", "th": "ประตูแผน & AC" },
+        "title": { "en": "2. Plan & AC", "th": "2. แผนงาน & เกณฑ์ (AC)" },
         "description": {
-          "en": "The AI proposes a plan with clear success criteria, and a human must approve it before anything else happens.",
-          "th": "AI เสนอแผนพร้อมเกณฑ์ความสำเร็จที่ชัดเจน และมนุษย์ต้องอนุมัติก่อนที่จะเริ่มขั้นตอนอื่นใด"
+          "en": "The AI gathers context, then posts a plan with explicit Acceptance Criteria - no code or tests yet.",
+          "th": "AI รวบรวมบริบท แล้วเสนอแผนพร้อมเกณฑ์ความสำเร็จ (AC) ที่ชัดเจน - ยังไม่เขียนโค้ดหรือเทสต์ในขั้นนี้"
         }
       },
       {
-        "title": { "en": "TDD Gate", "th": "ประตู TDD" },
+        "title": { "en": "3. Plan Approval Gate", "th": "3. ประตูอนุมัติแผน" },
         "description": {
-          "en": "The AI writes tests that describe the desired outcome before any feature code exists, and a human signs off on them first.",
-          "th": "AI เขียนเทสต์ที่อธิบายผลลัพธ์ที่ต้องการก่อนที่โค้ดฟีเจอร์จะมีอยู่ และมนุษย์ต้องอนุมัติเทสต์ก่อน"
+          "en": "A human approves the plan and specifies the tests to write - or explicitly waives the Test PR to go straight to the Code PR. The AI may propose that waiver, but only the human's explicit answer here makes it final.",
+          "th": "มนุษย์อนุมัติแผนและระบุเทสต์ที่ต้องเขียน - หรือสั่ง waive ขั้น Test PR เพื่อข้ามไปทำ Code PR โดยตรง AI เสนอ waiver นี้ได้ แต่คำตัดสินสุดท้ายต้องมาจากมนุษย์เท่านั้น"
         }
       },
       {
-        "title": { "en": "Implementation Gate", "th": "ประตูการพัฒนาโค้ด" },
+        "title": { "en": "4. Test PR", "th": "4. Test PR" },
         "description": {
-          "en": "Only after the tests are approved does the AI write the actual feature code to make them pass.",
-          "th": "หลังจากเทสต์ได้รับการอนุมัติแล้วเท่านั้น AI จะเขียนโค้ดฟีเจอร์จริงเพื่อให้เทสต์ผ่าน"
+          "en": "The AI writes failing tests for the AC only and opens a separate Test PR. Skipped entirely if waived at step 3.",
+          "th": "AI เขียนเทสต์ที่ยังไม่ผ่าน (failing) ตาม AC เท่านั้น แล้วเปิด Test PR แยกต่างหาก ขั้นนี้จะถูกข้ามทั้งหมดหาก waive ไว้ในขั้นที่ 3"
         }
       },
       {
-        "title": { "en": "Review & Merge Gate", "th": "ประตูรีวิว & Merge" },
+        "title": { "en": "5. Test PR Approval Gate", "th": "5. ประตูอนุมัติ Test PR" },
         "description": {
-          "en": "A human reviews the finished work against quality and security checks, then merges it in to close the loop.",
-          "th": "มนุษย์รีวิวงานที่เสร็จแล้วตามเกณฑ์คุณภาพและความปลอดภัย จากนั้น merge เพื่อปิดวงจร"
+          "en": "A human reviews and approves the Test PR before any feature code is written.",
+          "th": "มนุษย์รีวิวและอนุมัติ Test PR ก่อนที่จะเริ่มเขียนโค้ดฟีเจอร์จริง"
         }
       },
       {
-        "title": { "en": "Close & Capture Gate", "th": "ประตูปิดงาน & บันทึกทักษะ" },
+        "title": { "en": "6. Code PR", "th": "6. Code PR" },
         "description": {
-          "en": "Lessons learned along the way get written down and turned into reusable know-how for the next round.",
-          "th": "บทเรียนที่ได้ระหว่างทางถูกบันทึกและแปลงเป็นความรู้ที่นำกลับมาใช้ใหม่ได้ในรอบถัดไป"
+          "en": "The AI writes the feature code per the plan, reusing existing pieces first, to make the approved tests pass - then opens a separate Code PR.",
+          "th": "AI เขียนโค้ดฟีเจอร์ตามแผน โดยใช้ของเดิมซ้ำก่อนเสมอ เพื่อให้เทสต์ที่อนุมัติแล้วผ่าน จากนั้นเปิด Code PR แยกต่างหาก"
+        }
+      },
+      {
+        "title": { "en": "7. Review & Merge Gate", "th": "7. ประตูรีวิว & Merge" },
+        "description": {
+          "en": "A human reviews the Code PR against quality, security, and traceability checks, then merges it to close the loop. Rework loops back to step 6 for a new Code PR, and anything found outside this issue's scope becomes a new issue instead of being pulled in here.",
+          "th": "มนุษย์รีวิว Code PR ตามเกณฑ์คุณภาพ ความปลอดภัย และการตรวจสอบย้อนกลับ แล้ว merge เพื่อปิดวงจร หากต้องแก้ไขจะย้อนกลับไปทำขั้นที่ 6 เป็น Code PR ใหม่ และสิ่งที่พบนอกขอบเขตของ issue นี้จะถูกแยกเป็น issue ใหม่แทนที่จะดึงเข้ามาทำต่อในที่นี้"
         }
       }
     ],
@@ -64,6 +71,10 @@
     }
   },
   "skillCapture": {
+    "intro": {
+      "en": "This capture-and-reuse cycle runs after the 7-step loop closes, at the human's \"close\" command - it isn't one of the 7 numbered steps above.",
+      "th": "วงจรการเก็บและนำทักษะกลับมาใช้นี้เกิดขึ้นหลังวงจร 7 ขั้นตอนด้านบนปิดแล้ว เมื่อมนุษย์สั่ง \"close\" - ไม่ใช่หนึ่งใน 7 ขั้นตอนที่กล่าวไปข้างต้น"
+    },
     "firstTime": {
       "title": { "en": "First Time", "th": "ครั้งแรก" },
       "body": {
