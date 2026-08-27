@@ -51,27 +51,40 @@
  * Written before data/whats-this-content.json's aidlcLoop object gains an
  * `image` field and before whats-this.js exports buildSectionImage, per
  * TDD — fails until this issue's Code PR (step 6) adds both.
+ *
+ * Issue #522 follow-up review (2026-08-27, kept in this same issue per
+ * @mekhal's explicit request): steps expand from 6 to CLAUDE.md's actual
+ * 7 numbered loop steps, each title now prefixed with its step number.
+ * EXPECTED_TITLES_EN/TH below are the new locked 7 titles, superseding the
+ * 6 from #404/#152. Two content assertions were added to test the new
+ * step 3 (Test PR waiver conditions) and step 7 (rework-loops-back-to-6 +
+ * missed-functionality-becomes-a-new-issue) copy against CLAUDE.md's own
+ * wording, same README-paraphrase-content-check precedent as
+ * tests/whats-this/whats-this-skills.test.js's ".claude/skills/"/
+ * "automatically" checks.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
   const { loadSharedModule } = window.SharedModuleTestHelpers;
 
   const EXPECTED_TITLES_EN = [
-    "Issue Trigger",
-    "Plan & AC Gate",
-    "TDD Gate",
-    "Implementation Gate",
-    "Review & Merge Gate",
-    "Close & Capture Gate",
+    "1. Issue Trigger",
+    "2. Plan & AC",
+    "3. Plan Approval Gate",
+    "4. Test PR",
+    "5. Test PR Approval Gate",
+    "6. Code PR",
+    "7. Review & Merge Gate",
   ];
 
   const EXPECTED_TITLES_TH = [
-    "จุดเริ่ม Issue",
-    "ประตูแผน & AC",
-    "ประตู TDD",
-    "ประตูการพัฒนาโค้ด",
-    "ประตูรีวิว & Merge",
-    "ประตูปิดงาน & บันทึกทักษะ",
+    "1. จุดเริ่ม Issue",
+    "2. แผนงาน & เกณฑ์ (AC)",
+    "3. ประตูอนุมัติแผน",
+    "4. Test PR",
+    "5. ประตูอนุมัติ Test PR",
+    "6. Code PR",
+    "7. ประตูรีวิว & Merge",
   ];
 
   const SAMPLE_TRANSLATIONS = {
@@ -112,13 +125,13 @@
   }
 
   describe('whats-this/whats-this.js (issue #404/#508, Ticket 3 — Section 2: The AI-DLC Loop)', () => {
-    it("loadWhatsThisContent() fetches data/whats-this-content.json and returns 6 bilingual steps, English resolution equal to the locked titles, in order (AC1, issue #508 AC2)", async () => {
+    it("loadWhatsThisContent() fetches data/whats-this-content.json and returns 7 bilingual steps, English resolution equal to the locked titles, in order (AC1, issue #522 follow-up)", async () => {
       await loadWhatsThisContentModule();
 
       const content = await window.loadWhatsThisContent();
 
       expect(content.aidlcLoop).toBeTruthy();
-      expect(content.aidlcLoop.steps.length).toBe(6);
+      expect(content.aidlcLoop.steps.length).toBe(7);
       expect(content.aidlcLoop.steps.map((step) => step.title.en)).toEqual(EXPECTED_TITLES_EN);
       content.aidlcLoop.steps.forEach((step) => {
         expect(typeof step.title.th).toBe("string");
@@ -141,18 +154,18 @@
       expect(heading.textContent).toBe("THE AI-DLC LOOP");
     });
 
-    it("buildAiDlcLoopGrid(state, steps) renders exactly 6 cards with these exact English titles, in this exact order, by default (AC1)", async () => {
+    it("buildAiDlcLoopGrid(state, steps) renders exactly 7 cards with these exact English titles, in this exact order, by default (AC1)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const grid = window.buildAiDlcLoopGrid(state, SAMPLE_STEPS);
       const titles = Array.from(grid.querySelectorAll(".whats-this-loop-card__title")).map((el) => el.textContent);
 
-      expect(titles.length).toBe(6);
+      expect(titles.length).toBe(7);
       expect(titles).toEqual(EXPECTED_TITLES_EN);
     });
 
-    it("buildAiDlcLoopSection(state, content) re-renders the heading, all 6 step titles, AND descriptions in Thai when the language changes, without a reload (issue #508 AC2, per @mekhal's 2026-08-25 decision to translate step names too)", async () => {
+    it("buildAiDlcLoopSection(state, content) re-renders the heading, all 7 step titles, AND descriptions in Thai when the language changes, without a reload (issue #508 AC2, per @mekhal's 2026-08-25 decision to translate step names too)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
@@ -174,14 +187,14 @@
       });
     });
 
-    it("buildAiDlcLoopSection(state, content) embeds all 6 cards from the content argument within the section, sourced from data not hardcoded (AC1, AC2)", async () => {
+    it("buildAiDlcLoopSection(state, content) embeds all 7 cards from the content argument within the section, sourced from data not hardcoded (AC1, AC2)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
       const cards = Array.from(section.querySelectorAll(".whats-this-loop-card"));
 
-      expect(cards.length).toBe(6);
+      expect(cards.length).toBe(7);
       cards.forEach((card, i) => {
         expect(card.querySelector(".whats-this-loop-card__title").textContent).toBe(EXPECTED_TITLES_EN[i]);
         expect(card.querySelector(".whats-this-loop-card__description").textContent).toBe(
@@ -200,6 +213,28 @@
       expect(section.textContent).not.toContain("Open an issue (type:");
       expect(section.textContent).not.toContain("spawns a **sub-agent**");
       expect(section.textContent).not.toContain("Review the plan again, then write");
+    });
+
+    it("step 3's (Plan Approval Gate) English copy explains the Test PR waiver: the AI may propose it, but only the human's decision makes it final (issue #522 follow-up AC2)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+      const planApprovalStep = content.aidlcLoop.steps[2];
+
+      expect(planApprovalStep.title.en).toBe("3. Plan Approval Gate");
+      expect(planApprovalStep.description.en.toLowerCase()).toContain("waive");
+      expect(planApprovalStep.description.en.toLowerCase()).toContain("human");
+    });
+
+    it("step 7's (Review & Merge Gate) English copy covers rework looping back to step 6 and out-of-scope findings becoming a new issue (issue #522 follow-up AC3)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+      const reviewMergeStep = content.aidlcLoop.steps[6];
+
+      expect(reviewMergeStep.title.en).toBe("7. Review & Merge Gate");
+      expect(reviewMergeStep.description.en.toLowerCase()).toContain("step 6");
+      expect(reviewMergeStep.description.en.toLowerCase()).toContain("new issue");
     });
 
     it("buildAiDlcLoopCard(state, step, index) places each card in a Bootstrap col-md-4 column (AC3: stacks on mobile, grid on desktop)", async () => {

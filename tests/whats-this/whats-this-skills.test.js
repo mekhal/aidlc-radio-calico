@@ -53,6 +53,14 @@
  * Written before data/whats-this-content.json's skillCapture object gains an
  * `image` field and before whats-this.js exports buildSectionImage, per
  * TDD — fails until this issue's Code PR (step 6) adds both.
+ *
+ * Issue #522 follow-up review (2026-08-27, kept in this same issue per
+ * @mekhal's explicit request): skillCapture gains a new bilingual `intro`
+ * field (AC4), rendered by buildSkillCaptureSection() as a paragraph right
+ * after the heading, clarifying this capture-and-reuse cycle runs after the
+ * 7-step loop closes rather than being folded into that loop's own
+ * numbering (previously implied by a "Close & Capture Gate" 6th loop card,
+ * now removed from tests/whats-this/whats-this-loop.test.js).
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -75,7 +83,13 @@
     },
   };
 
+  const SAMPLE_INTRO = {
+    en: "Sample intro: this cycle runs after the loop closes.",
+    th: "ตัวอย่างบทนำ: วงจรนี้เกิดขึ้นหลังจากวงจรหลักปิดแล้ว",
+  };
+
   const SAMPLE_CONTENT = {
+    intro: SAMPLE_INTRO,
     firstTime: {
       title: { en: "First Time", th: "ครั้งแรก" },
       body: { en: "Sample first-time body copy.", th: "ตัวอย่างเนื้อหาครั้งแรก" },
@@ -121,6 +135,34 @@
       expect(content.skillCapture.nextTime.body.en.length > 0).toBeTruthy();
       expect(typeof content.skillCapture.nextTime.body.th).toBe("string");
       expect(content.skillCapture.nextTime.body.th.length > 0).toBeTruthy();
+    });
+
+    it("loadWhatsThisContent() returns a bilingual skillCapture.intro clarifying this cycle runs after the loop closes (issue #522 follow-up AC4)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+
+      expect(typeof content.skillCapture.intro.en).toBe("string");
+      expect(content.skillCapture.intro.en.length > 0).toBeTruthy();
+      expect(typeof content.skillCapture.intro.th).toBe("string");
+      expect(content.skillCapture.intro.th.length > 0).toBeTruthy();
+      expect(content.skillCapture.intro.en.toLowerCase()).not.toContain("close & capture gate");
+    });
+
+    it("buildSkillCaptureSection(state, content) renders the intro paragraph before the cards, re-rendering in Thai on language change (issue #522 follow-up AC4)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      const intro = section.querySelector('[data-testid="whats-this-skills-intro"]');
+
+      expect(intro).toBeTruthy();
+      expect(intro.textContent).toBe(SAMPLE_INTRO.en);
+
+      state.lang = "th";
+      state.onLanguageChange.forEach((fn) => fn());
+
+      expect(intro.textContent).toBe(SAMPLE_INTRO.th);
     });
 
     it("buildSkillCaptureSection(state, content) renders a heading reading exactly SKILL CAPTURE & REUSE in English by default, sourced from i18n (issue #508)", async () => {
