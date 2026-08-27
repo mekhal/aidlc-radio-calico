@@ -22,7 +22,7 @@
   // it can be unit-tested without needing a real <script> load.
   function categorizeScriptPath(url) {
     if (!url) return "index/app";
-    const match = url.match(/\/tests\/(shared|logo|menu|sidebar|footer)\//);
+    const match = url.match(/\/tests\/(shared|logo|menu|sidebar|footer|about|case-study|contact|whats-this)\//);
     return match ? match[1] : "index/app";
   }
 
