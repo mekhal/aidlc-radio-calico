@@ -4,18 +4,7 @@
       "en": "Radio Calico isn't just a radio player - it's a live demonstration. The real thing being tested here is the workflow itself: a human and Claude's GitHub agent working entirely through GitHub issues and pull requests, from planning through tests, code, and review, to prove an AI agent can deliver production-grade work end to end with a human approving every step along the way.",
       "th": "Radio Calico ไม่ใช่แค่เครื่องเล่นวิทยุ แต่คือการสาธิตสด สิ่งที่ถูกทดสอบจริงคือกระบวนการทำงานเอง: มนุษย์และ Claude GitHub agent ทำงานร่วมกันทั้งหมดผ่าน GitHub issues และ pull requests ตั้งแต่การวางแผน ทดสอบ เขียนโค้ด ไปจนถึงรีวิว เพื่อพิสูจน์ว่า AI agent สามารถส่งมอบงานระดับโปรดักชันได้ครบวงจร โดยมีมนุษย์อนุมัติทุกขั้นตอน"
     },
-    "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"],
-    "image": {
-      "src": "code-pr-gates.jpg",
-      "alt": {
-        "en": "Diagram of the Step 7 Code PR gates: Security, Quality, Reviewability, and Traceability, all required before a human merges",
-        "th": "แผนภาพประตูตรวจสอบขั้นที่ 7 ของ Code PR: Security, Quality, Reviewability และ Traceability ต้องผ่านทั้งหมดก่อนมนุษย์ merge"
-      },
-      "caption": {
-        "en": "Every Code PR clears four quality gates before a human merges it.",
-        "th": "ทุก Code PR ต้องผ่านสี่ประตูคุณภาพก่อนมนุษย์จะ merge"
-      }
-    }
+    "badges": ["Human-in-the-loop", "TDD", "Skill Capture & Reuse", "Production-grade"]
   },
   "aidlcLoop": {
     "steps": [
@@ -65,12 +54,12 @@
     "image": {
       "src": "aidlc-loop-gates.jpg",
       "alt": {
-        "en": "Diagram of the full 7-step AI-DLC loop, from issue trigger through to close and capture",
-        "th": "แผนภาพวงจร AI-DLC ทั้ง 7 ขั้นตอน ตั้งแต่เปิด issue จนถึงปิดงานและบันทึกทักษะ"
+        "en": "Diagram of the AI-DLC loop's 7 steps in sequence, from opening an issue through review and merge, with a dashed waiver path that can skip the Test PR step",
+        "th": "แผนภาพ 7 ขั้นตอนของวงจร AI-DLC ตั้งแต่เปิด issue จนถึงรีวิวและ merge พร้อมเส้นทาง waiver แบบเส้นประที่สามารถข้ามขั้นตอน Test PR ได้"
       },
       "caption": {
-        "en": "The loop repeats every time, with a human gate at every odd step.",
-        "th": "วงจรนี้วนซ้ำทุกครั้ง โดยมีประตูให้มนุษย์ตรวจสอบในทุกขั้นคี่"
+        "en": "Seven steps, a human gate at every odd one — plus an optional waiver path that skips the Test PR.",
+        "th": "เจ็ดขั้นตอน มีประตูให้มนุษย์ตรวจสอบในทุกขั้นคี่ พร้อมเส้นทาง waiver ที่ข้าม Test PR ได้"
       }
     }
   },
@@ -92,12 +81,12 @@
     "image": {
       "src": "skill-reuse-gates.png",
       "alt": {
-        "en": "Diagram of the skill lifecycle: Capture, Distill, Store, Reuse, and Evolve",
-        "th": "แผนภาพวงจรทักษะ: Capture, Distill, Store, Reuse และ Evolve"
+        "en": "Diagram of the 5-stage skill lifecycle: Capture, Distill, Store, Reuse, and Evolve, with candidate skills reviewed by a human before they're stored or deprecated",
+        "th": "แผนภาพวงจรทักษะ 5 ขั้นตอน: Capture, Distill, Store, Reuse และ Evolve โดยมนุษย์ตรวจสอบทักษะที่เสนอก่อนจัดเก็บหรือเลิกใช้"
       },
       "caption": {
-        "en": "A human decision becomes a skill the agent reuses and refines over time.",
-        "th": "การตัดสินใจของมนุษย์กลายเป็นทักษะที่ agent นำกลับมาใช้และพัฒนาต่อได้"
+        "en": "Five stages turn a human decision into a skill — reviewed by a human before it's stored or retired.",
+        "th": "ห้าขั้นตอนเปลี่ยนการตัดสินใจของมนุษย์ให้เป็นทักษะ โดยมนุษย์ตรวจสอบก่อนจัดเก็บหรือเลิกใช้"
       }
     }
   }

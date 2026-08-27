@@ -312,6 +312,13 @@
          pattern as the whats-this/ blocks above. -->
     <script src="whats-this/whats-this-images.test.js"></script>
 
+    <!-- issue #522 (follow-up from #505): whats-this/whats-this.css's
+         .whats-this-image max-width: 42rem cap — CSS source-text
+         assertions, same category/pattern as about-standards-theme.test.js
+         above, so wired directly here rather than into
+         test-report-suite-files.js. -->
+    <script src="whats-this/whats-this-image-width.test.js"></script>
+
     <!-- issue #402 (Ticket 1 of the "What's this" page story), AC5:
          config/cdn-sources.json's bootstrap/bootstrap-icons usedIn lists
          must include pages/whats-this.html — a plain JSON-content check, same
