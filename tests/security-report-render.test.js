@@ -10,10 +10,14 @@
  *
  * Test PR waived at step 3 (mekhal, issue #544) — bundled into the Code PR.
  *
- * Issue #544 follow-up (2026-08-27 review): mekhal asked for bilingual
- * (EN/TH) body labels on this page — formatBilingualLabel()/
- * formatFindingsCount() are the pure functions that produce that text, so
- * they're covered here alongside the existing parse/categorize tests.
+ * Issue #544 follow-up (2026-08-27, mekhal): the page moved from showing
+ * EN/TH together to a real language toggle, with copy text moved into
+ * i18n/security-report-en.json + i18n/security-report-th.json (fetched by
+ * report-boot.js, untested for the same reason as its DOM wiring). The old
+ * formatBilingualLabel()/STRINGS/per-category-label coverage is replaced by
+ * a formatFindingsCount() test (the one small pure string-templating
+ * function that still lives in report-render.js) and buildCategorySummary()
+ * dropping its `label` field (labels now resolve from i18n at render time).
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -91,43 +95,20 @@
       expect(byKey.secrets).toBe(1);
     });
 
-    it("buildCategorySummary() renders each category's label bilingually (EN / TH)", async () => {
-      await loadReportRender();
-      const { buildCategorySummary } = window.SecurityReportRender;
-
-      const summary = buildCategorySummary([]);
-      const byKey = Object.fromEntries(summary.map((category) => [category.key, category.label]));
-
-      expect(byKey.secrets).toBe("Secrets Detection / การตรวจจับข้อมูลลับ");
-      expect(byKey.sca).toBe("Dependencies (SCA) / การพึ่งพา (SCA)");
-      expect(byKey.misconfig).toBe("Misconfigurations / การตั้งค่าที่ผิดพลาด");
-      expect(byKey.license).toBe("License Compliance / การปฏิบัติตามสัญญาอนุญาต");
-    });
-
-    it("formatBilingualLabel() joins an { en, th } field as 'EN / TH'", async () => {
-      await loadReportRender();
-      const { formatBilingualLabel } = window.SecurityReportRender;
-
-      expect(formatBilingualLabel({ en: "Passed", th: "ผ่าน" })).toBe("Passed / ผ่าน");
-    });
-
-    it("formatFindingsCount() renders a bilingual count for zero and non-zero", async () => {
+    it("formatFindingsCount() substitutes {count} into an EN or TH template", async () => {
       await loadReportRender();
       const { formatFindingsCount } = window.SecurityReportRender;
 
-      expect(formatFindingsCount(0)).toBe("0 finding(s) / พบ 0 รายการ");
-      expect(formatFindingsCount(3)).toBe("3 finding(s) / พบ 3 รายการ");
+      expect(formatFindingsCount("{count} finding(s)", 0)).toBe("0 finding(s)");
+      expect(formatFindingsCount("{count} finding(s)", 3)).toBe("3 finding(s)");
+      expect(formatFindingsCount("พบ {count} รายการ", 3)).toBe("พบ 3 รายการ");
     });
 
-    it("STRINGS exposes bilingual loading/error/status text", async () => {
+    it("CATEGORY_KEYS exposes the 4 fixed category keys in display order", async () => {
       await loadReportRender();
-      const { STRINGS } = window.SecurityReportRender;
+      const { CATEGORY_KEYS } = window.SecurityReportRender;
 
-      expect(STRINGS.loading.en).toBe("Loading scan results...");
-      expect(STRINGS.loading.th).toBeTruthy();
-      expect(STRINGS.error.th).toBeTruthy();
-      expect(STRINGS.statusPassed).toEqual({ en: "Passed", th: "ผ่าน" });
-      expect(STRINGS.statusFailed).toEqual({ en: "Failed", th: "ไม่ผ่าน" });
+      expect(CATEGORY_KEYS).toEqual(["secrets", "sca", "misconfig", "license"]);
     });
   });
 })();
