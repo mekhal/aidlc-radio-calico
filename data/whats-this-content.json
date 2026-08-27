@@ -75,20 +75,43 @@
       "en": "This capture-and-reuse cycle runs after the 7-step loop closes, at the human's \"close\" command - it isn't one of the 7 numbered steps above.",
       "th": "วงจรการเก็บและนำทักษะกลับมาใช้นี้เกิดขึ้นหลังวงจร 7 ขั้นตอนด้านบนปิดแล้ว เมื่อมนุษย์สั่ง \"close\" - ไม่ใช่หนึ่งใน 7 ขั้นตอนที่กล่าวไปข้างต้น"
     },
-    "firstTime": {
-      "title": { "en": "First Time", "th": "ครั้งแรก" },
-      "body": {
-        "en": "When a human makes a call - choosing an approach, setting a rule, giving feedback - the agent writes it down and saves it as a new skill in .claude/skills/.",
-        "th": "เมื่อมนุษย์ตัดสินใจ - เลือกแนวทาง ตั้งกฎ หรือให้ฟีดแบ็ก - agent จะบันทึกไว้และเก็บเป็นทักษะใหม่ใน .claude/skills/"
+    "stages": [
+      {
+        "title": { "en": "1. Capture", "th": "1. Capture" },
+        "body": {
+          "en": "Every time a human makes a call - choosing an approach, setting a rule, giving feedback - it's recorded under docs/decisions/.",
+          "th": "ทุกครั้งที่มนุษย์ตัดสินใจ - เลือกแนวทาง ตั้งกฎ หรือให้ฟีดแบ็ก - จะถูกบันทึกไว้ใน docs/decisions/"
+        }
+      },
+      {
+        "title": { "en": "2. Distill", "th": "2. Distill" },
+        "body": {
+          "en": "Recurring or valuable decisions get written up as a reusable skill.",
+          "th": "การตัดสินใจที่เกิดซ้ำหรือมีคุณค่าจะถูกกลั่นกรองและเขียนเป็นทักษะที่นำกลับมาใช้ใหม่ได้"
+        }
+      },
+      {
+        "title": { "en": "3. Store", "th": "3. Store" },
+        "body": {
+          "en": "Skills live in this repo's own .claude/skills/ - there is no separate skills repo.",
+          "th": "ทักษะถูกจัดเก็บไว้ใน .claude/skills/ ของ repo นี้เอง - ไม่มี repo ทักษะแยกต่างหาก"
+        }
+      },
+      {
+        "title": { "en": "4. Reuse", "th": "4. Reuse" },
+        "body": {
+          "en": "The agent checks and applies stored skills in later loops, so its behavior stays consistent with prior decisions.",
+          "th": "agent จะตรวจสอบและนำทักษะที่จัดเก็บไว้มาใช้ในรอบถัดไป เพื่อให้พฤติกรรมสอดคล้องกับการตัดสินใจก่อนหน้า"
+        }
+      },
+      {
+        "title": { "en": "5. Evolve", "th": "5. Evolve" },
+        "body": {
+          "en": "A human reviews candidate or outdated skills and decides to keep, update, or deprecate them.",
+          "th": "มนุษย์ตรวจสอบทักษะที่เสนอใหม่หรือที่ล้าสมัย แล้วตัดสินใจว่าจะเก็บไว้ อัปเดต หรือเลิกใช้"
+        }
       }
-    },
-    "nextTime": {
-      "title": { "en": "Next Time", "th": "ครั้งต่อไป" },
-      "body": {
-        "en": "In later loops, the agent automatically checks that stored skill and applies it, so its behavior stays consistent with what was decided before.",
-        "th": "ในรอบถัดไป agent จะตรวจสอบทักษะที่บันทึกไว้โดยอัตโนมัติและนำมาใช้ เพื่อให้พฤติกรรมสอดคล้องกับสิ่งที่ตัดสินใจไว้ก่อนหน้า"
-      }
-    },
+    ],
     "image": {
       "src": "skill-reuse-gates.png",
       "alt": {

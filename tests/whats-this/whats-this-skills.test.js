@@ -54,6 +54,19 @@
  * `image` field and before whats-this.js exports buildSectionImage, per
  * TDD — fails until this issue's Code PR (step 6) adds both.
  *
+ * Issue #529 (follow-up from #522's close): per @mekhal's follow-up review
+ * comment asking for more detail matching the section's own diagram
+ * (skill-reuse-gates.png, a 5-stage Capture/Distill/Store/Reuse/Evolve
+ * lifecycle), the 2-card "First Time"/"Next Time" grid
+ * (buildSkillCaptureCard/Grid, .whats-this-skill-card*) is replaced by a
+ * 5-row table. `skillCapture.firstTime`/`nextTime` are replaced by a
+ * `stages` array of 5 `{title, body}` entries — a content-shape change,
+ * called out explicitly since #522's own AC4 said "no shape change" for
+ * this same field. Rendered by the shared
+ * buildWhatsThisTable(state, rows, headingKeys), same builder as Section
+ * 2's AI-DLC Loop table. Step 3 waiver approved again (2026-08-27): Test PR
+ * skipped, bundled into this Code PR.
+ *
  * Issue #522 follow-up review (2026-08-27, kept in this same issue per
  * @mekhal's explicit request): skillCapture gains a new bilingual `intro`
  * field (AC4), rendered by buildSkillCaptureSection() as a paragraph right
@@ -67,9 +80,25 @@
   const { loadSharedModule } = window.SharedModuleTestHelpers;
 
   const SAMPLE_TRANSLATIONS = {
-    en: { whatsThisSkillsHeading: "SKILL CAPTURE & REUSE" },
-    th: { whatsThisSkillsHeading: "การเก็บและใช้ทักษะซ้ำ" },
+    en: {
+      whatsThisSkillsHeading: "SKILL CAPTURE & REUSE",
+      whatsThisSkillsColStage: "Stage",
+      whatsThisSkillsColDescription: "What happens",
+    },
+    th: {
+      whatsThisSkillsHeading: "การเก็บและใช้ทักษะซ้ำ",
+      whatsThisSkillsColStage: "ขั้นตอน",
+      whatsThisSkillsColDescription: "รายละเอียด",
+    },
   };
+
+  const EXPECTED_STAGE_TITLES_EN = ["1. Capture", "2. Distill", "3. Store", "4. Reuse", "5. Evolve"];
+  const EXPECTED_STAGE_TITLES_TH = ["1. Capture", "2. Distill", "3. Store", "4. Reuse", "5. Evolve"];
+
+  const SAMPLE_STAGES = EXPECTED_STAGE_TITLES_EN.map((titleEn, i) => ({
+    title: { en: titleEn, th: EXPECTED_STAGE_TITLES_TH[i] },
+    body: { en: `Sample body for ${titleEn}.`, th: `เนื้อหาตัวอย่างสำหรับ ${titleEn}` },
+  }));
 
   const SAMPLE_SKILL_IMAGE = {
     src: "skill-reuse-gates.png",
@@ -90,14 +119,7 @@
 
   const SAMPLE_CONTENT = {
     intro: SAMPLE_INTRO,
-    firstTime: {
-      title: { en: "First Time", th: "ครั้งแรก" },
-      body: { en: "Sample first-time body copy.", th: "ตัวอย่างเนื้อหาครั้งแรก" },
-    },
-    nextTime: {
-      title: { en: "Next Time", th: "ครั้งต่อไป" },
-      body: { en: "Sample next-time body copy.", th: "ตัวอย่างเนื้อหาครั้งต่อไป" },
-    },
+    stages: SAMPLE_STAGES,
     image: SAMPLE_SKILL_IMAGE,
   };
 
@@ -115,26 +137,22 @@
   }
 
   describe('whats-this/whats-this.js (issue #405/#508, Ticket 4 — Section 3: Skill Capture & Reuse)', () => {
-    it("loadWhatsThisContent() fetches data/whats-this-content.json and returns bilingual firstTime/nextTime title+body (issue #508 AC2, AC3)", async () => {
+    it("loadWhatsThisContent() fetches data/whats-this-content.json and returns 5 bilingual skill-lifecycle stages, in Capture/Distill/Store/Reuse/Evolve order (issue #529)", async () => {
       await loadWhatsThisContentModule();
 
       const content = await window.loadWhatsThisContent();
 
       expect(content.skillCapture).toBeTruthy();
-      expect(content.skillCapture.firstTime.title.en).toBe("First Time");
-      expect(typeof content.skillCapture.firstTime.title.th).toBe("string");
-      expect(content.skillCapture.firstTime.title.th.length > 0).toBeTruthy();
-      expect(content.skillCapture.nextTime.title.en).toBe("Next Time");
-      expect(typeof content.skillCapture.nextTime.title.th).toBe("string");
-      expect(content.skillCapture.nextTime.title.th.length > 0).toBeTruthy();
-      expect(typeof content.skillCapture.firstTime.body.en).toBe("string");
-      expect(content.skillCapture.firstTime.body.en.length > 0).toBeTruthy();
-      expect(typeof content.skillCapture.firstTime.body.th).toBe("string");
-      expect(content.skillCapture.firstTime.body.th.length > 0).toBeTruthy();
-      expect(typeof content.skillCapture.nextTime.body.en).toBe("string");
-      expect(content.skillCapture.nextTime.body.en.length > 0).toBeTruthy();
-      expect(typeof content.skillCapture.nextTime.body.th).toBe("string");
-      expect(content.skillCapture.nextTime.body.th.length > 0).toBeTruthy();
+      expect(content.skillCapture.stages.length).toBe(5);
+      expect(content.skillCapture.stages.map((stage) => stage.title.en)).toEqual(EXPECTED_STAGE_TITLES_EN);
+      content.skillCapture.stages.forEach((stage) => {
+        expect(typeof stage.title.th).toBe("string");
+        expect(stage.title.th.length > 0).toBeTruthy();
+        expect(typeof stage.body.en).toBe("string");
+        expect(stage.body.en.length > 0).toBeTruthy();
+        expect(typeof stage.body.th).toBe("string");
+        expect(stage.body.th.length > 0).toBeTruthy();
+      });
     });
 
     it("loadWhatsThisContent() returns a bilingual skillCapture.intro clarifying this cycle runs after the loop closes (issue #522 follow-up AC4)", async () => {
@@ -149,7 +167,7 @@
       expect(content.skillCapture.intro.en.toLowerCase()).not.toContain("close & capture gate");
     });
 
-    it("buildSkillCaptureSection(state, content) renders the intro paragraph before the cards, re-rendering in Thai on language change (issue #522 follow-up AC4)", async () => {
+    it("buildSkillCaptureSection(state, content) renders the intro paragraph before the table, re-rendering in Thai on language change (issue #522 follow-up AC4)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
@@ -176,42 +194,49 @@
       expect(heading.textContent).toBe("SKILL CAPTURE & REUSE");
     });
 
-    it("buildSkillCaptureSection(state, content) renders exactly 2 cards titled First Time and Next Time, in that order, by default (AC1)", async () => {
+    it("buildSkillCaptureSection(state, content) renders the table's column headers (Stage / What happens) in English by default, sourced from i18n (issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
-      const titles = Array.from(section.querySelectorAll(".whats-this-skill-card__title")).map(
-        (el) => el.textContent,
-      );
+      const headers = Array.from(section.querySelectorAll("table thead th")).map((el) => el.textContent);
 
-      expect(titles).toEqual(["First Time", "Next Time"]);
+      expect(headers).toEqual(["Stage", "What happens"]);
     });
 
-    it("buildSkillCaptureGrid(state, content) wraps both cards in a Bootstrap row of col-md-6 columns (AC1: stacks on mobile, 2-up on desktop)", async () => {
+    it("buildSkillCaptureSection(state, content) renders exactly 5 table rows titled 1. Capture through 5. Evolve, in that order, by default (issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const grid = window.buildSkillCaptureGrid(state, SAMPLE_CONTENT);
-      const cols = Array.from(grid.querySelectorAll(".whats-this-skill-card-col"));
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      const titles = Array.from(section.querySelectorAll(".whats-this-table__title")).map((el) => el.textContent);
 
-      expect(grid.className).toContain("row");
-      expect(cols.length).toBe(2);
-      cols.forEach((col) => expect(col.className).toContain("col-md-6"));
+      expect(titles).toEqual(EXPECTED_STAGE_TITLES_EN);
     });
 
-    it("buildSkillCaptureSection(state, content) embeds the English First Time and Next Time body copy from the content argument, sourced from data not hardcoded, by default (AC2, AC3)", async () => {
+    it("buildSkillCaptureSection(state, content) renders exactly one table for the 5 stages (issue #529)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      const tables = section.querySelectorAll("table.whats-this-table");
+
+      expect(tables.length).toBe(1);
+    });
+
+    it("buildSkillCaptureSection(state, content) embeds all 5 stages' English body copy from the content argument, sourced from data not hardcoded, by default (issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const content = await window.loadWhatsThisContent();
       const section = window.buildSkillCaptureSection(state, content.skillCapture);
 
-      expect(section.textContent).toContain(content.skillCapture.firstTime.body.en);
-      expect(section.textContent).toContain(content.skillCapture.nextTime.body.en);
+      content.skillCapture.stages.forEach((stage) => {
+        expect(section.textContent).toContain(stage.body.en);
+      });
     });
 
-    it("buildSkillCaptureSection(state, content) re-renders the heading, both card titles, AND bodies in Thai when the language changes, without a reload (issue #508 AC2, AC3)", async () => {
+    it("buildSkillCaptureSection(state, content) re-renders the heading, column headers, all 5 stage titles, AND bodies in Thai when the language changes, without a reload (issue #508 AC2, issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
@@ -222,29 +247,39 @@
       const heading = section.querySelector("h2");
       expect(heading.textContent).toBe("การเก็บและใช้ทักษะซ้ำ");
 
-      const titles = Array.from(section.querySelectorAll(".whats-this-skill-card__title")).map(
-        (el) => el.textContent,
-      );
-      expect(titles).toEqual(["ครั้งแรก", "ครั้งต่อไป"]);
+      const headers = Array.from(section.querySelectorAll("table thead th")).map((el) => el.textContent);
+      expect(headers).toEqual(["ขั้นตอน", "รายละเอียด"]);
 
-      expect(section.textContent).toContain(SAMPLE_CONTENT.firstTime.body.th);
-      expect(section.textContent).toContain(SAMPLE_CONTENT.nextTime.body.th);
+      const titles = Array.from(section.querySelectorAll(".whats-this-table__title")).map((el) => el.textContent);
+      expect(titles).toEqual(EXPECTED_STAGE_TITLES_TH);
+
+      SAMPLE_STAGES.forEach((stage) => {
+        expect(section.textContent).toContain(stage.body.th);
+      });
     });
 
-    it("First Time English copy describes a new skill being captured into .claude/skills/ (AC2)", async () => {
+    it("Capture stage English copy describes a human decision being recorded under docs/decisions/ (issue #529, per CLAUDE.md's Skill capture flow)", async () => {
       await loadWhatsThisContentModule();
 
       const content = await window.loadWhatsThisContent();
 
-      expect(content.skillCapture.firstTime.body.en).toContain(".claude/skills/");
+      expect(content.skillCapture.stages[0].body.en).toContain("docs/decisions/");
     });
 
-    it("Next Time English copy describes the agent automatically reusing the stored skill (AC3)", async () => {
+    it("Store stage English copy names .claude/skills/ as where skills live (issue #529, per CLAUDE.md's Skill capture flow)", async () => {
       await loadWhatsThisContentModule();
 
       const content = await window.loadWhatsThisContent();
 
-      expect(content.skillCapture.nextTime.body.en.toLowerCase()).toContain("automatically");
+      expect(content.skillCapture.stages[2].body.en).toContain(".claude/skills/");
+    });
+
+    it("Reuse stage English copy describes the agent applying stored skills in later loops (issue #529, per CLAUDE.md's Skill capture flow)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+
+      expect(content.skillCapture.stages[3].body.en.toLowerCase()).toContain("later loops");
     });
 
     it("buildSkillCaptureSection(state, content) does not render README section 7's literal language (AC4)", async () => {

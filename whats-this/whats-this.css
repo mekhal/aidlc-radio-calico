@@ -42,11 +42,11 @@
 }
 
 /* Issue #404 (Ticket 3 of the "What's this" page story): Section 2, "The
-   AI-DLC Loop" - reuses case-study/case-study.css's card look (same
-   --chloe-sage/--chloe-ink/--chloe-pink-deep theme-flipping tokens, per
-   docs/knowledge-asset/published/theme-token-background-audit.md) and its
-   Bootstrap col-md-4 grid (AC3: stacks vertically below md, 3-per-row grid
-   at md and up). */
+   AI-DLC Loop" heading/section spacing.
+
+   Issue #529 (follow-up from #522's close): the 7-step card grid this
+   section used is replaced by a table - see .whats-this-table below, shared
+   with Section 3's Skill Capture table. */
 
 .chloe-whats-this-loop {
   padding: 2rem;
@@ -58,39 +58,6 @@
   margin: 0 0 1.5rem;
 }
 
-.whats-this-loop-card-col {
-  margin-bottom: 1.5rem;
-}
-
-.whats-this-loop-card {
-  height: 100%;
-  background: var(--chloe-sage);
-  color: var(--chloe-ink);
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.whats-this-loop-card__number {
-  font-family: var(--chloe-sans);
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--chloe-pink-deep);
-  margin: 0 0 0.5rem;
-}
-
-.whats-this-loop-card__title {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.1rem;
-  margin: 0 0 0.5rem;
-}
-
-.whats-this-loop-card__description {
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 @media (max-width: 767.98px) {
   .chloe-whats-this-loop {
     padding: 1.25rem;
@@ -98,13 +65,12 @@
 }
 
 /* Issue #405 (Ticket 4 of the "What's this" page story): Section 3, "Skill
-   Capture & Reuse" - two-column "First Time" / "Next Time" comparison
-   (AC1: Bootstrap col-md-6 grid, stacks to a single column below md - same
-   card look/theme-flipping tokens as Section 2's loop cards above, per
-   docs/knowledge-asset/published/theme-token-background-audit.md). The
-   "Next Time" card gets a border accent rather than a different background
-   to distinguish it, per that same skill's guidance to keep state cues out
-   of the background/text-contrast pairing. */
+   Capture & Reuse" heading/section spacing.
+
+   Issue #529 (follow-up from #522's close): the 2-card "First Time"/"Next
+   Time" grid this section used is replaced by a table (now 5 rows, one per
+   skill lifecycle stage) - see .whats-this-table below, shared with
+   Section 2's AI-DLC Loop table. */
 
 .chloe-whats-this-skills {
   padding: 2rem;
@@ -124,37 +90,42 @@
   margin: 0 0 1.5rem;
 }
 
-.whats-this-skill-card-col {
-  margin-bottom: 1.5rem;
-}
-
-.whats-this-skill-card {
-  height: 100%;
-  background: var(--chloe-sage);
-  color: var(--chloe-ink);
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-}
-
-.whats-this-skill-card--next {
-  border-left: 4px solid var(--chloe-pink-deep);
-}
-
-.whats-this-skill-card__title {
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.1rem;
-  margin: 0 0 0.5rem;
-}
-
-.whats-this-skill-card__body {
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 @media (max-width: 767.98px) {
   .chloe-whats-this-skills {
     padding: 1.25rem;
   }
+}
+
+/* Issue #529 (follow-up from #522's close): shared table for Section 2's
+   AI-DLC Loop steps and Section 3's Skill Capture stages, replacing both
+   sections' card grids. Same theme-flipping token pairs as about.css's
+   .chloe-about-standards__table (per
+   docs/knowledge-asset/published/theme-token-background-audit.md) - reused
+   rather than re-auditing a new pair from scratch. */
+
+.whats-this-table {
+  --bs-table-bg: var(--chloe-sage);
+  --bs-table-color: var(--chloe-ink);
+  background-color: var(--chloe-sage);
+  color: var(--chloe-ink);
+  border-color: var(--chloe-ink);
+}
+
+.whats-this-table thead {
+  --bs-table-bg: var(--chloe-player-box-bg);
+  --bs-table-color: var(--chloe-player-box-fg);
+  background-color: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+}
+
+.whats-this-table th,
+.whats-this-table td {
+  border-color: var(--chloe-ink);
+}
+
+.whats-this-table__title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
 }
 
 /* Issue #509 (Ticket 2 of the "What's this" bilingual + diagram story, part
@@ -165,11 +136,16 @@
    it, the wrapper had no cap of its own (only img-fluid's max-width: 100%
    of its *container*, and the section container itself has no cap either),
    so wide source images rendered close to full page width instead of
-   matching the ~42rem text column (.chloe-whats-this-what__body above). */
+   matching the ~42rem text column (.chloe-whats-this-what__body above).
+
+   Issue #529 (follow-up from #522's close): margin's horizontal component
+   changed from 0 to auto - the 42rem cap alone left the box flush against
+   the section's left edge on any viewport wider than 42rem instead of
+   centering it. */
 
 .whats-this-image {
   max-width: 42rem;
-  margin: 0 0 1.5rem;
+  margin: 0 auto 1.5rem;
 }
 
 .whats-this-image__img {

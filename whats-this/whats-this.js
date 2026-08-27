@@ -98,6 +98,24 @@
  * closes rather than being one of the 7 numbered steps (previously the old
  * 6th "Close & Capture Gate" card blurred this into the loop's own
  * numbering).
+ *
+ * Issue #529 (follow-up from #522's close): @mekhal reported the aidlcLoop/
+ * skillCapture diagram images sat flush left instead of centered on wide
+ * viewports (whats-this.css's .whats-this-image had no horizontal
+ * auto-margin), and asked for both the AI-DLC Loop and Skill Capture
+ * sections to render as tables instead of card grids. buildAiDlcLoopCard/
+ * Grid and buildSkillCaptureCard/Grid are replaced by a single shared
+ * buildWhatsThisTable(state, rows, headingKeys) - modeled on about.js's
+ * buildProductionStandardsTable(state, standards) (reuse-first) - a
+ * <table> with a <thead> (two bilingual column headers, i18n keys per
+ * section) and one <tbody> row per item, self-rendering/self-subscribing to
+ * state.onLanguageChange like every other builder here. Per @mekhal's
+ * follow-up review comment, the Skill Capture table also gains more detail:
+ * `skillCapture.firstTime`/`nextTime` (2 rows) are replaced by a `stages`
+ * array of 5 rows (Capture/Distill/Store/Reuse/Evolve), matching the
+ * section's own diagram (skill-reuse-gates.png) and CLAUDE.md's "Skill
+ * capture flow" - a content-shape change, called out explicitly since the
+ * original plan's AC4 had said "no shape change".
  */
 (function () {
   "use strict";
@@ -178,49 +196,52 @@
     return section;
   }
 
-  function buildAiDlcLoopCard(state, step, index) {
-    const col = document.createElement("div");
-    col.className = "col-md-4 whats-this-loop-card-col";
-    col.dataset.testid = "whats-this-loop-card-col";
+  function buildWhatsThisTable(state, rows, headingKeys) {
+    const table = document.createElement("table");
+    table.className = "table whats-this-table";
+    table.dataset.testid = "whats-this-table";
 
-    const card = document.createElement("div");
-    card.className = "whats-this-loop-card";
-    card.dataset.testid = "whats-this-loop-card";
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    const firstHeader = document.createElement("th");
+    firstHeader.scope = "col";
+    const secondHeader = document.createElement("th");
+    secondHeader.scope = "col";
+    headerRow.appendChild(firstHeader);
+    headerRow.appendChild(secondHeader);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-    const number = document.createElement("p");
-    number.className = "whats-this-loop-card__number";
-    number.textContent = String(index + 1);
-
-    const title = document.createElement("h3");
-    title.className = "whats-this-loop-card__title";
-
-    const description = document.createElement("p");
-    description.className = "whats-this-loop-card__description";
+    const tbody = document.createElement("tbody");
+    const cells = rows.map(() => {
+      const row = document.createElement("tr");
+      const title = document.createElement("td");
+      title.className = "whats-this-table__title";
+      const description = document.createElement("td");
+      description.className = "whats-this-table__description";
+      row.appendChild(title);
+      row.appendChild(description);
+      tbody.appendChild(row);
+      return { title, description };
+    });
+    table.appendChild(tbody);
 
     function render() {
-      title.textContent = resolveBilingualField(step.title, state.lang);
-      description.textContent = resolveBilingualField(step.description, state.lang);
+      if (!ALBUM_PROMO_TRANSLATIONS) return;
+      const t = ALBUM_PROMO_TRANSLATIONS[state.lang];
+      firstHeader.textContent = t[headingKeys.first];
+      secondHeader.textContent = t[headingKeys.second];
+
+      cells.forEach(({ title, description }, i) => {
+        title.textContent = resolveBilingualField(rows[i].title, state.lang);
+        description.textContent = resolveBilingualField(rows[i].description ?? rows[i].body, state.lang);
+      });
     }
 
     render();
     state.onLanguageChange.push(render);
 
-    card.appendChild(number);
-    card.appendChild(title);
-    card.appendChild(description);
-    col.appendChild(card);
-
-    return col;
-  }
-
-  function buildAiDlcLoopGrid(state, steps) {
-    const grid = document.createElement("div");
-    grid.className = "row whats-this-loop-grid";
-    grid.dataset.testid = "whats-this-loop-grid";
-
-    steps.forEach((step, index) => grid.appendChild(buildAiDlcLoopCard(state, step, index)));
-
-    return grid;
+    return table;
   }
 
   function buildAiDlcLoopSection(state, content) {
@@ -241,50 +262,14 @@
 
     section.appendChild(heading);
     section.appendChild(buildSectionImage(state, content.image));
-    section.appendChild(buildAiDlcLoopGrid(state, content.steps));
+    section.appendChild(
+      buildWhatsThisTable(state, content.steps, {
+        first: "whatsThisLoopColStep",
+        second: "whatsThisLoopColDescription",
+      }),
+    );
 
     return section;
-  }
-
-  function buildSkillCaptureCard(state, card, modifierClass) {
-    const col = document.createElement("div");
-    col.className = "col-md-6 whats-this-skill-card-col";
-    col.dataset.testid = "whats-this-skill-card-col";
-
-    const box = document.createElement("div");
-    box.className = `whats-this-skill-card ${modifierClass}`;
-    box.dataset.testid = "whats-this-skill-card";
-
-    const title = document.createElement("h3");
-    title.className = "whats-this-skill-card__title";
-
-    const body = document.createElement("p");
-    body.className = "whats-this-skill-card__body";
-
-    function render() {
-      title.textContent = resolveBilingualField(card.title, state.lang);
-      body.textContent = resolveBilingualField(card.body, state.lang);
-    }
-
-    render();
-    state.onLanguageChange.push(render);
-
-    box.appendChild(title);
-    box.appendChild(body);
-    col.appendChild(box);
-
-    return col;
-  }
-
-  function buildSkillCaptureGrid(state, content) {
-    const grid = document.createElement("div");
-    grid.className = "row whats-this-skill-grid";
-    grid.dataset.testid = "whats-this-skill-grid";
-
-    grid.appendChild(buildSkillCaptureCard(state, content.firstTime, "whats-this-skill-card--first"));
-    grid.appendChild(buildSkillCaptureCard(state, content.nextTime, "whats-this-skill-card--next"));
-
-    return grid;
   }
 
   function buildSkillCaptureSection(state, content) {
@@ -311,7 +296,12 @@
     section.appendChild(heading);
     section.appendChild(intro);
     section.appendChild(buildSectionImage(state, content.image));
-    section.appendChild(buildSkillCaptureGrid(state, content));
+    section.appendChild(
+      buildWhatsThisTable(state, content.stages, {
+        first: "whatsThisSkillsColStage",
+        second: "whatsThisSkillsColDescription",
+      }),
+    );
 
     return section;
   }
@@ -320,10 +310,7 @@
   window.buildBadgeRow = buildBadgeRow;
   window.buildSectionImage = buildSectionImage;
   window.buildWhatIsThisSection = buildWhatIsThisSection;
-  window.buildAiDlcLoopCard = buildAiDlcLoopCard;
-  window.buildAiDlcLoopGrid = buildAiDlcLoopGrid;
+  window.buildWhatsThisTable = buildWhatsThisTable;
   window.buildAiDlcLoopSection = buildAiDlcLoopSection;
-  window.buildSkillCaptureCard = buildSkillCaptureCard;
-  window.buildSkillCaptureGrid = buildSkillCaptureGrid;
   window.buildSkillCaptureSection = buildSkillCaptureSection;
 })();
