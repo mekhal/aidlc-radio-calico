@@ -1,9 +1,11 @@
 /**
- * Issue #205 (PR C / AC-C1, 2026-08-05 revised AC): each stored test result
- * must be tagged with the page/component it belongs to, grouped by test
- * folder — tests/shared/, tests/logo/, tests/menu/, tests/sidebar/,
- * tests/footer/ — with everything else (test files directly under tests/,
- * covering index.html/app.js) bucketed as "index/app".
+ * Issue #205 (PR C / AC-C1, 2026-08-05 revised AC; extended by issue #538):
+ * each stored test result must be tagged with the page/component it belongs
+ * to, grouped by test folder — tests/shared/, tests/logo/, tests/menu/,
+ * tests/sidebar/, tests/footer/, tests/about/, tests/case-study/,
+ * tests/contact/, tests/whats-this/ — with everything else (test files
+ * directly under tests/, covering index.html/app.js) bucketed as
+ * "index/app".
  *
  * Design: tests/assert.js's it() derives the category from
  * document.currentScript.src at registration time (every *.test.js file in
@@ -39,6 +41,21 @@
       expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/footer/footer.test.js")).toBe(
         "footer"
       );
+    });
+
+    it("categorizes tests/about/, tests/case-study/, tests/contact/, and tests/whats-this/ script paths (issue #538)", () => {
+      expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/about/about-page.test.js")).toBe(
+        "about"
+      );
+      expect(
+        window.TestHarness.categorizeScriptPath("http://localhost/tests/case-study/case-study.test.js")
+      ).toBe("case-study");
+      expect(window.TestHarness.categorizeScriptPath("http://localhost/tests/contact/contact-form.test.js")).toBe(
+        "contact"
+      );
+      expect(
+        window.TestHarness.categorizeScriptPath("http://localhost/tests/whats-this/whats-this-page.test.js")
+      ).toBe("whats-this");
     });
 
     it('falls back to "index/app" for test files directly under tests/', () => {
