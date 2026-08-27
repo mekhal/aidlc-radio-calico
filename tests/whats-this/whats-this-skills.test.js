@@ -183,6 +183,34 @@
       expect(intro.textContent).toBe(SAMPLE_INTRO.th);
     });
 
+    it("loadWhatsThisContent() returns a bilingual skillCapture.intro clarifying this cycle runs after the loop closes (issue #522 follow-up AC4)", async () => {
+      await loadWhatsThisContentModule();
+
+      const content = await window.loadWhatsThisContent();
+
+      expect(typeof content.skillCapture.intro.en).toBe("string");
+      expect(content.skillCapture.intro.en.length > 0).toBeTruthy();
+      expect(typeof content.skillCapture.intro.th).toBe("string");
+      expect(content.skillCapture.intro.th.length > 0).toBeTruthy();
+      expect(content.skillCapture.intro.en.toLowerCase()).not.toContain("close & capture gate");
+    });
+
+    it("buildSkillCaptureSection(state, content) renders the intro paragraph before the cards, re-rendering in Thai on language change (issue #522 follow-up AC4)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildSkillCaptureSection(state, SAMPLE_CONTENT);
+      const intro = section.querySelector('[data-testid="whats-this-skills-intro"]');
+
+      expect(intro).toBeTruthy();
+      expect(intro.textContent).toBe(SAMPLE_INTRO.en);
+
+      state.lang = "th";
+      state.onLanguageChange.forEach((fn) => fn());
+
+      expect(intro.textContent).toBe(SAMPLE_INTRO.th);
+    });
+
     it("buildSkillCaptureSection(state, content) renders a heading reading exactly SKILL CAPTURE & REUSE in English by default, sourced from i18n (issue #508)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
