@@ -320,30 +320,101 @@
   // this page already mounts its own chrome/globals, which would collide
   // with test-runner.html's fixtures if run inline (see the module doc
   // comment in tests/test-report-dashboard-reload.test.js).
-  function buildLoadingBackdrop() {
-    const backdrop = document.createElement("div");
-    backdrop.className = "report-loading-backdrop";
-    backdrop.dataset.testid = "report-loading-backdrop";
-
-    const label = document.createElement("p");
-    label.className = "report-loading-backdrop__label";
-    label.textContent = "Running tests…";
-    backdrop.appendChild(label);
-
+  function buildTestRunnerIframe() {
     const iframe = document.createElement("iframe");
     iframe.dataset.testid = "report-test-runner-iframe";
     iframe.title = "Test suite runner";
     iframe.hidden = true;
     iframe.setAttribute("aria-hidden", "true");
-    backdrop.appendChild(iframe);
 
-    document.body.appendChild(backdrop);
+    document.body.appendChild(iframe);
     // AC-B2: test-runner.html calls window.parent.onTestRunComplete() (set
     // below) once it has saved its results — only meaningful once the
     // iframe is actually in the document, so src is set last.
     iframe.src = "test-runner.html";
 
-    return backdrop;
+    return iframe;
+  }
+
+  // Issue #533: replaces the full-screen report-loading-backdrop overlay —
+  // this skeleton renders in place of the stats row + category grid inside
+  // `main` instead, so the chrome (header/sidebar/heading/Reload button)
+  // stays visible while a run is in flight. Each placeholder block reuses
+  // --chloe-player-box-bg (already theme-flipping, per
+  // docs/knowledge-asset/published/theme-token-background-audit.md) so the
+  // shimmer/pulse animation stays dark-theme-safe without a new token.
+  const DEFAULT_SKELETON_CARD_COUNT = 3;
+
+  function buildSkeletonStatTile() {
+    const tile = document.createElement("div");
+    tile.className = "report-skeleton__stat-tile report-skeleton__pulse";
+    tile.dataset.testid = "report-skeleton-stat-tile";
+    return tile;
+  }
+
+  function buildSkeletonStatsRow() {
+    const row = document.createElement("div");
+    row.className = "report-stats-row report-skeleton__stats-row";
+    for (let i = 0; i < 4; i += 1) {
+      row.appendChild(buildSkeletonStatTile());
+    }
+    return row;
+  }
+
+  function buildSkeletonCategoryCard() {
+    const col = document.createElement("div");
+    col.className = "col-md-4 report-category-card-col";
+
+    const card = document.createElement("div");
+    card.className = "report-skeleton__category-card report-skeleton__pulse";
+    card.dataset.testid = "report-skeleton-category-card";
+
+    col.appendChild(card);
+    return col;
+  }
+
+  function buildSkeletonCategoryGrid(cardCount) {
+    const grid = document.createElement("div");
+    grid.className = "row report-category-grid";
+    for (let i = 0; i < cardCount; i += 1) {
+      grid.appendChild(buildSkeletonCategoryCard());
+    }
+    return grid;
+  }
+
+  function buildDashboardSkeleton(categoryCount) {
+    const skeleton = document.createElement("div");
+    skeleton.className = "report-skeleton";
+    skeleton.dataset.testid = "report-dashboard-skeleton";
+    skeleton.appendChild(buildSkeletonStatsRow());
+    skeleton.appendChild(buildSkeletonCategoryGrid(categoryCount));
+    return skeleton;
+  }
+
+  // Skeleton category-card count mirrors the previous report's category
+  // count (so a Reload doesn't shift the grid once real data lands); falls
+  // back to DEFAULT_SKELETON_CARD_COUNT on a true first-ever load.
+  function skeletonCategoryCount() {
+    const previousReport = window.TestReportStorage.loadTestReport();
+    if (!previousReport) return DEFAULT_SKELETON_CARD_COUNT;
+    return Object.keys(groupResultsByCategory(previousReport.results)).length;
+  }
+
+  // Reload Test is disabled only while the skeleton is up, as a re-entrancy
+  // guard against a double-run — chrome otherwise stays fully interactive.
+  function renderLoadingSkeleton(main, onReload) {
+    main.textContent = "";
+
+    const heading = document.createElement("h1");
+    heading.className = "report-heading";
+    heading.textContent = "Test Report Dashboard";
+    main.appendChild(heading);
+
+    const reloadButton = buildReloadButton(onReload);
+    reloadButton.disabled = true;
+    main.appendChild(reloadButton);
+
+    main.appendChild(buildDashboardSkeleton(skeletonCategoryCount()));
   }
 
   // Issue #367: window.onTestRunComplete has no timeout/fallback, so a run
@@ -362,10 +433,9 @@
     return message;
   }
 
-  // The loading backdrop is a full-screen overlay, so a timeout still needs
-  // to remove it (like a normal completion does) for the Reload Test button
-  // in `main` to stay reachable — this renders a distinct message there
-  // instead of swapping the backdrop's own label text in place.
+  // Issue #533: Reload Test stays visually reachable throughout loading now
+  // (only disabled, never covered), so a timeout just needs to replace the
+  // skeleton with this distinct message in `main`'s normal content area.
   function renderTestRunTimeoutState(main, onReload) {
     main.textContent = "";
 
@@ -378,13 +448,15 @@
   }
 
   // AC-B1/AC-B2/AC-B3: shared by the Reload Test button click and the
-  // empty-storage auto-run — shows the backdrop+iframe, and wires
-  // window.onTestRunComplete (AC-B2's contract with test-runner.html) to
-  // hide the backdrop and re-render `main` from the freshly-saved report.
+  // empty-storage auto-run — shows the in-place skeleton + hidden iframe,
+  // and wires window.onTestRunComplete (AC-B2's contract with
+  // test-runner.html) to remove the iframe and re-render `main` from the
+  // freshly-saved report.
   function startTestRun(main) {
-    if (document.querySelector('[data-testid="report-loading-backdrop"]')) return;
+    if (document.querySelector('[data-testid="report-dashboard-skeleton"]')) return;
 
-    const backdrop = buildLoadingBackdrop();
+    renderLoadingSkeleton(main, () => startTestRun(main));
+    const iframe = buildTestRunnerIframe();
     const timeoutMs = window.__TEST_REPORT_RUN_TIMEOUT_MS__ || DEFAULT_TEST_RUN_TIMEOUT_MS;
     let settled = false;
 
@@ -392,7 +464,7 @@
       if (settled) return;
       settled = true;
       window.onTestRunComplete = null;
-      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
       renderTestRunTimeoutState(main, () => startTestRun(main));
     }, timeoutMs);
 
@@ -400,7 +472,7 @@
       if (settled) return;
       settled = true;
       clearTimeout(timeoutId);
-      if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
       renderDashboardContent(main, window.TestReportStorage.loadTestReport(), () => startTestRun(main));
     };
   }
