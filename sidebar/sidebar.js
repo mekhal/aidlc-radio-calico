@@ -59,7 +59,7 @@
     },
     {
       testid: "sidebar-footer-security-report-link",
-      href: `${SIDEBAR_BASE_PATH}reports/security/trivy.sarif`,
+      href: `${SIDEBAR_BASE_PATH}reports/security/security-report.html`,
       label: "Security Scan Report",
       icon: "bi-shield-check",
     },

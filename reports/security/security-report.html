@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Security Scan Report</title><style>
+/* Styling for reports/security/security-report.html (issue #544). Neutral
+   dev-report look (not the RadioCalico brand palette) — same call as
+   reports/lint/megalinter-report.html's internal-CI-artifact styling, not
+   user-facing product UI. */
+:root {
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --text: #1c1c1e;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --error: #dc2626;
+  --success: #16a34a;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 2rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 0.25rem;
+}
+.subtitle {
+  color: var(--muted);
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.empty-state {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.status-passed {
+  background: #dcfce7;
+  color: var(--success);
+}
+.status-failed {
+  background: #fee2e2;
+  color: var(--error);
+}
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.category-row:last-child {
+  border-bottom: none;
+}
+.category-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.download-link {
+  display: inline-block;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.download-link:hover {
+  text-decoration: underline;
+}
+</style></head><body>
+<h1>🛡️ Security Scan Report</h1>
+<div class="subtitle">Trivy filesystem scan &mdash; generated every CI run</div>
+<div class="card"><div id="security-status"></div></div>
+<div class="card"><div id="security-categories"></div></div>
+<div class="card">
+  <a id="security-download-link" class="download-link" href="trivy.sarif" download="trivy-results.sarif">⬇ Download report (trivy.sarif)</a>
+</div>
+<script src="report-render.js"></script>
+<script src="report-boot.js"></script>
+</body></html>
