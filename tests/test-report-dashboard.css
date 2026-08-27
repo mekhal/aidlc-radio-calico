@@ -29,21 +29,38 @@
   cursor: pointer;
 }
 
-.report-loading-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgb(0 0 0 / 0.6);
+/* Issue #533: in-place loading skeleton, replacing the old full-screen
+   report-loading-backdrop overlay — mirrors the stats-row + category-grid
+   layout below so the chrome/heading/Reload button stay visible instead of
+   being covered. Placeholder blocks reuse --chloe-player-box-bg (already
+   theme-flipping) as their background per
+   docs/knowledge-asset/published/theme-token-background-audit.md, so the
+   shimmer/pulse animation stays dark-theme-safe without a new token. */
+.report-skeleton__stat-tile {
+  flex: 1 1 140px;
+  height: 84px;
+  border-radius: 16px;
+  background: var(--chloe-player-box-bg);
 }
 
-.report-loading-backdrop__label {
-  font-family: var(--chloe-sans);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
+.report-skeleton__category-card {
+  min-height: 160px;
+  border-radius: 16px;
+  background: var(--chloe-player-box-bg);
+}
+
+.report-skeleton__pulse {
+  animation: report-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes report-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .report-timestamp {
