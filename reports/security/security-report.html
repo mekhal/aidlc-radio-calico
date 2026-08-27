@@ -2,7 +2,10 @@
 /* Styling for reports/security/security-report.html (issue #544). Neutral
    dev-report look (not the RadioCalico brand palette) — same call as
    reports/lint/megalinter-report.html's internal-CI-artifact styling, not
-   user-facing product UI. */
+   user-facing product UI. Unlike megalinter-report.html, body text is
+   bilingual (EN / TH) since this page is reachable from the footer/sidebar
+   (mekhal's approval, 2026-08-27 review on issue #544) — no language
+   toggle, just both languages shown together. */
 :root {
   --bg: #f7f7f8;
   --card: #ffffff;
@@ -82,12 +85,12 @@ h1 {
   text-decoration: underline;
 }
 </style></head><body>
-<h1>🛡️ Security Scan Report</h1>
-<div class="subtitle">Trivy filesystem scan &mdash; generated every CI run</div>
+<h1>🛡️ Security Scan Report / รายงานผลการสแกนความปลอดภัย</h1>
+<div class="subtitle">Trivy filesystem scan &mdash; generated every CI run / สแกนไฟล์ระบบด้วย Trivy &mdash; สร้างขึ้นทุกครั้งที่ CI รัน</div>
 <div class="card"><div id="security-status"></div></div>
 <div class="card"><div id="security-categories"></div></div>
 <div class="card">
-  <a id="security-download-link" class="download-link" href="trivy.sarif" download="trivy-results.sarif">⬇ Download report (trivy.sarif)</a>
+  <a id="security-download-link" class="download-link" href="trivy.sarif" download="trivy-results.sarif">⬇ Download report (trivy.sarif) / ดาวน์โหลดรายงาน (trivy.sarif)</a>
 </div>
 <script src="report-render.js"></script>
 <script src="report-boot.js"></script>
