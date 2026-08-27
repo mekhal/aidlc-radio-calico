@@ -33,6 +33,14 @@
  * `main` content area, alongside the always-reachable Reload Test button —
  * not as an in-place backdrop label swap.
  *
+ * Issue #533 (plan approved 2026-08-27): the full-screen backdrop this note
+ * describes is being replaced by an in-place loading skeleton
+ * (`report-dashboard-skeleton`, see test-report-dashboard-skeleton.test.js)
+ * — Reload Test now stays visually reachable throughout, so this file's
+ * timeout assertions are updated to check for the skeleton's absence
+ * instead of the old backdrop's, but the AC1-AC4 timeout contract itself is
+ * unchanged.
+ *
  * Written before test-report-dashboard.js implements any of this, per TDD
  * — fails until this ticket's Code PR adds the timeout/fallback.
  */
@@ -110,6 +118,8 @@
   }
 
   function cleanupStray() {
+    const skeleton = document.querySelector('[data-testid="report-dashboard-skeleton"]');
+    if (skeleton) skeleton.remove();
     const backdrop = document.querySelector('[data-testid="report-loading-backdrop"]');
     if (backdrop) backdrop.remove();
     const iframe = document.querySelector('[data-testid="report-test-runner-iframe"]');
@@ -126,7 +136,7 @@
       expect(source.indexOf("120000")).toBeGreaterThan(-1);
     });
 
-    it("shows a distinct timeout state and stops blocking the backdrop's re-entrancy guard when onTestRunComplete never fires (AC1)", async () => {
+    it("shows a distinct timeout state and stops blocking the skeleton's re-entrancy guard when onTestRunComplete never fires (AC1)", async () => {
       window.localStorage.removeItem(STORAGE_KEY);
       window.__TEST_REPORT_RUN_TIMEOUT_MS__ = 20;
       const stub = stubIframeNavigation();
@@ -135,16 +145,21 @@
         const root = await loadTestReportDashboard();
         await nextTick();
 
-        // AC-B3: empty storage auto-runs, so the backdrop is already up.
-        expect(document.querySelector('[data-testid="report-loading-backdrop"]')).toBeTruthy();
+        // AC-B3: empty storage auto-runs, so the skeleton is already up.
+        expect(root.querySelector('[data-testid="report-dashboard-skeleton"]')).toBeTruthy();
 
         await wait(80);
 
-        expect(document.querySelector('[data-testid="report-loading-backdrop"]')).toBeFalsy();
+        expect(root.querySelector('[data-testid="report-dashboard-skeleton"]')).toBeFalsy();
 
         const message = root.querySelector('[data-testid="report-run-timeout-message"]');
         expect(message).toBeTruthy();
         expect((message.textContent || "").toLowerCase()).toContain("timed out");
+
+        // Issue #533: Reload Test is disabled only while the skeleton is up
+        // (re-entrancy guard) — a timeout must re-enable it, same as before.
+        const reloadButton = root.querySelector('[data-testid="report-reload-button"]');
+        expect(reloadButton.disabled).toBeFalsy();
 
         unloadTestReportDashboard(root);
       } finally {
@@ -172,7 +187,7 @@
         reloadButton.click();
         await nextTick();
 
-        expect(document.querySelector('[data-testid="report-loading-backdrop"]')).toBeTruthy();
+        expect(root.querySelector('[data-testid="report-dashboard-skeleton"]')).toBeTruthy();
         expect(typeof window.onTestRunComplete).toBe("function");
 
         // Finish the retried run's own timer before the test ends — leaving
