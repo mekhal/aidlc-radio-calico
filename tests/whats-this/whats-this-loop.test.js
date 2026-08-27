@@ -52,6 +52,15 @@
  * `image` field and before whats-this.js exports buildSectionImage, per
  * TDD — fails until this issue's Code PR (step 6) adds both.
  *
+ * Issue #529 (follow-up from #522's close): the 3-up card grid
+ * (buildAiDlcLoopCard/Grid, .whats-this-loop-card*) is replaced by a table,
+ * rendered by the shared buildWhatsThisTable(state, rows, headingKeys) —
+ * modeled on about.js's buildProductionStandardsTable(state, standards).
+ * Card-specific assertions below (col-md-4, .whats-this-loop-card__title,
+ * the Bootstrap row wrapper) are replaced with table assertions
+ * (.whats-this-table__title cells, <thead> column headers). Step 3 waiver
+ * approved again (2026-08-27): Test PR skipped, bundled into this Code PR.
+ *
  * Issue #522 follow-up review (2026-08-27, kept in this same issue per
  * @mekhal's explicit request): steps expand from 6 to CLAUDE.md's actual
  * 7 numbered loop steps, each title now prefixed with its step number.
@@ -88,8 +97,16 @@
   ];
 
   const SAMPLE_TRANSLATIONS = {
-    en: { whatsThisLoopHeading: "THE AI-DLC LOOP" },
-    th: { whatsThisLoopHeading: "วงจร AI-DLC" },
+    en: {
+      whatsThisLoopHeading: "THE AI-DLC LOOP",
+      whatsThisLoopColStep: "Step",
+      whatsThisLoopColDescription: "Description",
+    },
+    th: {
+      whatsThisLoopHeading: "วงจร AI-DLC",
+      whatsThisLoopColStep: "ขั้นตอน",
+      whatsThisLoopColDescription: "คำอธิบาย",
+    },
   };
 
   const SAMPLE_STEPS = EXPECTED_TITLES_EN.map((titleEn, i) => ({
@@ -154,18 +171,28 @@
       expect(heading.textContent).toBe("THE AI-DLC LOOP");
     });
 
-    it("buildAiDlcLoopGrid(state, steps) renders exactly 7 cards with these exact English titles, in this exact order, by default (AC1)", async () => {
+    it("buildAiDlcLoopSection(state, content) renders exactly 7 table rows with these exact English titles, in this exact order (AC1, issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const grid = window.buildAiDlcLoopGrid(state, SAMPLE_STEPS);
-      const titles = Array.from(grid.querySelectorAll(".whats-this-loop-card__title")).map((el) => el.textContent);
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
+      const titles = Array.from(section.querySelectorAll(".whats-this-table__title")).map((el) => el.textContent);
 
       expect(titles.length).toBe(7);
       expect(titles).toEqual(EXPECTED_TITLES_EN);
     });
 
-    it("buildAiDlcLoopSection(state, content) re-renders the heading, all 7 step titles, AND descriptions in Thai when the language changes, without a reload (issue #508 AC2, per @mekhal's 2026-08-25 decision to translate step names too)", async () => {
+    it("buildAiDlcLoopSection(state, content) renders the table's column headers (Step / Description) in English by default, sourced from i18n (issue #529)", async () => {
+      await loadWhatsThisContentModule();
+      const state = sampleState();
+
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
+      const headers = Array.from(section.querySelectorAll("table thead th")).map((el) => el.textContent);
+
+      expect(headers).toEqual(["Step", "Description"]);
+    });
+
+    it("buildAiDlcLoopSection(state, content) re-renders the heading, column headers, all 7 step titles, AND descriptions in Thai when the language changes, without a reload (issue #508 AC2, issue #529)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
@@ -176,10 +203,13 @@
       const heading = section.querySelector("h2");
       expect(heading.textContent).toBe("วงจร AI-DLC");
 
-      const titles = Array.from(section.querySelectorAll(".whats-this-loop-card__title")).map((el) => el.textContent);
+      const headers = Array.from(section.querySelectorAll("table thead th")).map((el) => el.textContent);
+      expect(headers).toEqual(["ขั้นตอน", "คำอธิบาย"]);
+
+      const titles = Array.from(section.querySelectorAll(".whats-this-table__title")).map((el) => el.textContent);
       expect(titles).toEqual(EXPECTED_TITLES_TH);
 
-      const descriptions = Array.from(section.querySelectorAll(".whats-this-loop-card__description")).map(
+      const descriptions = Array.from(section.querySelectorAll(".whats-this-table__description")).map(
         (el) => el.textContent,
       );
       descriptions.forEach((text, i) => {
@@ -187,19 +217,17 @@
       });
     });
 
-    it("buildAiDlcLoopSection(state, content) embeds all 7 cards from the content argument within the section, sourced from data not hardcoded (AC1, AC2)", async () => {
+    it("buildAiDlcLoopSection(state, content) embeds all 7 rows from the content argument within the section, sourced from data not hardcoded (AC1, AC2)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
       const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
-      const cards = Array.from(section.querySelectorAll(".whats-this-loop-card"));
+      const rows = Array.from(section.querySelectorAll("table tbody tr"));
 
-      expect(cards.length).toBe(7);
-      cards.forEach((card, i) => {
-        expect(card.querySelector(".whats-this-loop-card__title").textContent).toBe(EXPECTED_TITLES_EN[i]);
-        expect(card.querySelector(".whats-this-loop-card__description").textContent).toBe(
-          SAMPLE_STEPS[i].description.en,
-        );
+      expect(rows.length).toBe(7);
+      rows.forEach((row, i) => {
+        expect(row.querySelector(".whats-this-table__title").textContent).toBe(EXPECTED_TITLES_EN[i]);
+        expect(row.querySelector(".whats-this-table__description").textContent).toBe(SAMPLE_STEPS[i].description.en);
       });
     });
 
@@ -237,22 +265,14 @@
       expect(reviewMergeStep.description.en.toLowerCase()).toContain("new issue");
     });
 
-    it("buildAiDlcLoopCard(state, step, index) places each card in a Bootstrap col-md-4 column (AC3: stacks on mobile, grid on desktop)", async () => {
+    it("buildAiDlcLoopSection(state, content) renders exactly one table for the 7 steps (issue #529 AC2)", async () => {
       await loadWhatsThisContentModule();
       const state = sampleState();
 
-      const col = window.buildAiDlcLoopCard(state, SAMPLE_STEPS[0], 0);
+      const section = window.buildAiDlcLoopSection(state, SAMPLE_AIDLC_CONTENT);
+      const tables = section.querySelectorAll("table.whats-this-table");
 
-      expect(col.className).toContain("col-md-4");
-    });
-
-    it("buildAiDlcLoopGrid(state, steps) wraps cards in a Bootstrap row for the responsive grid (AC3)", async () => {
-      await loadWhatsThisContentModule();
-      const state = sampleState();
-
-      const grid = window.buildAiDlcLoopGrid(state, SAMPLE_STEPS);
-
-      expect(grid.className).toContain("row");
+      expect(tables.length).toBe(1);
     });
 
     it("loadWhatsThisContent() returns the aidlcLoop section's image, aidlc-loop-gates.jpg (unchanged, already correctly named), with bilingual alt/caption (issue #509 AC1, AC3)", async () => {

@@ -20,6 +20,12 @@
  * Step 3 waiver approved (2026-08-27): Test PR skipped, this test is
  * bundled directly into the Code PR instead (CLAUDE.md's Definition of
  * Done, "tests bundled into the Code PR" option).
+ *
+ * Issue #529 (follow-up from #522's close): the 42rem cap alone left the
+ * image wrapper flush against the section's left edge on viewports wider
+ * than 42rem — `margin: 0 0 1.5rem` has no horizontal auto-margin to center
+ * the capped box. AC1: `margin: 0 auto 1.5rem`. Test PR waived again
+ * (2026-08-27), bundled into this Code PR.
  */
 (function () {
   "use strict";
@@ -49,6 +55,15 @@
       const rule = extractRule(css, ".whats-this-image");
 
       expect(rule.includes("max-width: 42rem")).toBeTruthy();
+    });
+  });
+
+  describe(".whats-this-image centering (issue #529 AC1)", () => {
+    it("centers the capped image wrapper horizontally via a horizontal auto margin", async () => {
+      const css = await readWhatsThisCss();
+      const rule = extractRule(css, ".whats-this-image");
+
+      expect(rule.includes("margin: 0 auto 1.5rem")).toBeTruthy();
     });
   });
 })();
