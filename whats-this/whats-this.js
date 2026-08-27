@@ -82,6 +82,22 @@
  * text column - buildSectionImage itself is unchanged. AC3/AC4: their
  * alt/caption copy (data/whats-this-content.json) was rewritten to
  * describe each diagram's actual content instead of a generic summary.
+ *
+ * Issue #522 follow-up review (2026-08-27, kept in this same issue per
+ * @mekhal's explicit "ทำใน Issue นี้" direction rather than a new ticket -
+ * see this turn's PR/issue comment for the scope-rule note): the loop cards
+ * are expanded from 6 to CLAUDE.md's actual 7 numbered steps
+ * (aidlcLoop.steps), each now also naming its artifact (Plan+AC/Test
+ * PR/Code PR) and whether it's an AI action or a human gate. Step 3's card
+ * spells out the Test PR waiver condition (AI may propose, only the
+ * human's explicit answer makes it final); step 7's card covers the
+ * step-7-rework-loops-back-to-6 rule and the missed-functionality-becomes-
+ * a-new-issue scope-drift rule. skillCapture gains a new bilingual `intro`
+ * field, rendered by buildSkillCaptureSection() as a paragraph before the
+ * image/cards, clarifying this capture-and-reuse cycle runs after the loop
+ * closes rather than being one of the 7 numbered steps (previously the old
+ * 6th "Close & Capture Gate" card blurred this into the loop's own
+ * numbering).
  */
 (function () {
   "use strict";
@@ -279,15 +295,21 @@
     const heading = document.createElement("h2");
     heading.className = "chloe-whats-this-skills__heading";
 
+    const intro = document.createElement("p");
+    intro.className = "chloe-whats-this-skills__intro";
+    intro.dataset.testid = "whats-this-skills-intro";
+
     function render() {
       if (!ALBUM_PROMO_TRANSLATIONS) return;
       heading.textContent = ALBUM_PROMO_TRANSLATIONS[state.lang].whatsThisSkillsHeading;
+      intro.textContent = resolveBilingualField(content.intro, state.lang);
     }
 
     render();
     state.onLanguageChange.push(render);
 
     section.appendChild(heading);
+    section.appendChild(intro);
     section.appendChild(buildSectionImage(state, content.image));
     section.appendChild(buildSkillCaptureGrid(state, content));
 
