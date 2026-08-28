@@ -7,7 +7,10 @@
    pinned to white under [data-chloe-theme="dark"] while the rest of the page
    flips. Reuses the --chloe-sage/--chloe-ink pair About's cards already use
    (shared/tokens.css), plus --chloe-pink/--chloe-pink-deep for
-   borders/focus and --chloe-sans for typography, so it flips correctly. */
+   borders/focus and --chloe-sans for typography, so it flips correctly.
+   Issue #546 follow-up: the submit button's background moved from
+   --chloe-pink-deep to --chloe-mint-deep; borders/focus stay on
+   --chloe-pink-deep. */
 
 .chloe-contact-form {
   background-color: var(--chloe-sage);
@@ -36,7 +39,7 @@
 }
 
 .chloe-contact-form__submit {
-  background-color: var(--chloe-pink-deep);
+  background-color: var(--chloe-mint-deep);
   color: #ffffff;
   border: none;
   font-family: var(--chloe-sans);
