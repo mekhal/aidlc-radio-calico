@@ -70,12 +70,18 @@
     <!-- Issue #323 (Ticket 2 of #203): same "one directory below root"
          reasoning, applied to case-study/case-study.js's data/ fetch base
          path (mirrors __ALBUM_PROMO_I18N_BASE_PATH__ above). -->
+    <!-- issue #542 (root cause A): about/whats-this/contact.js each read
+         their own dedicated global (__ABOUT_DATA_PATH__/__WHATS_THIS_DATA_PATH__/
+         __CONTACT_DATA_PATH__), not the case-study one — previously unset,
+         so their data/ fetches 404'd under tests/. -->
     <script>
       window.__I18N_BASE_PATH__ = "../i18n/";
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
       window.__SIDEBAR_BASE_PATH__ = "../";
       window.__CASE_STUDY_DATA_PATH__ = "../data/";
-      window.__ABOUT_CONTENT_DATA_PATH__ = "../data/";
+      window.__ABOUT_DATA_PATH__ = "../data/";
+      window.__WHATS_THIS_DATA_PATH__ = "../data/";
+      window.__CONTACT_DATA_PATH__ = "../data/";
     </script>
 
     <script src="assert.js"></script>

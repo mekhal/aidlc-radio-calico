@@ -39,6 +39,18 @@
   const LANGUAGE_STORAGE_KEY = "radioCalicoLanguage";
   const I18N_BASE_PATH = window.__I18N_BASE_PATH__ || "i18n/";
 
+  // Issue #542 (root causes B/C): runTestReportSuite()'s fetches below assume
+  // the current document is at the repo root (true for index.html/the real
+  // footer modal) — but tests/test-report-modal.test.js mounts and exercises
+  // this same code from inside tests/test-runner.html itself, one directory
+  // below root, where "tests/..." paths 404 and clobbering window.__APP_JS_PATH__
+  // corrupts later suites (e.g. skills-storage-in-repo.test.js) that read it.
+  // window.__I18N_BASE_PATH__ is already the signal test-runner.html sets for
+  // exactly this "one directory below root" case, so it's reused here instead
+  // of adding a second identical override.
+  const IS_NESTED_TEST_RUNNER = Boolean(window.__I18N_BASE_PATH__);
+  const TEST_SUITE_BASE_PATH = IS_NESTED_TEST_RUNNER ? "" : "tests/";
+
   function getStoredLanguage() {
     return window.localStorage.getItem(LANGUAGE_STORAGE_KEY) === "th" ? "th" : "en";
   }
@@ -200,18 +212,24 @@
     }
     activeTestReportRun = isClosed;
     window.__radioCalicoTestReportRunning = true;
-    const previousAppJsPath = window.__APP_JS_PATH__;
-    window.__APP_JS_PATH__ = "app.js";
+    // Only override __APP_JS_PATH__ when actually running from the repo root:
+    // in the nested test-runner.html case, the default (unset) value already
+    // resolves correctly for anything that reads it (tests/load-app.js,
+    // skills-storage-in-repo.test.js), so leaving it untouched avoids
+    // clobbering it out from under those suites.
+    if (!IS_NESTED_TEST_RUNNER) {
+      window.__APP_JS_PATH__ = "app.js";
+    }
     try {
       if (isClosed()) return;
       await ensureTestReportCdnDeps();
       if (isClosed()) return;
-      await fetchAndInjectScript("tests/assert.js");
+      await fetchAndInjectScript(`${TEST_SUITE_BASE_PATH}assert.js`);
       if (isClosed()) return;
-      await fetchAndInjectScript("tests/test-report-suite-files.js");
+      await fetchAndInjectScript(`${TEST_SUITE_BASE_PATH}test-report-suite-files.js`);
 
-      const suiteFiles = ["tests/mock-hls.js", "tests/load-app.js"].concat(
-        window.TEST_REPORT_SUITE_FILES.map((file) => `tests/${file}`)
+      const suiteFiles = [`${TEST_SUITE_BASE_PATH}mock-hls.js`, `${TEST_SUITE_BASE_PATH}load-app.js`].concat(
+        window.TEST_REPORT_SUITE_FILES.map((file) => `${TEST_SUITE_BASE_PATH}${file}`)
       );
 
       for (const file of suiteFiles) {
