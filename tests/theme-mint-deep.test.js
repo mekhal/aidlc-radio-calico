@@ -120,14 +120,22 @@
       expect(playRule.includes("chloe-pink-deep")).toBeFalsy();
     });
 
-    it("styles the Contact page's Send button background with --chloe-mint-deep, borders/focus unchanged (follow-up)", async () => {
+    it("styles the Contact page's Send button background with --chloe-mint-deep (follow-up)", async () => {
       const css = await readCss("../contact/contact.css");
       const submitRule = extractRule(css, ".chloe-contact-form__submit");
       expect(submitRule.includes("background-color: var(--chloe-mint-deep);")).toBeTruthy();
       expect(submitRule.includes("chloe-pink-deep")).toBeFalsy();
+    });
+
+    it("styles the Contact form's input/textarea border and labels with --chloe-mint-deep (follow-up)", async () => {
+      const css = await readCss("../contact/contact.css");
 
       const controlRule = extractRule(css, ".chloe-contact-form .form-control");
-      expect(controlRule.includes("var(--chloe-pink-deep)")).toBeTruthy();
+      expect(controlRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
+      expect(controlRule.includes("chloe-pink-deep")).toBeFalsy();
+
+      const labelRule = extractRule(css, ".chloe-contact-form .form-label");
+      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
     });
   });
 })();

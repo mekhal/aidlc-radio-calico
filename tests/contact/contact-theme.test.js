@@ -60,26 +60,26 @@
       expect(formRule.includes("#ffffff")).toBeFalsy();
     });
 
-    it("styles the Name/Email/Message labels with --chloe-ink text and the site's --chloe-sans font stack (AC2, AC4)", async () => {
+    it("styles the Name/Email/Message labels with --chloe-mint-deep text and the site's --chloe-sans font stack (issue #546)", async () => {
       const css = await readContactCss();
       const labelRule = extractRule(css, ".chloe-contact-form .form-label");
 
-      expect(labelRule.includes("var(--chloe-ink)")).toBeTruthy();
+      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
       expect(labelRule.includes("var(--chloe-sans)")).toBeTruthy();
     });
 
-    it("styles the input/textarea borders with the --chloe-pink-deep brand token instead of Bootstrap defaults (AC3)", async () => {
+    it("styles the input/textarea borders with the --chloe-mint-deep brand token instead of Bootstrap defaults (issue #546)", async () => {
       const css = await readContactCss();
       const controlRule = extractRule(css, ".chloe-contact-form .form-control");
 
-      expect(controlRule.includes("var(--chloe-pink-deep)")).toBeTruthy();
+      expect(controlRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
     });
 
-    it("styles the input/textarea focus state with the --chloe-pink/--chloe-pink-deep brand tokens instead of Bootstrap's default focus ring (AC3)", async () => {
+    it("styles the input/textarea focus state with --chloe-mint-deep border and --chloe-pink focus ring (issue #546)", async () => {
       const css = await readContactCss();
       const focusRule = extractRule(css, ".chloe-contact-form .form-control:focus");
 
-      expect(focusRule.includes("var(--chloe-pink-deep)")).toBeTruthy();
+      expect(focusRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
       expect(focusRule.includes("var(--chloe-pink)")).toBeTruthy();
     });
 
