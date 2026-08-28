@@ -21,6 +21,11 @@
  * pattern as tests/contact/contact-theme.test.js and
  * tests/test-report-dashboard-dark-theme.test.js (this suite runs inside
  * tests/test-runner.html, which never links these page stylesheets).
+ *
+ * Follow-up (same issue #546, human request "button slider bar" -> mint
+ * tone): the volume slider's accent-color (previously excluded from scope
+ * as a non-`color:` declaration) also moves to --chloe-mint-deep. The play
+ * button's background stays on --chloe-pink-deep, unchanged.
  */
 (function () {
   "use strict";
@@ -94,6 +99,17 @@
       const failedRule = extractRule(css, ".report-stat-tile--failed .report-stat-tile__value");
       expect(failedRule.includes("var(--chloe-pink-deep)")).toBeTruthy();
       expect(failedRule.includes("var(--chloe-mint-deep)")).toBeFalsy();
+    });
+
+    it("styles the volume slider with --chloe-mint-deep, play button unchanged (follow-up)", async () => {
+      const css = await readCss("../album-promo.css");
+
+      const volumeRule = extractRule(css, '.chloe-player-controls__volume input[type="range"]');
+      expect(volumeRule.includes("accent-color: var(--chloe-mint-deep);")).toBeTruthy();
+      expect(volumeRule.includes("chloe-pink-deep")).toBeFalsy();
+
+      const playRule = extractRule(css, ".chloe-player-controls__play");
+      expect(playRule.includes("background: var(--chloe-pink-deep);")).toBeTruthy();
     });
   });
 })();
