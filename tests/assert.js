@@ -57,7 +57,7 @@
   }
 
   function expect(actual) {
-    return {
+    const matchers = {
       toBe(expected) {
         if (actual !== expected) {
           throw new Error(`Expected ${stringify(actual)} to be ${stringify(expected)}`);
@@ -85,6 +85,26 @@
         }
       },
     };
+
+    // Issue #542 (root cause D): negates each matcher above by asserting it
+    // throws — reused rather than duplicated so .not stays in sync with
+    // whatever matchers exist.
+    matchers.not = Object.keys(matchers).reduce((negated, name) => {
+      negated[name] = (...args) => {
+        let threw = false;
+        try {
+          matchers[name](...args);
+        } catch (_e) {
+          threw = true;
+        }
+        if (!threw) {
+          throw new Error(`Expected ${stringify(actual)} not to satisfy ${name}(${args.map(stringify).join(", ")})`);
+        }
+      };
+      return negated;
+    }, {});
+
+    return matchers;
   }
 
   async function allSettled() {

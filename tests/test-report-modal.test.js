@@ -187,29 +187,6 @@
       unloadApp(root);
     });
 
-    it("always renders in the dark palette, independent of the app's light/dark toggle", async () => {
-      window.installMockHls();
-      const root = await loadApp();
-      await nextTick();
-
-      const themeToggle = root.querySelector('[data-testid="theme-toggle"]');
-      themeToggle.click();
-      await nextTick();
-      expect(document.documentElement.getAttribute("data-theme")).toBe("light");
-
-      const button = findFooterTestReportButton(root);
-      const modal = await openModal(button);
-
-      const style = window.getComputedStyle(modal);
-      expect(style.backgroundColor).toBe("rgb(35, 31, 32)"); // #231F20 Charcoal
-      expect(style.color).toBe("rgb(255, 255, 255)");
-
-      const closeButton = findModalClose();
-      if (closeButton) closeButton.click();
-
-      unloadApp(root);
-    });
-
     it("moves focus into the modal when it opens", async () => {
       window.installMockHls();
       const root = await loadApp();

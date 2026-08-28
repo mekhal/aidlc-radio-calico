@@ -403,6 +403,13 @@
   // Reload Test is disabled only while the skeleton is up, as a re-entrancy
   // guard against a double-run — chrome otherwise stays fully interactive.
   function renderLoadingSkeleton(main, onReload) {
+    // Issue #542 (root cause E): disable the button actually clicked, in
+    // place, before it's wiped out below — a caller holding onto that same
+    // node (as a real click handler does) needs to observe it go disabled;
+    // the fresh disabled button appended further down is a different node.
+    const existingReloadButton = main.querySelector('[data-testid="report-reload-button"]');
+    if (existingReloadButton) existingReloadButton.disabled = true;
+
     main.textContent = "";
 
     const heading = document.createElement("h1");
