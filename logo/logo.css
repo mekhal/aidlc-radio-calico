@@ -16,9 +16,15 @@
   font-weight: 700;
   font-size: 2rem;
   color: var(--chloe-ink);
+  text-decoration: none;
 }
 
-[data-chloe-theme="dark"] .chloe-wordmark {
+.chloe-wordmark:visited {
+  color: var(--chloe-ink);
+}
+
+[data-chloe-theme="dark"] .chloe-wordmark,
+[data-chloe-theme="dark"] .chloe-wordmark:visited {
   color: var(--chloe-mint);
 }
 
