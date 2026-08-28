@@ -13,6 +13,10 @@
  *
  * Written before logo/logo.js exists, per TDD — fails until this ticket's
  * Code PR (step 6) creates logo/logo.js and wires buildHeader() to call it.
+ *
+ * Issue #559: wordmarkShape() also captures href/target/rel so the mounted
+ * header's wordmark link stays consistent with a fresh buildLogo() call,
+ * same as its other attributes.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -22,6 +26,9 @@
     return {
       tagName: node.tagName,
       className: node.className,
+      href: node.getAttribute("href"),
+      target: node.getAttribute("target"),
+      rel: node.getAttribute("rel"),
       text: Array.from(node.childNodes)
         .map((n) => (n.nodeType === Node.TEXT_NODE ? n.textContent : `<${n.tagName} src="${n.getAttribute("src")}" alt="${n.getAttribute("alt")}">`))
         .join("|"),
