@@ -361,7 +361,7 @@ body {
   flex-shrink: 0;
   border-radius: 50%;
   border: none;
-  background: var(--chloe-pink-deep);
+  background: var(--chloe-mint-deep);
   color: #ffffff;
   font-size: 1rem;
   cursor: pointer;
@@ -446,10 +446,10 @@ body {
    accent token with a confirmed [data-chloe-theme="dark"] override, and a
    full-background swap risks contrast issues that a fixed-hue border avoids.
    No specific highlight color was locked in #421's review beyond "ไฮไลท์สี"
-   (color highlight, replacing the earlier ✓ checkmark), so this reuses the
-   same accent already used elsewhere in this card (play button). The volume
-   slider's accent-color moved to --chloe-mint-deep per issue #546's
-   follow-up ("button slider bar" request), so it no longer matches. */
+   (color highlight, replacing the earlier ✓ checkmark), so this keeps the
+   border-left accent on --chloe-pink-deep even though issue #546's
+   follow-ups moved the volume slider's accent-color and the play button's
+   background to --chloe-mint-deep. */
 .chloe-player-controls__more-wrap {
   position: relative;
   flex-shrink: 0;

@@ -24,8 +24,12 @@
  *
  * Follow-up (same issue #546, human request "button slider bar" -> mint
  * tone): the volume slider's accent-color (previously excluded from scope
- * as a non-`color:` declaration) also moves to --chloe-mint-deep. The play
- * button's background stays on --chloe-pink-deep, unchanged.
+ * as a non-`color:` declaration) also moves to --chloe-mint-deep.
+ *
+ * Second follow-up (same issue #546, human confirmed the circled elements
+ * are the Album Promo page's Play/Pause button and the Contact page's Send
+ * button): both buttons' background moves from --chloe-pink-deep to
+ * --chloe-mint-deep too.
  */
 (function () {
   "use strict";
@@ -101,15 +105,29 @@
       expect(failedRule.includes("var(--chloe-mint-deep)")).toBeFalsy();
     });
 
-    it("styles the volume slider with --chloe-mint-deep, play button unchanged (follow-up)", async () => {
+    it("styles the volume slider with --chloe-mint-deep (follow-up)", async () => {
       const css = await readCss("../album-promo.css");
 
       const volumeRule = extractRule(css, '.chloe-player-controls__volume input[type="range"]');
       expect(volumeRule.includes("accent-color: var(--chloe-mint-deep);")).toBeTruthy();
       expect(volumeRule.includes("chloe-pink-deep")).toBeFalsy();
+    });
 
+    it("styles the Play/Pause button background with --chloe-mint-deep (follow-up)", async () => {
+      const css = await readCss("../album-promo.css");
       const playRule = extractRule(css, ".chloe-player-controls__play");
-      expect(playRule.includes("background: var(--chloe-pink-deep);")).toBeTruthy();
+      expect(playRule.includes("background: var(--chloe-mint-deep);")).toBeTruthy();
+      expect(playRule.includes("chloe-pink-deep")).toBeFalsy();
+    });
+
+    it("styles the Contact page's Send button background with --chloe-mint-deep, borders/focus unchanged (follow-up)", async () => {
+      const css = await readCss("../contact/contact.css");
+      const submitRule = extractRule(css, ".chloe-contact-form__submit");
+      expect(submitRule.includes("background-color: var(--chloe-mint-deep);")).toBeTruthy();
+      expect(submitRule.includes("chloe-pink-deep")).toBeFalsy();
+
+      const controlRule = extractRule(css, ".chloe-contact-form .form-control");
+      expect(controlRule.includes("var(--chloe-pink-deep)")).toBeTruthy();
     });
   });
 })();
