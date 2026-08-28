@@ -208,7 +208,7 @@ body {
   font-size: 0.85rem;
   font-style: italic;
   opacity: 0.75;
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
 }
 
 .chloe-now-playing__player-box {
@@ -505,7 +505,7 @@ body {
 
 .chloe-player-controls__menu-item.is-active {
   border-left-color: var(--chloe-pink-deep);
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
   font-weight: 700;
 }
 
@@ -585,7 +585,7 @@ body {
 .chloe-player-controls__sleep-timer-cancel {
   border: none;
   background: transparent;
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
   font-weight: 700;
   font-size: 0.8rem;
   cursor: pointer;
