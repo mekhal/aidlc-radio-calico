@@ -80,9 +80,9 @@
   // to mount app.js, so those CDN deps must be loaded here before the suite
   // runs. Pinned to the same major versions tests/test-runner.html uses.
   const TEST_REPORT_CDN_DEPS = [
-    { isLoaded: () => Boolean(window.React), src: "https://unpkg.com/react@18/umd/react.production.min.js" },
-    { isLoaded: () => Boolean(window.ReactDOM), src: "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" },
-    { isLoaded: () => Boolean(window.Babel), src: "https://unpkg.com/@babel/standalone@7/babel.min.js" },
+    { isLoaded: () => Boolean(window.React), src: "https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js" },
+    { isLoaded: () => Boolean(window.ReactDOM), src: "https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js" },
+    { isLoaded: () => Boolean(window.Babel), src: "https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js" },
   ];
 
   function loadScriptTag(src) {
