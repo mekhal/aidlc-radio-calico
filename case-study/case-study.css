@@ -46,7 +46,7 @@
   display: inline-block;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
   border: 1px solid var(--chloe-pink-deep);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
@@ -74,7 +74,7 @@
 }
 
 .case-study-card__connector {
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
   text-align: center;
   line-height: 1;
   margin: 0.5rem 0;
