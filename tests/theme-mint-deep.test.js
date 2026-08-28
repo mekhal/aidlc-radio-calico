@@ -30,6 +30,11 @@
  * are the Album Promo page's Play/Pause button and the Contact page's Send
  * button): both buttons' background moves from --chloe-pink-deep to
  * --chloe-mint-deep too.
+ *
+ * Third follow-up (same issue #546, Contact form input/textarea border +
+ * labels moved to --chloe-mint-deep) was partially reverted: the field
+ * labels move back to --chloe-ink, per human request. The input/textarea
+ * border stays on --chloe-mint-deep.
  */
 (function () {
   "use strict";
@@ -127,7 +132,7 @@
       expect(submitRule.includes("chloe-pink-deep")).toBeFalsy();
     });
 
-    it("styles the Contact form's input/textarea border and labels with --chloe-mint-deep (follow-up)", async () => {
+    it("styles the Contact form's input/textarea border with --chloe-mint-deep, labels stay --chloe-ink (follow-up)", async () => {
       const css = await readCss("../contact/contact.css");
 
       const controlRule = extractRule(css, ".chloe-contact-form .form-control");
@@ -135,7 +140,8 @@
       expect(controlRule.includes("chloe-pink-deep")).toBeFalsy();
 
       const labelRule = extractRule(css, ".chloe-contact-form .form-label");
-      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
+      expect(labelRule.includes("var(--chloe-ink)")).toBeTruthy();
+      expect(labelRule.includes("chloe-mint-deep")).toBeFalsy();
     });
   });
 })();

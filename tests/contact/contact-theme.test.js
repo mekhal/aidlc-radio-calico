@@ -60,11 +60,11 @@
       expect(formRule.includes("#ffffff")).toBeFalsy();
     });
 
-    it("styles the Name/Email/Message labels with --chloe-mint-deep text and the site's --chloe-sans font stack (issue #546)", async () => {
+    it("styles the Name/Email/Message labels with --chloe-ink text and the site's --chloe-sans font stack (issue #546)", async () => {
       const css = await readContactCss();
       const labelRule = extractRule(css, ".chloe-contact-form .form-label");
 
-      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
+      expect(labelRule.includes("var(--chloe-ink)")).toBeTruthy();
       expect(labelRule.includes("var(--chloe-sans)")).toBeTruthy();
     });
 
