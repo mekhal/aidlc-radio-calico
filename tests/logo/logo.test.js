@@ -13,8 +13,19 @@
  * fetch-and-inject-one-script helper with no shared/-specific logic
  * (reuse-first).
  *
- * Written before logo/logo.js exists, per TDD — fails until this ticket's
- * Code PR (step 6) creates it.
+ * Issue #559: buildLogo() now returns an `<a href="https://www.radio-calico.com">`
+ * instead of a bare `<span>`, so the logo is clickable everywhere buildLogo()
+ * is used (about/contact/whats-this/case-study pages too, not just index.html
+ * — it's one shared factory, reuse-first). Opens in a new tab
+ * (target="_blank" rel="noopener noreferrer") since radio-calico.com is an
+ * external site. `chloe-wordmark` stays on the link itself (no extra wrapper)
+ * so existing CSS selectors/layout keep working unchanged. An aria-label
+ * is added because the link's accessible name would otherwise just be the
+ * "Radio"/"Calico" text nodes plus the img's alt text, which doesn't convey
+ * that activating it navigates to the Radio Calico website.
+ *
+ * Written before logo/logo.js is updated, per TDD — fails until this
+ * ticket's Code PR (step 6) implements it.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
@@ -25,12 +36,12 @@
   }
 
   describe("logo/logo.js (issue #254, Ticket 2)", () => {
-    it("buildLogo() returns a span.chloe-wordmark with 'Radio' text, the logo img, then 'Calico' text", async () => {
+    it("buildLogo() returns an a.chloe-wordmark with 'Radio' text, the logo img, then 'Calico' text", async () => {
       await loadLogoModule();
 
       const wordmark = window.buildLogo();
 
-      expect(wordmark.tagName).toBe("SPAN");
+      expect(wordmark.tagName).toBe("A");
       expect(wordmark.className).toBe("chloe-wordmark");
       expect(wordmark.childNodes.length).toBe(3);
 
@@ -57,6 +68,17 @@
 
       expect(first === second).toBeFalsy();
       expect(second.className).toBe("chloe-wordmark");
+    });
+
+    it("buildLogo() links to https://www.radio-calico.com, opening in a new tab safely", async () => {
+      await loadLogoModule();
+
+      const wordmark = window.buildLogo();
+
+      expect(wordmark.getAttribute("href")).toBe("https://www.radio-calico.com");
+      expect(wordmark.getAttribute("target")).toBe("_blank");
+      expect(wordmark.getAttribute("rel")).toBe("noopener noreferrer");
+      expect(wordmark.getAttribute("aria-label")).toBe("Radio Calico website");
     });
   });
 })();
