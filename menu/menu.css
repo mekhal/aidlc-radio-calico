@@ -15,13 +15,13 @@
 }
 
 .chloe-nav a:hover {
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
 }
 
 /* Issue #306: active nav item — non-italic + accent color so it reads as
    "currently selected"; not clickable (see menu/menu.js's preventDefault). */
 .chloe-nav a.chloe-nav-active {
-  color: var(--chloe-pink-deep);
+  color: var(--chloe-mint-deep);
   font-style: normal;
   font-weight: 600;
   cursor: default;
