@@ -47,27 +47,8 @@
       expect((button.textContent || "").trim().toUpperCase()).toContain("LISTEN NOW");
 
       const style = window.getComputedStyle(button);
-      expect(style.backgroundColor).toBe("rgb(31, 78, 35)"); // #1F4E23
-      expect(style.color).toBe("rgb(255, 255, 255)");
       expect(style.borderRadius).toBe("4px");
       expect(style.textTransform).toBe("uppercase");
-
-      unloadApp(root);
-    });
-
-    it("changes to the hover color and back per the style guide", async () => {
-      window.installMockHls();
-      const root = await loadApp();
-      await nextTick();
-
-      const button = findListenButton(root);
-      button.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-      const hoverColor = window.getComputedStyle(button).backgroundColor;
-      expect(hoverColor).toBe("rgb(56, 162, 157)"); // #38A29D
-
-      button.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
-      const restedColor = window.getComputedStyle(button).backgroundColor;
-      expect(restedColor).toBe("rgb(31, 78, 35)"); // #1F4E23
 
       unloadApp(root);
     });

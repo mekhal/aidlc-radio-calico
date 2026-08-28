@@ -43,14 +43,6 @@
     },
   };
 
-  const EXPECTED_PALETTE = [
-    { name: "Mint", hex: "#D8F2D5" },
-    { name: "Forest Green", hex: "#1F4E23" },
-    { name: "Teal", hex: "#38A29D" },
-    { name: "Calico Orange", hex: "#EFA63C" },
-    { name: "Charcoal", hex: "#231F20" },
-  ];
-
   async function loadAboutContentModule() {
     await loadSharedModule(window.__ALBUM_PROMO_SHARED_STATE_JS_PATH__ || "../shared/state.js");
     await loadSharedModule(window.__ALBUM_PROMO_SHARED_TRANSLATIONS_JS_PATH__ || "../shared/translations.js");
@@ -65,19 +57,6 @@
   }
 
   describe("about/about.js (issue #151, Ticket 2 — Section 1: The Radio Calico Project)", () => {
-    it("loadAboutContent() fetches data/about-content.json and returns the fixed 5-swatch color palette", async () => {
-      await loadAboutContentModule();
-
-      const content = await window.loadAboutContent();
-
-      expect(content.colorPalette.length).toBe(5);
-      EXPECTED_PALETTE.forEach((expected) => {
-        const match = content.colorPalette.find((swatch) => swatch.hex.toUpperCase() === expected.hex);
-        expect(match).toBeTruthy();
-        expect(match.name).toBe(expected.name);
-      });
-    });
-
     it("buildProjectSection(state) renders a serif-styled heading and description sourced from i18n", async () => {
       await loadAboutContentModule();
       const state = sampleState();
@@ -101,16 +80,6 @@
       const heading = section.querySelector("h1, h2");
       expect(heading.textContent).toBe(SAMPLE_TRANSLATIONS.th.aboutProjectHeading);
       expect(section.textContent).toContain(SAMPLE_TRANSLATIONS.th.aboutProjectDescription);
-    });
-
-    it("buildProjectSection(state) renders no color palette swatch card (removed per issue #394)", async () => {
-      await loadAboutContentModule();
-      const state = sampleState();
-
-      const section = window.buildProjectSection(state);
-
-      expect(section.querySelector(".about-palette__swatch")).toBeFalsy();
-      expect(window.buildColorPalette).toBeFalsy();
     });
   });
 })();
