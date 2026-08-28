@@ -432,6 +432,11 @@
          suites above. -->
     <script src="test-report-dashboard-skeleton.test.js"></script>
 
+    <!-- issue #546: --chloe-pink-deep -> --chloe-mint-deep text-color swap,
+         spans case-study/menu/sidebar/album-promo plus shared/tokens.css, so
+         wired directly here rather than duplicated per-component folder. -->
+    <script src="theme-mint-deep.test.js"></script>
+
     <script>
       (async function () {
         await window.TestHarness.allSettled();
