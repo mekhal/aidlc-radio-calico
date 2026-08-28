@@ -436,7 +436,7 @@ body {
   flex: 1;
   min-width: 48px;
   max-width: 100%;
-  accent-color: var(--chloe-pink-deep);
+  accent-color: var(--chloe-mint-deep);
 }
 
 /* --- Issue #446 (Ticket 0, parent #421): More Options button + sub-menu
@@ -447,7 +447,9 @@ body {
    full-background swap risks contrast issues that a fixed-hue border avoids.
    No specific highlight color was locked in #421's review beyond "ไฮไลท์สี"
    (color highlight, replacing the earlier ✓ checkmark), so this reuses the
-   same accent already used elsewhere in this card (play button, slider). */
+   same accent already used elsewhere in this card (play button). The volume
+   slider's accent-color moved to --chloe-mint-deep per issue #546's
+   follow-up ("button slider bar" request), so it no longer matches. */
 .chloe-player-controls__more-wrap {
   position: relative;
   flex-shrink: 0;
