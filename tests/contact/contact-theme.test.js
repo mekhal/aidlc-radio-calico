@@ -64,7 +64,7 @@
       const css = await readContactCss();
       const labelRule = extractRule(css, ".chloe-contact-form .form-label");
 
-      expect(labelRule.includes("var(--chloe-ink)")).toBeTruthy();
+      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
       expect(labelRule.includes("var(--chloe-sans)")).toBeTruthy();
     });
 
