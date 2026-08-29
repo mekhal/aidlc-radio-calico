@@ -13,7 +13,8 @@
    input/textarea border color and the field labels to --chloe-mint-deep too
    (already proven to hold contrast against --chloe-sage in both themes, so
    no new dark-mode override is needed); the focus ring's box-shadow stays on
-   --chloe-pink. */
+   --chloe-pink. A further #546 follow-up reverted the field labels back to
+   --chloe-ink — only the input/textarea border stays on --chloe-mint-deep. */
 
 .chloe-contact-form {
   background-color: var(--chloe-sage);
