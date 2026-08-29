@@ -1,124 +1,65 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Security Scan Report</title><style>
-/* Styling for reports/security/security-report.html (issue #544). Neutral
-   dev-report look (not the RadioCalico brand palette) — same call as
-   reports/lint/megalinter-report.html's internal-CI-artifact styling, not
-   user-facing product UI.
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radio Calico — Security Scan Report</title>
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico" />
 
-   Issue #544 follow-up (2026-08-27, mekhal): body text is bilingual since
-   this page is reachable from the footer/sidebar, but via a real EN/TH
-   language toggle (#security-lang-toggle) rather than showing both
-   languages together — see report-boot.js. */
-:root {
-  --bg: #f7f7f8;
-  --card: #ffffff;
-  --text: #1c1c1e;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --error: #dc2626;
-  --success: #16a34a;
-}
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  padding: 2rem;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-}
-h1 {
-  font-size: 1.5rem;
-  margin: 0 0 0.25rem;
-}
-.subtitle {
-  color: var(--muted);
-  margin: 0.5rem 0 0;
-  font-size: 0.9rem;
-}
-.lang-toggle {
-  flex-shrink: 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--text);
-  cursor: pointer;
-}
-.lang-toggle:hover {
-  background: var(--bg);
-}
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.empty-state {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-.status-badge {
-  display: inline-block;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.status-passed {
-  background: #dcfce7;
-  color: var(--success);
-}
-.status-failed {
-  background: #fee2e2;
-  color: var(--error);
-}
-.category-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.9rem;
-}
-.category-row:last-child {
-  border-bottom: none;
-}
-.category-count {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.download-link {
-  display: inline-block;
-  color: var(--text);
-  font-weight: 600;
-  text-decoration: none;
-}
-.download-link:hover {
-  text-decoration: underline;
-}
-</style></head><body>
-<div class="header-row">
-  <div>
-    <h1 id="security-title"></h1>
-    <div id="security-subtitle" class="subtitle"></div>
-  </div>
-  <button id="security-lang-toggle" class="lang-toggle" type="button">TH</button>
-</div>
-<div class="card"><div id="security-status"></div></div>
-<div class="card"><div id="security-categories"></div></div>
-<div class="card">
-  <a id="security-download-link" class="download-link" href="trivy.sarif" download="trivy-results.sarif"></a>
-</div>
-<script src="report-render.js"></script>
-<script src="report-boot.js"></script>
-</body></html>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@600;700&family=Open+Sans:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+    />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Issue #548: reuse index.html's own header/sidebar/footer chrome
+         styling, reversing #544's "neutral standalone page" choice. -->
+    <link rel="stylesheet" href="../../shared/tokens.css" />
+    <link rel="stylesheet" href="../../album-promo.css" />
+    <link rel="stylesheet" href="../../logo/logo.css" />
+    <link rel="stylesheet" href="../../menu/menu.css" />
+    <link rel="stylesheet" href="../../sidebar/sidebar.css" />
+    <link rel="stylesheet" href="../../footer/footer.css" />
+    <link rel="stylesheet" href="security-report.css" />
+  </head>
+  <body>
+    <!-- Issue #548: header, sidebar, and footer are rendered by
+         security-report-page.js (reusing index.html/album-promo.js's same
+         shared chrome globals), same DOM-construction pattern as
+         pages/about.html and tests/test-report-dashboard.html. -->
+    <div id="security-report-root"></div>
+
+    <!-- This page lives TWO directories below the repo root (reports/
+         security/, not one like every other chrome-mounting page), so
+         every base-path override below uses "../../" instead of "../" —
+         see docs/knowledge-asset/published/
+         root-relative-path-audit-for-nested-pages.md. Without these, the
+         i18n fetch (shared/translations.js) and the sidebar's Test/Lint/
+         Security Scan links (sidebar/sidebar.js, issue #299) would 404
+         here. report-boot.js already independently defaults its own
+         I18N_BASE_PATH to "../../i18n/" for the same reason. -->
+    <script>
+      window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../../i18n/";
+      window.__SIDEBAR_BASE_PATH__ = "../../";
+    </script>
+
+    <!-- Issue #548: same reusable chrome globals index.html/album-promo.js
+         compose — must load before security-report-page.js, which calls
+         createState()/buildLogo()/buildMenu()/buildSidebar()/buildFooter(). -->
+    <script src="../../shared/state.js"></script>
+    <script src="../../shared/translations.js"></script>
+    <script src="../../shared/helpers.js"></script>
+    <script src="../../logo/logo.js"></script>
+    <script src="../../menu/menu.js"></script>
+    <script src="../../sidebar/sidebar.js"></script>
+    <script src="../../footer/footer.js"></script>
+
+    <script src="report-render.js"></script>
+    <script src="report-boot.js"></script>
+    <script src="security-report-page.js"></script>
+  </body>
+</html>
