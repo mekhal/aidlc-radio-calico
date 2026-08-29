@@ -410,6 +410,15 @@
          same generic fetch+inject loader — wired directly here too. -->
     <script src="security-report-render.test.js"></script>
 
+    <!-- issue #548 (follow-up to #544/#545): full Header/Sidebar/Footer
+         chrome + theme tokens + download-link sizing for
+         reports/security/security-report.html — same doc/source-content-
+         assertion category as the suite above, loaded via the shared
+         fetch+inject loader (SharedModuleTestHelpers, already included
+         above via about/about-page.test.js), so wired directly here too. -->
+    <script src="security/security-report-page.test.js"></script>
+    <script src="security/security-report-theme.test.js"></script>
+
     <!-- issue #205: report-storage.js/test-report-dashboard.js have no
          app.js DOM surface (same category as the two files above), so their
          suites are wired directly here too. -->
