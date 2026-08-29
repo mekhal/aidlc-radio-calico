@@ -1,0 +1,110 @@
+/* reports/security/security-report.css (issue #548): extracted from
+   security-report.html's former inline <style> — this page now mounts the
+   app's real header/sidebar/footer chrome (album-promo.css, loaded
+   alongside this file) instead of standing alone (reversing #544's
+   "neutral standalone page" choice per @mekhal's step-3 answer). The
+   private :root palette (--bg/--card/--text/--muted/--border) is dropped in
+   favor of shared/tokens.css's already theme-flipping --chloe-* custom
+   properties — same token-reuse pattern as about/about.css and
+   tests/test-report-dashboard.css.
+
+   Issue #548 item 2: the download control no longer sits inside its own
+   full-width .card — .download-row + a compact .download-link pill replace
+   it (no width: 100%), so it reads as a normal-sized control. */
+
+.security-report-main {
+  display: block;
+  padding-top: 2rem;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.security-report-title {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--chloe-ink);
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  color: var(--chloe-ink);
+  opacity: 0.7;
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+.card {
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status-passed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-failed {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(245, 238, 224, 0.2);
+  font-size: 0.9rem;
+}
+
+.category-row:last-child {
+  border-bottom: none;
+}
+
+.category-count {
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.download-row {
+  display: flex;
+}
+
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  background: var(--chloe-player-box-bg);
+  color: var(--chloe-player-box-fg);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}

@@ -7,7 +7,6 @@
   "statusFailed": "ไม่ผ่าน",
   "findingsCount": "พบ {count} รายการ",
   "downloadLink": "⬇ ดาวน์โหลดรายงาน (trivy.sarif)",
-  "languageToggleLabel": "สลับภาษา",
   "categorySecrets": "การตรวจจับข้อมูลลับ",
   "categorySca": "การพึ่งพา (SCA)",
   "categoryMisconfig": "การตั้งค่าที่ผิดพลาด",

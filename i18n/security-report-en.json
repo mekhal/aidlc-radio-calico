@@ -7,7 +7,6 @@
   "statusFailed": "Failed",
   "findingsCount": "{count} finding(s)",
   "downloadLink": "⬇ Download report (trivy.sarif)",
-  "languageToggleLabel": "Switch language",
   "categorySecrets": "Secrets Detection",
   "categorySca": "Dependencies (SCA)",
   "categoryMisconfig": "Misconfigurations",
