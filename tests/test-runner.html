@@ -392,6 +392,12 @@
     <script src="harness-serialization.test.js"></script>
     <script src="skills-storage-in-repo.test.js"></script>
 
+    <!-- Issue #579: confirmed-DELETE cleanup from the #573 audit — doc/asset
+         content assertions, no app/DOM behavior, same category/pattern as
+         skills-storage-in-repo.test.js above, so wired directly here rather
+         than into the footer modal's scoped suite. -->
+    <script src="unreferenced-file-cleanup.test.js"></script>
+
     <!-- issue #340: standing regression check for the issue #330 IIFE-safety
          bug — same doc-content-assertion category as the two suites above,
          so wired directly here rather than into test-report-suite-files.js. -->
