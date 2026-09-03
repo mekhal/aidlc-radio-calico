@@ -20,15 +20,15 @@
       "type": "js",
       "primary": "https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js",
       "fallbacks": ["https://unpkg.com/react@18/umd/react.production.min.js"],
-      "usedIn": ["index.html", "tests/test-runner.html", "app.js (TEST_REPORT_CDN_DEPS)"],
-      "notes": "unpkg.com was network-blocked in the environment that surfaced issue #157's 'ReactDOM is not defined' bug; jsDelivr (already used for Bootstrap in the same files) is primary now. Keep unpkg listed only as a fallback, not a first choice. Issue #542: tests/test-runner.html and app.js's on-demand Test Report modal were still unpkg-only, causing an intermittent 0% pass rate whenever unpkg was unreachable — migrated to match."
+      "usedIn": ["index.html", "tests/test-runner.html"],
+      "notes": "unpkg.com was network-blocked in the environment that surfaced issue #157's 'ReactDOM is not defined' bug; jsDelivr (already used for Bootstrap in the same files) is primary now. Keep unpkg listed only as a fallback, not a first choice. Issue #542: tests/test-runner.html and the on-demand Test Report modal formerly in app.js (deleted as dead code, issue #585) were still unpkg-only, causing an intermittent 0% pass rate whenever unpkg was unreachable — migrated to match."
     },
     "react-dom": {
       "version": "18",
       "type": "js",
       "primary": "https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js",
       "fallbacks": ["https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"],
-      "usedIn": ["index.html", "tests/test-runner.html", "app.js (TEST_REPORT_CDN_DEPS)"],
+      "usedIn": ["index.html", "tests/test-runner.html"],
       "notes": "Same rationale as react above — load order must stay react -> react-dom -> the page's own script."
     },
     "babel-standalone": {
@@ -36,7 +36,7 @@
       "type": "js",
       "primary": "https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js",
       "fallbacks": ["https://unpkg.com/@babel/standalone@7/babel.min.js"],
-      "usedIn": ["tests/test-runner.html", "app.js (TEST_REPORT_CDN_DEPS)"],
+      "usedIn": ["tests/test-runner.html"],
       "notes": "Issue #542: migrated off unpkg-only to match the react/react-dom primary/fallback pattern above — unpkg was intermittently unreachable, causing every test file to throw at load time (no Babel to transpile) and the suite to silently record a 0-case, 0% run."
     },
     "hls.js": {
@@ -45,7 +45,7 @@
       "primary": "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js",
       "fallbacks": ["https://unpkg.com/hls.js@1/dist/hls.min.js"],
       "usedIn": ["index.html"],
-      "notes": "Issue #220 (Option B): same library app.js already relies on via window.Hls (app.js itself has no <script> tag of its own in either HTML file — see the app.js dead-code note on issue #220). jsDelivr primary / unpkg fallback, matching the react/react-dom entries above. Must load before album-promo.js."
+      "notes": "Issue #220 (Option B): same library album-promo.js relies on via window.Hls. jsDelivr primary / unpkg fallback, matching the react/react-dom entries above. Must load before album-promo.js. Issue #585: app.js (which also used window.Hls, mirrored by album-promo.js) was deleted as confirmed dead code — it had no <script> tag of its own in either HTML file to begin with."
     }
   },
   "knownDrift": []
