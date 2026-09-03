@@ -10,19 +10,19 @@
  * opening it via file:// fails these fetches in most browsers regardless of
  * the docs, since local-file fetch is blocked by file:// CORS policy.
  *
- * Issue #54: this file also runs inside the footer's on-demand Test Report
- * modal, which injects it from index.html at the repo root rather than from
- * tests/test-runner.html — "../CLAUDE.md" would resolve above the repo root
- * in that context. window.__APP_JS_PATH__ is the same signal
- * tests/load-app.js already uses to tell the two contexts apart (app.js sets
- * it to "app.js" before running the suite; test-runner.html never sets it),
- * so repoFilePath() uses it to pick the right prefix.
+ * Issue #54 (superseded by #585): this file used to also run inside the
+ * footer's on-demand Test Report modal (app.js), which injected it from
+ * index.html at the repo root rather than from tests/test-runner.html —
+ * "../CLAUDE.md" would have resolved above the repo root in that context, so
+ * repoFilePath() branched on window.__APP_JS_PATH__ to pick the right prefix.
+ * app.js (and that modal) was deleted as dead code in issue #585 — this file
+ * now only ever runs from tests/test-runner.html, one directory below root.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
 
   function repoFilePath(name) {
-    return window.__APP_JS_PATH__ ? name : `../${name}`;
+    return `../${name}`;
   }
 
   async function readRepoFile(relativePath) {

@@ -40,7 +40,7 @@ Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
   — Trivy's report is unaffected and still publishes on every `main` push.
   `.mega-linter.yml` at the repo root further scopes which linters run at
   all, to this repo's decided tech stack.
-- **Report paths match the footer links already in `app.js`:**
+- **Report paths match the footer links already in `sidebar/sidebar.js`:**
   `reports/lint/megalinter-report.html` and (since issue #544)
   `reports/security/security-report.html`, both at the site root so they
   resolve once published to `main`. Trivy's workflow still stages the raw

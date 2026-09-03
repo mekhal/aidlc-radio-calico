@@ -17,20 +17,15 @@ harness:
   pass/fail list on the page.
 
 **Tests run only on demand** — never automatically when `index.html` loads, and never via an
-`npm test` script. `index.html`'s footer has a "Test Report" button (issue #41) that opens an
-in-app modal and runs a suite on demand, injecting the harness/fixture DOM directly into the page
-(no `<iframe>`) so a reviewer can check results without any local install step.
-`tests/test-runner.html` still runs the full suite on load and remains the fallback/CI entry
-point.
+`npm test` script. The sidebar's footer links (`test-report-dashboard.html`, issue #205) open a
+dedicated dashboard page that drives a full `tests/test-runner.html` run in a hidden `<iframe>`
+and renders a pass/fail list grouped per test suite, so a reviewer can check results without any
+local install step. `tests/test-runner.html` still runs the full suite on load and remains the
+fallback/CI entry point.
 
-Since issue #67 (AC2), the modal's suite is scoped to tests that exercise `app.js`'s own
-HTML/DOM interface functions (`tests/test-report-suite-files.js` is the single source of truth
-for that list). Tests with no app/DOM surface — the harness's own self-test
-(`harness-serialization.test.js`) and doc-content assertions
-(`skills-storage-in-repo.test.js`) — are wired directly into `tests/test-runner.html` instead, so
-they still run as part of the full report, just not the footer modal. The modal groups results as
-a list per test suite with a sub-list per case, so it reads as "what's tested" rather than a flat
-list of assertions.
+(Issue #585: `index.html`'s previous "Test Report" footer button, which opened an in-app modal
+via `app.js` and ran a suite scoped to `tests/test-report-suite-files.js`, was removed along with
+`app.js` — both were confirmed dead code, superseded by the dashboard page above.)
 
 If a test needs "the database," it mocks `localStorage` directly — only as far as the
 Acceptance Criteria under test requires, nothing extra.
@@ -44,6 +39,6 @@ disk). The page runs the suite on load and renders results.
 
 A ticket with no app/DOM surface (docs-only or process changes) is still tested per TDD —
 the assertion just reads sibling repo files via `fetch()` and checks their text instead of
-exercising `app.js`. This means that specific suite needs `test-runner.html` served over
+exercising app DOM behavior. This means that specific suite needs `test-runner.html` served over
 http(s) (a static file server); opening it via `file://` fails those fetches in most browsers
 regardless of the docs' content, since local-file fetch is blocked by `file://` CORS policy.

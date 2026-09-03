@@ -25,7 +25,6 @@
   // #340) — add new entries here whenever a new one is added to the repo,
   // since that's exactly the regression this suite exists to catch.
   const APP_SOURCE_JS_FILES = [
-    "app.js",
     "album-promo.js",
     "case-study/case-study.js",
     "footer/footer.js",

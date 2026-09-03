@@ -1,19 +1,13 @@
 /**
- * Issue #67, AC2: the footer's on-demand Test Report modal (app.js) was
- * scoped down to only app.js's own HTML/DOM interface-function tests —
- * tests/harness-serialization.test.js (tests the assert.js harness itself)
- * and tests/skills-storage-in-repo.test.js (doc-content assertions, no
- * app/DOM behavior) no longer belong there. This supersedes the original
- * issue #54 version of this file, which asserted the opposite (that the
- * modal's injected suite fetches skills-storage-in-repo.test.js) — that was
- * the fix for those two files never running anywhere at all. They still need
- * to run somewhere, so this now asserts they're wired directly into
- * tests/test-runner.html's script list instead of the modal's scoped suite.
- *
- * Note: like the original version, this file itself opens the Test Report
- * modal, so it stays self-referential — excluded from
- * tests/test-report-suite-files.js and wired only into tests/test-runner.html
- * (see the comment there).
+ * Issue #67, AC2: the footer's on-demand Test Report modal (app.js, since
+ * deleted as dead code per issue #585) was scoped down to only app.js's own
+ * HTML/DOM interface-function tests — tests/harness-serialization.test.js
+ * (tests the assert.js harness itself) and tests/skills-storage-in-repo.test.js
+ * (doc-content assertions, no app/DOM behavior) no longer belonged there.
+ * window.TEST_REPORT_SUITE_FILES (tests/test-report-suite-files.js) is now
+ * permanently empty since app.js's modal was its only consumer, but these two
+ * files still need to run somewhere, so this asserts they stay wired directly
+ * into tests/test-runner.html's script list rather than that (now-empty) list.
  */
 (function () {
   const { describe, it, expect } = window.TestHarness;
