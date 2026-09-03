@@ -60,11 +60,11 @@
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
 
-    <!-- Ticket C (issue #101), AC6: app.js fetches i18n/en.json + i18n/th.json
-         relative to the page it's running from. This page lives one
-         directory under the repo root (unlike the live index.html, which
-         app.js's default "i18n/" path assumes), so it needs the "../" prefix
-         — mirrors the existing window.__APP_JS_PATH__ override pattern. -->
+    <!-- Ticket C (issue #101): album-promo.js fetches i18n/en.json +
+         i18n/th.json relative to the page it's running from. This page lives
+         one directory under the repo root (unlike the live index.html, which
+         album-promo.js's default "i18n/" path assumes), so it needs the
+         "../" prefix. -->
     <!-- Issue #299 (AC3): same "one directory below root" reasoning as the
          i18n override above, applied to sidebar/sidebar.js's base path. -->
     <!-- Issue #323 (Ticket 2 of #203): same "one directory below root"
@@ -75,7 +75,6 @@
          __CONTACT_DATA_PATH__), not the case-study one — previously unset,
          so their data/ fetches 404'd under tests/. -->
     <script>
-      window.__I18N_BASE_PATH__ = "../i18n/";
       window.__ALBUM_PROMO_I18N_BASE_PATH__ = "../i18n/";
       window.__SIDEBAR_BASE_PATH__ = "../";
       window.__CASE_STUDY_DATA_PATH__ = "../data/";
@@ -86,7 +85,6 @@
 
     <script src="assert.js"></script>
     <script src="mock-hls.js"></script>
-    <script src="load-app.js"></script>
 
     <!-- issue #205: persists this run's results to localStorage (AC1), read
          by tests/test-report-dashboard.html — never the other way around. -->
@@ -366,9 +364,12 @@
          than into test-report-suite-files.js. -->
     <script src="contact/contact-theme.test.js"></script>
 
-    <!-- issue #54: the list of "real" test files is shared with app.js's
-         footer modal via test-report-suite-files.js (single source of
-         truth) instead of being hand-duplicated here. -->
+    <!-- issue #54 (superseded by #585): test-report-suite-files.js used to be
+         the single source of truth shared with app.js's footer modal, whose
+         only member files have since all been deleted along with app.js — the
+         list is now permanently empty, so this loop is a no-op. Left in place
+         since tests/test-report-suite-completeness.test.js still asserts
+         against window.TEST_REPORT_SUITE_FILES. -->
     <script src="test-report-suite-files.js"></script>
     <script>
       window.TEST_REPORT_SUITE_FILES.forEach(function (file) {
@@ -376,19 +377,13 @@
       });
     </script>
 
-    <!-- Self-referential — each opens the Test Report modal as part of its
-         own test, so they stay out of test-report-suite-files.js to avoid
-         the modal's injected suite recursing into itself. -->
-    <script src="load-app-isolation.test.js"></script>
-    <script src="test-report-modal.test.js"></script>
-    <script src="test-report-cdn-deps.test.js"></script>
+    <!-- Self-referential — fetches this page by a path relative to itself,
+         so it would 404 if injected from elsewhere. -->
     <script src="test-report-suite-completeness.test.js"></script>
-    <script src="footer-test-report-button.test.js"></script>
 
-    <!-- issue #67, AC2: not app.js interface-function tests, so the footer
-         modal's scoped suite excludes them (test-report-suite-files.js) —
-         wired directly here instead so they still run as part of the full
-         report. -->
+    <!-- issue #67, AC2 (superseded by #585): not app.js interface-function
+         tests, so the (now-empty) footer-modal suite excludes them — wired
+         directly here instead so they still run as part of the full report. -->
     <script src="harness-serialization.test.js"></script>
     <script src="skills-storage-in-repo.test.js"></script>
 

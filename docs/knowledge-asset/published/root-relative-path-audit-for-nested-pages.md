@@ -36,8 +36,9 @@ Before merging any change that introduces a new root-relative asset path:
      prefixing only root-relative paths, with the override set in each nested page *before* the
      module's `<script>` tag loads (`window.__<ModuleName>_BASE_PATH__`). See
      `docs/decisions/2026-08-10-issue-299-repo-relative-path-base-path-pattern.md`
-     (`window.__I18N_BASE_PATH__` in `app.js`/#101, `window.__ALBUM_PROMO_I18N_BASE_PATH__` in
-     `shared/translations.js`/#253, `window.__SIDEBAR_BASE_PATH__` in `sidebar/sidebar.js`/#299).
+     (`window.__ALBUM_PROMO_I18N_BASE_PATH__` in `shared/translations.js`/#253,
+     `window.__SIDEBAR_BASE_PATH__` in `sidebar/sidebar.js`/#299 — `window.__I18N_BASE_PATH__` in
+     `app.js`/#101 was a third example of this pattern until app.js was deleted as dead code, #585).
    - **Per-page chrome built by that page's own `-page.js` init script** (e.g. the logo/nav
      rewrite already in `about-page.js`'s and `whats-this-page.js`'s `buildHeader()`) — a
      page-level rewrite applied right after the element is built/mounted, prefixing with `"../"`.
