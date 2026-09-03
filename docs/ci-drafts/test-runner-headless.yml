@@ -1,0 +1,55 @@
+name: Headless Test Runner
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+jobs:
+  headless-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Serve repo over http (tests/README.md: fetch() fails under file://)"
+        run: |
+          python3 -m http.server 8080 &
+          for i in $(seq 1 10); do
+            curl -sf http://localhost:8080/tests/test-runner.html > /dev/null && break
+            sleep 1
+          done
+
+      - name: Install a throwaway Playwright outside the repo tree (CI tool only, not an app dependency)
+        run: |
+          mkdir -p /tmp/pw-runner
+          cd /tmp/pw-runner
+          npm init -y --silent
+          npm install --no-save playwright@1.47.0
+          npx playwright install --with-deps chromium
+
+      - name: Run tests/test-runner.html headlessly and report pass/fail
+        run: |
+          cat > /tmp/pw-runner/check.js <<'EOF'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+            await page.goto('http://localhost:8080/tests/test-runner.html');
+            await page.waitForFunction(
+              () => document.getElementById('summary').textContent !== 'Running tests…',
+              { timeout: 60000 }
+            );
+            const summary = await page.textContent('#summary');
+            const failedLines = await page.$$eval('#results li.fail', (els) =>
+              els.map((el) => el.textContent)
+            );
+            console.log(summary);
+            failedLines.forEach((line) => console.log('  ' + line));
+            await browser.close();
+            if (failedLines.length > 0) {
+              process.exitCode = 1;
+            }
+          })();
+          EOF
+          node /tmp/pw-runner/check.js

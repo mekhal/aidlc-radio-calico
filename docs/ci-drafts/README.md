@@ -1,15 +1,16 @@
-# CI workflow drafts (issue #67)
+# CI workflow drafts (issue #67, #577)
 
-`mega-linter.yml` and `trivy.yml` in this folder are **drafts**, not live workflows.
-Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
+`mega-linter.yml`, `trivy.yml`, and `test-runner-headless.yml` in this folder are **drafts**, not
+live workflows. Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
 `.github/workflows/` — a human must copy these files into that path.
 
 ## How to install
 
-1. Copy both files into `.github/workflows/`:
+1. Copy the files you need into `.github/workflows/`:
    ```
    cp docs/ci-drafts/mega-linter.yml .github/workflows/mega-linter.yml
    cp docs/ci-drafts/trivy.yml .github/workflows/trivy.yml
+   cp docs/ci-drafts/test-runner-headless.yml .github/workflows/test-runner-headless.yml
    ```
 2. In repo Settings → Actions → General → Workflow permissions, make sure
    **"Read and write permissions"** is selected. Both workflows commit the
@@ -64,6 +65,24 @@ Per `CLAUDE.md`'s write-guard note, the Claude agent cannot write under
   `docs/decisions/2026-07-12-tech-stack-vanilla-js-jquery.md`.
 - **Test coverage is intentionally absent** from both drafts — out of scope
   per the issue and `docs/decisions/2026-07-12-testing-framework-vanilla-runner.md`.
+- **`test-runner-headless.yml` (issue #577): serves the branch locally, not GitHub
+  Pages.** The live Pages URL only ever reflects the last `develop` → `main`
+  release (see the Trivy note above — legacy branch-based Pages off `main`),
+  so pointing a "PR/push → `develop`" trigger at it would always test stale,
+  already-released code instead of the change under review. Instead the job
+  serves the checked-out branch itself over `http://localhost:8080` via
+  Python's built-in `http.server` (already on `ubuntu-latest`, no install —
+  same "no `npm install` in the repo tree" discipline as Mega-Linter/Trivy),
+  which also satisfies `tests/README.md`'s requirement that `fetch()`-based
+  suites run over http(s), not `file://`. A throwaway Playwright is installed
+  into `/tmp/pw-runner` (`--no-save`, outside the repo tree) purely as CI
+  tooling to drive headless Chromium and wait for
+  `tests/test-runner.html`'s real completion signal (`#summary`'s text
+  changing away from `"Running tests…"`) rather than a fixed sleep — no
+  `package.json`/`node_modules` is ever committed to the repo, consistent
+  with `docs/decisions/2026-07-12-tech-stack-vanilla-js-jquery.md`. Report-only
+  for now (not in `develop`'s required-status-checks list) since the suite
+  had never run unattended before this issue.
 
 ## Fixes applied after the first live CI runs
 
@@ -106,6 +125,14 @@ stays a trustworthy copy source.
   security link (`reports/security/trivy.sarif`) opens that file directly,
   per the human's step-3 decision on #87 to keep this simple rather than
   build a custom grouped HTML viewer.
+- **`test-runner-headless.yml`, fix 1/1 — `Invalid workflow file ... #L15`
+  (issue #577).** The step name
+  `Serve repo over http (tests/README.md: fetch() fails under file://)`
+  is an unquoted YAML plain scalar containing `README.md: fetch()` — a
+  colon immediately followed by a space, which YAML always reads as the
+  start of a new mapping key, not literal text. Fixed by wrapping the whole
+  step name in double quotes. No other `name:`/string field in this
+  workflow has the same `: ` sequence.
 
 ## What's NOT covered here
 
