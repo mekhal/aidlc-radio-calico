@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-This is a **process demo**, not an application. The deliverable is the *workflow* — proving a human + the Claude GitHub agent can produce production-grade work end-to-end on GitHub. Do not treat requests as "build the Radio Calico app locally"; treat them as steps in the AI-DLC loop. There is no product source code yet — `src/` and `tests/` are created only when the first loop begins.
+This is a **process demo**, not an application. The deliverable is the *workflow* — proving a human + the Claude GitHub agent can produce production-grade work end-to-end on GitHub. Do not treat requests as "build the Radio Calico app locally"; treat them as steps in the AI-DLC loop. Product code from completed loops lives at the repo root and in per-section component folders (e.g. `about/`, `contact/`, `footer/`) — see §8 of `README.md`/`README.th.md` for the actual layout; `tests/` holds the hand-written test suite (see `tests/README.md`).
 
 The full process is defined in `README.md` (Thai, canonical) and `README.en.md` (English). Read the README before acting on any issue.
 
@@ -201,13 +201,10 @@ Decided under issue #203 (see `docs/decisions/2026-08-11-issue-203-case-study-da
 
 ## Commands
 
-Scaffold the planned folder structure (`.github/`, `docs/`, `specs/`, `src/`, `tests/`) — run from the repo root:
+There is no build step and no `npm install` — the app runs directly from static files (see "Tech stack").
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/scaffold.ps1
-```
-
-It is idempotent and never overwrites existing files. There is no build, lint, or test tooling yet; add it (with commands documented here) when the first product code lands in step 6.
+- **Tests:** open `tests/test-runner.html` directly in a browser; see `tests/README.md`.
+- **Lint:** ESLint (`.eslintrc.json`), Stylelint (`.stylelintrc.json`), and Mega-Linter (`.mega-linter.yml`) configs are already in place and run in CI (`.github/workflows/`); there is no local npm script to invoke them outside CI.
 
 ## Assets
 

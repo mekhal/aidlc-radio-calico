@@ -208,18 +208,31 @@ Integration test: HLS player โหลด stream URL สำเร็จ
 aidlc-radiocalico/
 ├─ README.md                     ← เวอร์ชันภาษาอังกฤษ (default)
 ├─ README.th.md                  ← ไฟล์นี้ (ไทย): อธิบายกระบวนการ AI-DLC
+├─ CLAUDE.md                     ← operating source of truth ของ agent
+├─ index.html, *.html            ← หน้าเว็บหลัก (เช่น case-study.html)
+├─ *.js, *.css                   ← โค้ด root-level (เช่น styles.css)
+├─ about/, contact/, footer/,
+│  menu/, sidebar/, case-study/,
+│  whats-this/                   ← โค้ดแยกตาม component (HTML/CSS/JS)
+├─ config/, data/, i18n/,
+│  shared/, images/, logo/,
+│  pages/                        ← config, data, คำแปล, โค้ดที่ใช้ร่วมกัน, asset
 ├─ .github/
 │  ├─ ISSUE_TEMPLATE/            ← เทมเพลต issue: story / improvement / task
 │  ├─ pull_request_template.md   ← เช็กลิสต์ก่อน review PR
 │  └─ workflows/                 ← claude.yml, CI, security scan, quality gates
+├─ .claude/
+│  └─ skills/                    ← reusable skills, <kebab-name>/SKILL.md
 ├─ docs/
 │  ├─ ai-dlc-loop.md             ← รายละเอียดเชิงลึกของ loop
-│  └─ decisions/                 ← decision log (บันทึกการตัดสินใจของมนุษย์)
-├─ specs/                        ← plan + AC ที่ AI สร้างต่อแต่ละ issue
-├─ src/                          ← โค้ดผลิตภัณฑ์ Radio Calico
-├─ tests/                        ← เทส (เขียนก่อนโค้ดตาม TDD)
+│  ├─ decisions/                 ← decision log (บันทึกการตัดสินใจของมนุษย์)
+│  └─ knowledge-asset/           ← skill ที่ published/deprecated แล้ว (§7)
+├─ ai-review-evals/              ← หนึ่ง entry ต่อการ `@claude close` (§7)
+├─ tests/                        ← เทสเขียนมือด้วย vanilla JS (TDD) + test-runner.html
 └─ RadioCalicoStyle/             ← brand assets + style guide (มีอยู่แล้ว)
 ```
+
+Plan + AC ของ step 2 อยู่ในคอมเมนต์ของ issue เอง และเมื่อสรุปแล้วจะถูกบันทึกไว้ที่ `docs/decisions/` — ไม่มีโฟลเดอร์ `specs/` แยกต่างหาก โค้ดผลิตภัณฑ์จะอยู่ที่ root และโฟลเดอร์ component ต่าง ๆ ด้านบน ตัดสินใจเป็นราย issue แทนที่จะรวมไว้ในโฟลเดอร์ `src/` เดียว
 
 > **Skills** อยู่ใน repo นี้ ที่ `.claude/skills/<kebab-name>/SKILL.md`
 

@@ -208,18 +208,31 @@ The heart of making the agent "keep getting better" is turning **human decisions
 aidlc-radiocalico/
 ├─ README.md                     ← this file (English, default)
 ├─ README.th.md                  ← Thai version: describes the AI-DLC process
+├─ CLAUDE.md                     ← operating source of truth for the agent
+├─ index.html, *.html            ← page entry points (e.g. case-study.html)
+├─ *.js, *.css                   ← root-level app code (e.g. styles.css)
+├─ about/, contact/, footer/,
+│  menu/, sidebar/, case-study/,
+│  whats-this/                   ← per-section component code (HTML/CSS/JS)
+├─ config/, data/, i18n/,
+│  shared/, images/, logo/,
+│  pages/                        ← app config, data, translations, shared code, assets
 ├─ .github/
 │  ├─ ISSUE_TEMPLATE/            ← issue templates: story / improvement / task
 │  ├─ pull_request_template.md   ← pre-review PR checklist
 │  └─ workflows/                 ← claude.yml, CI, security scan, quality gates
+├─ .claude/
+│  └─ skills/                    ← reusable skills, <kebab-name>/SKILL.md
 ├─ docs/
 │  ├─ ai-dlc-loop.md             ← the loop in depth
-│  └─ decisions/                 ← decision log (records of human decisions)
-├─ specs/                        ← plan + AC created by the AI per issue
-├─ src/                          ← Radio Calico product code
-├─ tests/                        ← tests (written before code, TDD)
+│  ├─ decisions/                 ← decision log (records of human decisions)
+│  └─ knowledge-asset/           ← published/deprecated skill candidates (§7)
+├─ ai-review-evals/              ← one entry per `@claude close` (§7)
+├─ tests/                        ← hand-written vanilla-JS tests (TDD) + test-runner.html
 └─ RadioCalicoStyle/             ← brand assets + style guide (already present)
 ```
+
+Plan + AC produced at step 2 live in the issue's own comments and, once decided, in `docs/decisions/` — there is no separate `specs/` folder. Product code lands at the repo root and in the per-section component folders above, decided per issue rather than under a single `src/` folder.
 
 > **Skills** live in this repo under `.claude/skills/<kebab-name>/SKILL.md`.
 
