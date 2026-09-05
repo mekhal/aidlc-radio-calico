@@ -128,7 +128,23 @@
 
   function openSleepTimerSubmenu(root) {
     ensureMoreMenuOpen(root);
-    findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]').click();
+    const row = findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]');
+    if (!row) {
+      const controls = findPlayerControls(root);
+      const moreBtn = moreOptionsButton(root);
+      const moreMenu = controls.querySelector('[data-testid="player-more-menu"]');
+      throw new Error(
+        "DIAG aria-expanded=" +
+          moreBtn.getAttribute("aria-expanded") +
+          " moreMenuExists=" +
+          !!moreMenu +
+          " moreMenuHtml=" +
+          (moreMenu ? moreMenu.outerHTML.slice(0, 400) : "N/A") +
+          " controlsHtml=" +
+          controls.innerHTML.slice(0, 600)
+      );
+    }
+    row.click();
   }
 
   function selectSleepTimerOption(root, value) {
