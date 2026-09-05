@@ -127,21 +127,29 @@
   }
 
   function openSleepTimerSubmenu(root) {
+    const moreBtn0 = moreOptionsButton(root);
+    let nativeClicks = 0;
+    moreBtn0.addEventListener("click", () => {
+      nativeClicks += 1;
+    });
     ensureMoreMenuOpen(root);
     const row = findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]');
     if (!row) {
-      const controls = findPlayerControls(root);
       const moreBtn = moreOptionsButton(root);
-      const moreMenu = controls.querySelector('[data-testid="player-more-menu"]');
+      const wrap = moreBtn.closest(".chloe-player-controls__more-wrap");
+      moreBtn.click();
+      const ariaAfterSecondClick = moreBtn.getAttribute("aria-expanded");
       throw new Error(
-        "DIAG aria-expanded=" +
+        "DIAG2 nativeClicks=" +
+          nativeClicks +
+          " ariaAfterFirst=" +
           moreBtn.getAttribute("aria-expanded") +
-          " moreMenuExists=" +
-          !!moreMenu +
-          " moreMenuHtml=" +
-          (moreMenu ? moreMenu.outerHTML.slice(0, 400) : "N/A") +
-          " controlsHtml=" +
-          controls.innerHTML.slice(0, 600)
+          " ariaAfterSecondClick=" +
+          ariaAfterSecondClick +
+          " sameBtnRef=" +
+          (moreBtn === moreBtn0) +
+          " wrapHtml=" +
+          (wrap ? wrap.outerHTML.slice(0, 500) : "NO_WRAP")
       );
     }
     row.click();
