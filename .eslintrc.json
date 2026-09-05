@@ -17,9 +17,22 @@
     "loadTranslations": "readonly",
     "ALBUM_PROMO_TRANSLATIONS": "readonly",
     "createIconLink": "readonly",
+    "resolveBilingualField": "readonly",
     "LANG_STORAGE_KEY": "readonly",
     "THEME_STORAGE_KEY": "readonly",
     "React": "readonly",
-    "ReactDOM": "readonly"
+    "ReactDOM": "readonly",
+    "loadAboutContent": "readonly",
+    "buildProjectSection": "readonly",
+    "buildStandardsSection": "readonly",
+    "buildReferencesSection": "readonly",
+    "buildCaseStudySection": "readonly",
+    "loadContactContent": "readonly",
+    "buildContactInfoSection": "readonly",
+    "buildContactFormSection": "readonly",
+    "loadWhatsThisContent": "readonly",
+    "buildWhatIsThisSection": "readonly",
+    "buildAiDlcLoopSection": "readonly",
+    "buildSkillCaptureSection": "readonly"
   }
 }
