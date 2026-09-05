@@ -64,7 +64,12 @@
       const css = await readContactCss();
       const labelRule = extractRule(css, ".chloe-contact-form .form-label");
 
-      expect(labelRule.includes("var(--chloe-mint-deep)")).toBeTruthy();
+      // A further #546 follow-up (see contact.css's header comment) reverted
+      // the field labels from --chloe-mint-deep back to --chloe-ink — only
+      // the input/textarea border stays on --chloe-mint-deep (covered by the
+      // next test below). This assertion was left stale after that revert
+      // (issue #599); the test's own title already said --chloe-ink.
+      expect(labelRule.includes("var(--chloe-ink)")).toBeTruthy();
       expect(labelRule.includes("var(--chloe-sans)")).toBeTruthy();
     });
 

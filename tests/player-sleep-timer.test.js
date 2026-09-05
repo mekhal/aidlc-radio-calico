@@ -121,18 +121,32 @@
     return findPlayerControls(root).querySelector('[data-testid="player-more-options"]');
   }
 
-  function ensureMoreMenuOpen(root) {
+  // React 18 batches the state update from this click asynchronously (it
+  // never flushes synchronously within the click() call), so opening the ⋮
+  // menu and each subsequent submenu navigation needs a tick to actually
+  // insert the new DOM before the next query — see issue #599.
+  async function ensureMoreMenuOpen(root) {
     const button = moreOptionsButton(root);
-    if (button.getAttribute("aria-expanded") !== "true") button.click();
+    if (button.getAttribute("aria-expanded") !== "true") {
+      button.click();
+      await nextTick();
+    }
   }
 
-  function openSleepTimerSubmenu(root) {
-    ensureMoreMenuOpen(root);
-    findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]').click();
+  async function openSleepTimerSubmenu(root) {
+    await ensureMoreMenuOpen(root);
+    // Idempotent: if a previous call already navigated into the Sleep Timer
+    // option list, the nav row is gone (replaced by the option list) —
+    // nothing left to click.
+    const row = findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]');
+    if (row) {
+      row.click();
+      await nextTick();
+    }
   }
 
-  function selectSleepTimerOption(root, value) {
-    openSleepTimerSubmenu(root);
+  async function selectSleepTimerOption(root, value) {
+    await openSleepTimerSubmenu(root);
     findPlayerControls(root).querySelector(`[data-testid="player-sleep-timer-option-${value}"]`).click();
   }
 
@@ -167,7 +181,7 @@
       const root = await mountPlaying();
 
       try {
-        openSleepTimerSubmenu(root);
+        await openSleepTimerSubmenu(root);
         ["off", "15", "30", "45", "60"].forEach((value) => {
           const option = findPlayerControls(root).querySelector(
             `[data-testid="player-sleep-timer-option-${value}"]`
@@ -186,7 +200,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
 
         const text = sleepTimerCountdownText(root);
@@ -211,7 +225,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const startText = sleepTimerCountdownText(root);
 
@@ -233,7 +247,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         await waitFor(() => sleepTimerCountdownText(root) !== null);
 
@@ -275,7 +289,7 @@
         await nextTick();
         expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
 
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
 
         const fullText = sleepTimerCountdownText(root);
@@ -308,12 +322,13 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const beforeQualityChange = sleepTimerCountdownText(root);
 
-        ensureMoreMenuOpen(root);
+        await ensureMoreMenuOpen(root);
         findPlayerControls(root).querySelector('[data-testid="player-menu-audio-quality-row"]').click();
+        await nextTick();
         findPlayerControls(root).querySelector('[data-testid="player-audio-quality-option-high"]').click();
         await nextTick();
 
@@ -338,11 +353,15 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
-        await waitFor(() => !sleepTimerPanel(root));
+        // The countdown is wall-clock-deadline-based (album-promo.js), so
+        // reaching 0 from a 2-second override genuinely takes ~2000ms of
+        // real time — waitFor's default 1500ms timeout is shorter than that
+        // and was intermittently timing out under CI load (issue #599).
+        await waitFor(() => !sleepTimerPanel(root), { timeout: 3000 });
         expect(spy.calls.pause.length).toBeGreaterThan(0);
         expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
       } finally {
@@ -361,7 +380,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
@@ -388,7 +407,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const activeWhileCounting = tracker.active.size;
 
@@ -412,11 +431,11 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
-        selectSleepTimerOption(root, "off");
+        await selectSleepTimerOption(root, "off");
         await nextTick();
 
         expect(sleepTimerPanel(root)).toBeFalsy();
@@ -436,7 +455,7 @@
       const lengthBefore = window.localStorage.length;
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(window.localStorage.length).toBe(lengthBefore);
       } finally {
@@ -453,7 +472,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
@@ -464,7 +483,7 @@
         const root2 = await mountPlaying();
         try {
           expect(sleepTimerPanel(root2)).toBeFalsy();
-          openSleepTimerSubmenu(root2);
+          await openSleepTimerSubmenu(root2);
           const offOption = findPlayerControls(root2).querySelector(
             '[data-testid="player-sleep-timer-option-off"]'
           );
