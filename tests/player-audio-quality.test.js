@@ -114,23 +114,31 @@
     return findPlayerControls(root).querySelector('[data-testid="player-more-options"]');
   }
 
-  function ensureMoreMenuOpen(root) {
+  // React 18 batches the state update from this click asynchronously (it
+  // never flushes synchronously within the click() call), so opening the ⋮
+  // menu and each subsequent submenu navigation needs a tick to actually
+  // insert the new DOM before the next query — see issue #599.
+  async function ensureMoreMenuOpen(root) {
     const button = moreOptionsButton(root);
-    if (button.getAttribute("aria-expanded") !== "true") button.click();
+    if (button.getAttribute("aria-expanded") !== "true") {
+      button.click();
+      await nextTick();
+    }
   }
 
-  function openAudioQualitySubmenu(root) {
-    ensureMoreMenuOpen(root);
+  async function openAudioQualitySubmenu(root) {
+    await ensureMoreMenuOpen(root);
     findPlayerControls(root).querySelector('[data-testid="player-menu-audio-quality-row"]').click();
+    await nextTick();
   }
 
-  function audioQualityOptionButton(root, value) {
-    openAudioQualitySubmenu(root);
+  async function audioQualityOptionButton(root, value) {
+    await openAudioQualitySubmenu(root);
     return findPlayerControls(root).querySelector(`[data-testid="player-audio-quality-option-${value}"]`);
   }
 
-  function selectAudioQualityOption(root, value) {
-    audioQualityOptionButton(root, value).click();
+  async function selectAudioQualityOption(root, value) {
+    (await audioQualityOptionButton(root, value)).click();
   }
 
   async function mountPlaying() {
@@ -147,7 +155,7 @@
       const root = await mountPlaying();
 
       try {
-        openAudioQualitySubmenu(root);
+        await openAudioQualitySubmenu(root);
         ["auto", "high", "medium", "low"].forEach((value) => {
           const option = findPlayerControls(root).querySelector(
             `[data-testid="player-audio-quality-option-${value}"]`
@@ -166,10 +174,10 @@
       const root = await mountPlaying();
 
       try {
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
 
-        const option = audioQualityOptionButton(root, "high");
+        const option = await audioQualityOptionButton(root, "high");
         expect(option.className.includes("is-active")).toBeTruthy();
         expect(option.getAttribute("aria-checked")).toBe("true");
         expect(option.textContent.includes("✓")).toBeFalsy();
@@ -196,15 +204,15 @@
           { bitrate: 320000 }, // index 2: High
         ];
 
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
         expect(hls.currentLevel).toBe(2);
 
-        selectAudioQualityOption(root, "medium");
+        await selectAudioQualityOption(root, "medium");
         await nextTick();
         expect(hls.currentLevel).toBe(0);
 
-        selectAudioQualityOption(root, "low");
+        await selectAudioQualityOption(root, "low");
         await nextTick();
         expect(hls.currentLevel).toBe(1);
       } finally {
@@ -222,11 +230,11 @@
         const hls = window.latestHlsInstance();
         hls.levels = [{ bitrate: 160000 }, { bitrate: 64000 }, { bitrate: 320000 }];
 
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
         expect(hls.currentLevel).toBe(2);
 
-        selectAudioQualityOption(root, "auto");
+        await selectAudioQualityOption(root, "auto");
         await nextTick();
         expect(hls.currentLevel).toBe(-1);
       } finally {
@@ -248,17 +256,17 @@
       try {
         expect(window.latestHlsInstance()).toBeFalsy();
 
-        openAudioQualitySubmenu(root);
+        await openAudioQualitySubmenu(root);
         ["auto", "high", "medium", "low"].forEach((value) => {
           expect(
             findPlayerControls(root).querySelector(`[data-testid="player-audio-quality-option-${value}"]`)
           ).toBeTruthy();
         });
 
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
 
-        const option = audioQualityOptionButton(root, "high");
+        const option = await audioQualityOptionButton(root, "high");
         expect(option.getAttribute("aria-checked")).toBe("true");
         expect(option.className.includes("is-active")).toBeTruthy();
       } finally {
@@ -280,7 +288,7 @@
       const lengthBefore = window.localStorage.length;
 
       try {
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
         expect(window.localStorage.length).toBe(lengthBefore);
       } finally {
@@ -300,8 +308,9 @@
         const hls = window.latestHlsInstance();
         hls.levels = [{ bitrate: 160000 }, { bitrate: 64000 }, { bitrate: 320000 }];
 
-        ensureMoreMenuOpen(root);
+        await ensureMoreMenuOpen(root);
         findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]').click();
+        await nextTick();
         findPlayerControls(root).querySelector('[data-testid="player-sleep-timer-option-15"]').click();
         await nextTick();
 
@@ -313,7 +322,7 @@
         };
         const beforeText = countdownText();
 
-        selectAudioQualityOption(root, "high");
+        await selectAudioQualityOption(root, "high");
         await nextTick();
 
         expect(hls.currentLevel).toBe(2);
