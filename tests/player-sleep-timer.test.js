@@ -135,8 +135,14 @@
 
   async function openSleepTimerSubmenu(root) {
     await ensureMoreMenuOpen(root);
-    findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]').click();
-    await nextTick();
+    // Idempotent: if a previous call already navigated into the Sleep Timer
+    // option list, the nav row is gone (replaced by the option list) —
+    // nothing left to click.
+    const row = findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]');
+    if (row) {
+      row.click();
+      await nextTick();
+    }
   }
 
   async function selectSleepTimerOption(root, value) {
@@ -351,7 +357,11 @@
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
-        await waitFor(() => !sleepTimerPanel(root));
+        // The countdown is wall-clock-deadline-based (album-promo.js), so
+        // reaching 0 from a 2-second override genuinely takes ~2000ms of
+        // real time — waitFor's default 1500ms timeout is shorter than that
+        // and was intermittently timing out under CI load (issue #599).
+        await waitFor(() => !sleepTimerPanel(root), { timeout: 3000 });
         expect(spy.calls.pause.length).toBeGreaterThan(0);
         expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
       } finally {

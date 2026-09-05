@@ -128,8 +128,15 @@
 
   async function openAudioQualitySubmenu(root) {
     await ensureMoreMenuOpen(root);
-    findPlayerControls(root).querySelector('[data-testid="player-menu-audio-quality-row"]').click();
-    await nextTick();
+    // Idempotent: if a previous call already navigated into the Audio
+    // Quality option list (e.g. a caller opened the submenu directly without
+    // selecting, then separately selected an option), the nav row is gone
+    // (replaced by the option list) — nothing left to click.
+    const row = findPlayerControls(root).querySelector('[data-testid="player-menu-audio-quality-row"]');
+    if (row) {
+      row.click();
+      await nextTick();
+    }
   }
 
   async function audioQualityOptionButton(root, value) {
