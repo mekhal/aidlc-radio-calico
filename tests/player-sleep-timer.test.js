@@ -121,42 +121,26 @@
     return findPlayerControls(root).querySelector('[data-testid="player-more-options"]');
   }
 
-  function ensureMoreMenuOpen(root) {
+  // React 18 batches the state update from this click asynchronously (it
+  // never flushes synchronously within the click() call), so opening the ⋮
+  // menu and each subsequent submenu navigation needs a tick to actually
+  // insert the new DOM before the next query — see issue #599.
+  async function ensureMoreMenuOpen(root) {
     const button = moreOptionsButton(root);
-    if (button.getAttribute("aria-expanded") !== "true") button.click();
-  }
-
-  function openSleepTimerSubmenu(root) {
-    const moreBtn0 = moreOptionsButton(root);
-    let nativeClicks = 0;
-    moreBtn0.addEventListener("click", () => {
-      nativeClicks += 1;
-    });
-    ensureMoreMenuOpen(root);
-    const row = findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]');
-    if (!row) {
-      const moreBtn = moreOptionsButton(root);
-      const wrap = moreBtn.closest(".chloe-player-controls__more-wrap");
-      moreBtn.click();
-      const ariaAfterSecondClick = moreBtn.getAttribute("aria-expanded");
-      throw new Error(
-        "DIAG2 nativeClicks=" +
-          nativeClicks +
-          " ariaAfterFirst=" +
-          moreBtn.getAttribute("aria-expanded") +
-          " ariaAfterSecondClick=" +
-          ariaAfterSecondClick +
-          " sameBtnRef=" +
-          (moreBtn === moreBtn0) +
-          " wrapHtml=" +
-          (wrap ? wrap.outerHTML.slice(0, 500) : "NO_WRAP")
-      );
+    if (button.getAttribute("aria-expanded") !== "true") {
+      button.click();
+      await nextTick();
     }
-    row.click();
   }
 
-  function selectSleepTimerOption(root, value) {
-    openSleepTimerSubmenu(root);
+  async function openSleepTimerSubmenu(root) {
+    await ensureMoreMenuOpen(root);
+    findPlayerControls(root).querySelector('[data-testid="player-menu-sleep-timer-row"]').click();
+    await nextTick();
+  }
+
+  async function selectSleepTimerOption(root, value) {
+    await openSleepTimerSubmenu(root);
     findPlayerControls(root).querySelector(`[data-testid="player-sleep-timer-option-${value}"]`).click();
   }
 
@@ -191,7 +175,7 @@
       const root = await mountPlaying();
 
       try {
-        openSleepTimerSubmenu(root);
+        await openSleepTimerSubmenu(root);
         ["off", "15", "30", "45", "60"].forEach((value) => {
           const option = findPlayerControls(root).querySelector(
             `[data-testid="player-sleep-timer-option-${value}"]`
@@ -210,7 +194,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
 
         const text = sleepTimerCountdownText(root);
@@ -235,7 +219,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const startText = sleepTimerCountdownText(root);
 
@@ -257,7 +241,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         await waitFor(() => sleepTimerCountdownText(root) !== null);
 
@@ -299,7 +283,7 @@
         await nextTick();
         expect(playPauseButton(root).getAttribute("aria-pressed")).toBe("false");
 
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
 
         const fullText = sleepTimerCountdownText(root);
@@ -332,12 +316,13 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const beforeQualityChange = sleepTimerCountdownText(root);
 
-        ensureMoreMenuOpen(root);
+        await ensureMoreMenuOpen(root);
         findPlayerControls(root).querySelector('[data-testid="player-menu-audio-quality-row"]').click();
+        await nextTick();
         findPlayerControls(root).querySelector('[data-testid="player-audio-quality-option-high"]').click();
         await nextTick();
 
@@ -362,7 +347,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
@@ -385,7 +370,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
@@ -412,7 +397,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         const activeWhileCounting = tracker.active.size;
 
@@ -436,11 +421,11 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
-        selectSleepTimerOption(root, "off");
+        await selectSleepTimerOption(root, "off");
         await nextTick();
 
         expect(sleepTimerPanel(root)).toBeFalsy();
@@ -460,7 +445,7 @@
       const lengthBefore = window.localStorage.length;
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(window.localStorage.length).toBe(lengthBefore);
       } finally {
@@ -477,7 +462,7 @@
       const root = await mountPlaying();
 
       try {
-        selectSleepTimerOption(root, "15");
+        await selectSleepTimerOption(root, "15");
         await nextTick();
         expect(sleepTimerPanel(root)).toBeTruthy();
 
@@ -488,7 +473,7 @@
         const root2 = await mountPlaying();
         try {
           expect(sleepTimerPanel(root2)).toBeFalsy();
-          openSleepTimerSubmenu(root2);
+          await openSleepTimerSubmenu(root2);
           const offOption = findPlayerControls(root2).querySelector(
             '[data-testid="player-sleep-timer-option-off"]'
           );

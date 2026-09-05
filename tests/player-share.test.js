@@ -144,18 +144,25 @@
     return findPlayerControls(root).querySelector('[data-testid="player-more-options"]');
   }
 
-  function ensureMoreMenuOpen(root) {
+  // React 18 batches the state update from this click asynchronously (it
+  // never flushes synchronously within the click() call), so opening the ⋮
+  // menu needs a tick to actually insert the new DOM before the next query
+  // — see issue #599.
+  async function ensureMoreMenuOpen(root) {
     const button = moreOptionsButton(root);
-    if (button.getAttribute("aria-expanded") !== "true") button.click();
+    if (button.getAttribute("aria-expanded") !== "true") {
+      button.click();
+      await nextTick();
+    }
   }
 
-  function shareMenuItem(root) {
-    ensureMoreMenuOpen(root);
+  async function shareMenuItem(root) {
+    await ensureMoreMenuOpen(root);
     return findPlayerControls(root).querySelector('[data-testid="player-share"]');
   }
 
-  function openShareModal(root) {
-    shareMenuItem(root).click();
+  async function openShareModal(root) {
+    (await shareMenuItem(root)).click();
   }
 
   function shareModal(root) {
@@ -186,7 +193,7 @@
       const root = await mountPlaying();
 
       try {
-        const item = shareMenuItem(root);
+        const item = await shareMenuItem(root);
         expect(item).toBeTruthy();
         expect(item.getAttribute("role")).toBe("menuitem");
 
@@ -212,7 +219,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
 
         const modal = shareModal(root);
@@ -233,7 +240,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
 
         copyLinkButton(root).click();
@@ -256,7 +263,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
         copyLinkButton(root).click();
         await nextTick();
@@ -276,7 +283,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
 
         const modal = shareModal(root);
@@ -315,7 +322,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
 
         const button = copyLinkButton(root);
@@ -354,7 +361,7 @@
       const root = await mountPlaying();
 
       try {
-        openShareModal(root);
+        await openShareModal(root);
         await nextTick();
 
         expect(copiedStatusSpan(root)).toBe(null);
