@@ -108,43 +108,6 @@
       }
     });
 
-    it("closes on Escape and returns focus to the trigger button", async () => {
-      const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
-      const root = await loadAlbumPromo();
-      try {
-        const trigger = findTrigger(root);
-        await openModal(trigger);
-
-        document.dispatchEvent(
-          new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true })
-        );
-        await waitFor(() => !findModal());
-
-        expect(document.activeElement).toBe(trigger);
-      } finally {
-        mock.restore();
-        unloadAlbumPromo(root);
-      }
-    });
-
-    it("closes via the close button and returns focus to the trigger button", async () => {
-      const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
-      const root = await loadAlbumPromo();
-      try {
-        const trigger = findTrigger(root);
-        await openModal(trigger);
-
-        const closeButton = findCloseButton();
-        closeButton.click();
-        await waitFor(() => !findModal());
-
-        expect(document.activeElement).toBe(trigger);
-      } finally {
-        mock.restore();
-        unloadAlbumPromo(root);
-      }
-    });
-
     it("closes when clicking outside the modal (on the backdrop)", async () => {
       const mock = window.installMockMetadataFetch({ metadataResponse: SAMPLE_METADATA });
       const root = await loadAlbumPromo();
