@@ -1,0 +1,35 @@
+# Example CI workflow — adapt to your stack.
+#
+# This is a reference skeleton, not a ready-to-run pipeline: it shows where lint,
+# tests, and a security scan plug into the AI-DLC Definition of Done (see
+# ../../docs/ai-dlc/README.md). Replace the placeholder steps with your language's
+# actual toolchain (npm/pytest/go test/etc.) before relying on this.
+name: CI
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lint
+        run: echo "Replace with your project's lint command"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: echo "Replace with your project's test command"
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency / secret / SAST scan
+        run: echo "Wire up a scanner (e.g. Trivy, CodeQL) to satisfy the Definition of Done's Security bar"
